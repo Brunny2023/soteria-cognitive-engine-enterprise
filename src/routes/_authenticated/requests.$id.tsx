@@ -6,7 +6,9 @@ import {
   type Autonomy,
   type RequestRecord,
 } from "@/lib/secp-data";
-import { useRequest } from "@/lib/secp-store";
+import { useAdvanceRequest, useRequest } from "@/lib/secp-store";
+import { useState } from "react";
+import { REQUESTS } from "@/lib/secp-data";
 
 export const Route = createFileRoute("/_authenticated/requests/$id")({
   head: ({ params }) => ({
@@ -23,6 +25,10 @@ export const Route = createFileRoute("/_authenticated/requests/$id")({
 function RequestDetail() {
   const { id } = Route.useParams();
   const request = useRequest(id);
+  const { advance, isPending } = useAdvanceRequest();
+  const [error, setError] = useState<string | null>(null);
+  const isSeed = REQUESTS.some((r) => r.id.toLowerCase() === id.toLowerCase());
+  const nextPending = request?.steps.find((s) => s.status === "pending" || s.status === "active");
   if (!request) {
     return (
       <AppShell title="Request not found" crumb={`${id} · missing`}>
@@ -49,6 +55,27 @@ function RequestDetail() {
         <div className="font-mono text-[10px] text-accent">{request.id} · INSPECTOR</div>
         <div className="text-sm font-bold mt-1">Validation Battery</div>
       </div>
+      {!isSeed && nextPending && (
+        <div className="px-5 py-4 border-b border-border flex flex-col gap-2">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Cognition dispatch</div>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={async () => {
+              setError(null);
+              try { await advance(request.id); }
+              catch (e) { setError(e instanceof Error ? e.message : "Advance failed"); }
+            }}
+            className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 rounded-sm disabled:opacity-40"
+          >
+            {isPending ? "▸ Reasoning…" : `▸ Advance · ${nextPending.stage.toUpperCase()}`}
+          </button>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Dispatches <span className="font-mono text-accent">{nextPending.agent}</span> to reason through the {nextPending.stage} stage via Lovable AI.
+          </p>
+          {error && <div className="text-[10px] font-mono text-[color:var(--danger)]">{error}</div>}
+        </div>
+      )}
       <div className="p-5 flex flex-col gap-3 overflow-y-auto">
         {request.validators.map((v: RequestRecord["validators"][number]) => (
           <div key={v.name} className="border border-border p-3 rounded-sm">
