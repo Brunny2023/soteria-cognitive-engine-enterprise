@@ -10,6 +10,8 @@ import { APPROVAL_STAGES, useAdvanceRequest, useApprovalLedger, useAutoRunReques
 import { useAuth } from "@/hooks/useAuth";
 import { useMemo, useState } from "react";
 import { REQUESTS } from "@/lib/secp-data";
+import { downloadComplianceReport } from "@/lib/compliance-report";
+import { LAYER_MODEL_CATALOG } from "@/lib/gateway.functions";
 
 export const Route = createFileRoute("/_authenticated/requests/$id")({
   head: ({ params }) => ({
@@ -38,6 +40,9 @@ function RequestDetail() {
   const [statusFilter, setStatusFilter] = useState<"all" | "complete" | "active" | "pending">("all");
   const [kindFilter, setKindFilter] = useState<"all" | "decisions" | "validators" | "outputs">("all");
   const [error, setError] = useState<string | null>(null);
+  const [reportBusy, setReportBusy] = useState(false);
+  const [reportHash, setReportHash] = useState<string | null>(null);
+  const [explainOpen, setExplainOpen] = useState<string | null>(null);
   const isSeed = REQUESTS.some((r) => r.id.toLowerCase() === id.toLowerCase());
   const nextPending = request?.steps.find((s) => s.status === "pending" || s.status === "active");
   const filteredSteps = useMemo(() => {
@@ -136,6 +141,33 @@ function RequestDetail() {
           {(error || auto.error) && (
             <div className="text-[10px] font-mono text-[color:var(--danger)]">{error ?? auto.error}</div>
           )}
+        </div>
+      )}
+      {request && (
+        <div className="px-5 py-4 border-b border-border flex flex-col gap-2">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Compliance report</div>
+          <button
+            type="button"
+            disabled={reportBusy}
+            onClick={async () => {
+              setReportBusy(true);
+              try {
+                const res = await downloadComplianceReport({ request, approvals, operator: requester });
+                setReportHash(res.sha256);
+              } finally { setReportBusy(false); }
+            }}
+            className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20 rounded-sm disabled:opacity-40"
+          >
+            {reportBusy ? "▤ Signing…" : "▤ Download signed PDF + JSON"}
+          </button>
+          {reportHash && (
+            <div className="text-[10px] font-mono text-muted-foreground break-all">
+              SHA-256 · <span className="text-foreground">{reportHash}</span>
+            </div>
+          )}
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Bundles stage outputs, validator results, and the co-approval ledger. The <span className="text-accent">.sha256</span> sidecar lets reviewers confirm the PDF/JSON were not altered after export.
+          </p>
         </div>
       )}
       <div className="p-5 flex flex-col gap-3 overflow-y-auto">
