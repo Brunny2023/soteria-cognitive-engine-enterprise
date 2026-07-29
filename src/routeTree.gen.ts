@@ -9,38 +9,234 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkforceRouteImport } from './routes/workforce'
+import { Route as RequestsRouteImport } from './routes/requests'
+import { Route as ProgramRouteImport } from './routes/program'
+import { Route as OrganizationalRouteImport } from './routes/organizational'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as GovernanceRouteImport } from './routes/governance'
+import { Route as ExecutivesRouteImport } from './routes/executives'
+import { Route as ConsultantsRouteImport } from './routes/consultants'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RequestsIdRouteImport } from './routes/requests.$id'
 
+const WorkforceRoute = WorkforceRouteImport.update({
+  id: '/workforce',
+  path: '/workforce',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramRoute = ProgramRouteImport.update({
+  id: '/program',
+  path: '/program',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizationalRoute = OrganizationalRouteImport.update({
+  id: '/organizational',
+  path: '/organizational',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GovernanceRoute = GovernanceRouteImport.update({
+  id: '/governance',
+  path: '/governance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExecutivesRoute = ExecutivesRouteImport.update({
+  id: '/executives',
+  path: '/executives',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsultantsRoute = ConsultantsRouteImport.update({
+  id: '/consultants',
+  path: '/consultants',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequestsIdRoute = RequestsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => RequestsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/consultants': typeof ConsultantsRoute
+  '/executives': typeof ExecutivesRoute
+  '/governance': typeof GovernanceRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/organizational': typeof OrganizationalRoute
+  '/program': typeof ProgramRoute
+  '/requests': typeof RequestsRouteWithChildren
+  '/workforce': typeof WorkforceRoute
+  '/requests/$id': typeof RequestsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/consultants': typeof ConsultantsRoute
+  '/executives': typeof ExecutivesRoute
+  '/governance': typeof GovernanceRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/organizational': typeof OrganizationalRoute
+  '/program': typeof ProgramRoute
+  '/requests': typeof RequestsRouteWithChildren
+  '/workforce': typeof WorkforceRoute
+  '/requests/$id': typeof RequestsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/consultants': typeof ConsultantsRoute
+  '/executives': typeof ExecutivesRoute
+  '/governance': typeof GovernanceRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/organizational': typeof OrganizationalRoute
+  '/program': typeof ProgramRoute
+  '/requests': typeof RequestsRouteWithChildren
+  '/workforce': typeof WorkforceRoute
+  '/requests/$id': typeof RequestsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/consultants'
+    | '/executives'
+    | '/governance'
+    | '/knowledge'
+    | '/organizational'
+    | '/program'
+    | '/requests'
+    | '/workforce'
+    | '/requests/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/consultants'
+    | '/executives'
+    | '/governance'
+    | '/knowledge'
+    | '/organizational'
+    | '/program'
+    | '/requests'
+    | '/workforce'
+    | '/requests/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/consultants'
+    | '/executives'
+    | '/governance'
+    | '/knowledge'
+    | '/organizational'
+    | '/program'
+    | '/requests'
+    | '/workforce'
+    | '/requests/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  ConsultantsRoute: typeof ConsultantsRoute
+  ExecutivesRoute: typeof ExecutivesRoute
+  GovernanceRoute: typeof GovernanceRoute
+  KnowledgeRoute: typeof KnowledgeRoute
+  OrganizationalRoute: typeof OrganizationalRoute
+  ProgramRoute: typeof ProgramRoute
+  RequestsRoute: typeof RequestsRouteWithChildren
+  WorkforceRoute: typeof WorkforceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workforce': {
+      id: '/workforce'
+      path: '/workforce'
+      fullPath: '/workforce'
+      preLoaderRoute: typeof WorkforceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program': {
+      id: '/program'
+      path: '/program'
+      fullPath: '/program'
+      preLoaderRoute: typeof ProgramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizational': {
+      id: '/organizational'
+      path: '/organizational'
+      fullPath: '/organizational'
+      preLoaderRoute: typeof OrganizationalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge': {
+      id: '/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/governance': {
+      id: '/governance'
+      path: '/governance'
+      fullPath: '/governance'
+      preLoaderRoute: typeof GovernanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/executives': {
+      id: '/executives'
+      path: '/executives'
+      fullPath: '/executives'
+      preLoaderRoute: typeof ExecutivesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consultants': {
+      id: '/consultants'
+      path: '/consultants'
+      fullPath: '/consultants'
+      preLoaderRoute: typeof ConsultantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +244,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/requests/$id': {
+      id: '/requests/$id'
+      path: '/$id'
+      fullPath: '/requests/$id'
+      preLoaderRoute: typeof RequestsIdRouteImport
+      parentRoute: typeof RequestsRoute
+    }
   }
 }
 
+interface RequestsRouteChildren {
+  RequestsIdRoute: typeof RequestsIdRoute
+}
+
+const RequestsRouteChildren: RequestsRouteChildren = {
+  RequestsIdRoute: RequestsIdRoute,
+}
+
+const RequestsRouteWithChildren = RequestsRoute._addFileChildren(
+  RequestsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  ConsultantsRoute: ConsultantsRoute,
+  ExecutivesRoute: ExecutivesRoute,
+  GovernanceRoute: GovernanceRoute,
+  KnowledgeRoute: KnowledgeRoute,
+  OrganizationalRoute: OrganizationalRoute,
+  ProgramRoute: ProgramRoute,
+  RequestsRoute: RequestsRouteWithChildren,
+  WorkforceRoute: WorkforceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
