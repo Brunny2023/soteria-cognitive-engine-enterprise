@@ -1,7 +1,14 @@
-// Retention & purge audit trail (client-persisted).
-// Records every settings change and every purge execution so operators
-// have a defensible chain of custody for compliance review.
-import { useSyncExternalStore } from "react";
+// Retention & purge audit trail — now server-persisted in
+// public.retention_audit_entries with RLS-guarded writes so the chain of
+// custody survives session resets and is encrypted at rest.
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useCallback } from "react";
+import {
+  listRetentionAuditFn,
+  logRetentionAuditFn,
+  type RetentionAuditRow,
+} from "./retention-audit.functions";
 
 export type RetentionAuditKind =
   | "retention_window"
@@ -9,69 +16,32 @@ export type RetentionAuditKind =
   | "legal_hold"
   | "purge_execution";
 
-export type RetentionAuditEntry = {
-  id: string;
-  ts: string; // ISO UTC
-  kind: RetentionAuditKind;
-  category_code: string;
-  category_name: string;
-  actor_id: string | null;
-  actor_name: string;
-  approver_name: string | null; // second operator for purge executions
-  field: string;
-  before: string;
-  after: string;
-  records_affected: number;
-  disposition: string;
-  note: string;
-};
+export type RetentionAuditEntry = RetentionAuditRow;
 
-const KEY = "secp.retention.audit.v1";
-
-function read(): RetentionAuditEntry[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as RetentionAuditEntry[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-let cache: RetentionAuditEntry[] = read();
-const listeners = new Set<() => void>();
-
-function emit() {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(KEY, JSON.stringify(cache));
-  }
-  listeners.forEach((l) => l());
-}
-
-function rid() {
-  return `RA-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-export const retentionAudit = {
-  subscribe(l: () => void) {
-    listeners.add(l);
-    return () => listeners.delete(l);
-  },
-  snapshot(): RetentionAuditEntry[] {
-    return cache;
-  },
-  log(entry: Omit<RetentionAuditEntry, "id" | "ts">) {
-    cache = [{ id: rid(), ts: new Date().toISOString(), ...entry }, ...cache].slice(0, 500);
-    emit();
-  },
-  clear() {
-    cache = [];
-    emit();
-  },
-};
+const KEY = ["secp", "retention-audit"] as const;
 
 export function useRetentionAudit(): RetentionAuditEntry[] {
-  return useSyncExternalStore(retentionAudit.subscribe, retentionAudit.snapshot, retentionAudit.snapshot);
+  const fetchAll = useServerFn(listRetentionAuditFn);
+  const { data } = useQuery({
+    queryKey: KEY,
+    queryFn: () => fetchAll(),
+    staleTime: 15_000,
+  });
+  return data ?? [];
+}
+
+export function useLogRetentionAudit() {
+  const qc = useQueryClient();
+  const call = useServerFn(logRetentionAuditFn);
+  const mut = useMutation({
+    mutationFn: (input: Omit<RetentionAuditEntry, "id" | "ts" | "actor_id">) =>
+      call({ data: input }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
+  });
+  return useCallback(
+    (entry: Omit<RetentionAuditEntry, "id" | "ts" | "actor_id">) => mut.mutate(entry),
+    [mut],
+  );
 }
 
 export function filterAudit(
