@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import {
-  advanceArchetype,
-  createArchetype,
-  retireArchetype,
-  togglePack,
+  useAdvanceArchetype,
+  useCreateArchetype,
+  useRetireArchetype,
+  useTogglePack,
   useArchetypes,
   usePacks,
   type Archetype,
@@ -37,6 +37,7 @@ const PACK_TONE: Record<DomainPack["status"], string> = {
 function SkillsConsole() {
   const archetypes = useArchetypes();
   const packs = usePacks();
+  const togglePack = useTogglePack();
   const [selectedId, setSelectedId] = useState<string | null>(archetypes[0]?.id ?? null);
   const [showComposer, setShowComposer] = useState(false);
   const [tab, setTab] = useState<"archetypes" | "packs">("archetypes");
@@ -159,7 +160,7 @@ function SkillsConsole() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => togglePack(p.id)}
+                    onClick={() => togglePack({ id: p.id, status: p.status })}
                     className="text-[10px] font-mono uppercase tracking-widest px-3 py-1.5 border border-border hover:border-primary/40 hover:text-primary rounded-sm w-fit"
                   >
                     {p.status === "installed" ? "Uninstall" : p.status === "available" ? "Queue install" : "Confirm install"}
@@ -175,6 +176,8 @@ function SkillsConsole() {
 }
 
 function ArchetypeInspector({ a }: { a: Archetype }) {
+  const advance = useAdvanceArchetype();
+  const retire = useRetireArchetype();
   return (
     <div className="flex flex-col h-full">
       <div className="px-5 py-4 border-b border-border">
@@ -228,7 +231,7 @@ function ArchetypeInspector({ a }: { a: Archetype }) {
         <div className="flex flex-col gap-2 pt-2 border-t border-border">
           <button
             type="button"
-            onClick={() => advanceArchetype(a.id)}
+            onClick={() => advance(a.id)}
             disabled={a.status === "retired"}
             className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary hover:bg-primary/10 rounded-sm disabled:opacity-40"
           >
@@ -239,7 +242,7 @@ function ArchetypeInspector({ a }: { a: Archetype }) {
           </button>
           <button
             type="button"
-            onClick={() => retireArchetype(a.id)}
+            onClick={() => retire(a.id)}
             disabled={a.status === "retired"}
             className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-[color:var(--danger)] hover:border-[color:var(--danger)]/40 rounded-sm disabled:opacity-40"
           >
@@ -260,7 +263,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Composer({ packs, onCreated }: { packs: DomainPack[]; onCreated: (a: Archetype) => void }) {
+function Composer({ packs, onCreated }: { packs: DomainPack[]; onCreated: (a: { id: string }) => void }) {
   const [codename, setCodename] = useState("");
   const [role, setRole] = useState("");
   const [layer, setLayer] = useState<"L3" | "L5">("L5");
@@ -269,23 +272,30 @@ function Composer({ packs, onCreated }: { packs: DomainPack[]; onCreated: (a: Ar
   const [skills, setSkills] = useState("");
   const [guardrails, setGuardrails] = useState("");
   const [selectedPacks, setSelectedPacks] = useState<string[]>([]);
+  const { create, isPending } = useCreateArchetype();
+  const [error, setError] = useState<string | null>(null);
 
   const canSubmit = codename.trim().length >= 3 && role.trim().length >= 3 && department.trim().length >= 2 && skills.trim().length >= 3;
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit) return;
-    const rec = createArchetype({
-      codename: codename.trim().toUpperCase(),
-      role: role.trim(),
-      layer,
-      department: department.trim(),
-      autonomy,
-      skills: skills.split(",").map((s) => s.trim()).filter(Boolean),
-      packs: selectedPacks,
-      guardrails: guardrails.split("\n").map((s) => s.trim()).filter(Boolean),
-    });
-    onCreated(rec);
+    if (!canSubmit || isPending) return;
+    setError(null);
+    try {
+      const rec = await create({
+        codename: codename.trim().toUpperCase(),
+        role: role.trim(),
+        layer,
+        department: department.trim(),
+        autonomy,
+        skills: skills.split(",").map((s) => s.trim()).filter(Boolean),
+        packs: selectedPacks,
+        guardrails: guardrails.split("\n").map((s) => s.trim()).filter(Boolean),
+      });
+      onCreated(rec);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to forge archetype");
+    }
   }
 
   return (
@@ -329,8 +339,9 @@ function Composer({ packs, onCreated }: { packs: DomainPack[]; onCreated: (a: Ar
         <textarea value={guardrails} onChange={(e) => setGuardrails(e.target.value)} rows={3} className="w-full bg-background border border-border rounded-sm px-2 py-1.5 text-xs font-mono" placeholder="Materiality > $250K → escalate" />
       </Field>
       <div className="md:col-span-2 flex items-center justify-end gap-2">
-        <span className="font-mono text-[10px] text-muted-foreground">{canSubmit ? "READY TO FORGE" : "COMPLETE REQUIRED FIELDS"}</span>
-        <button type="submit" disabled={!canSubmit} className="text-[10px] font-mono uppercase tracking-widest px-4 py-2 border border-primary text-primary bg-primary/10 hover:bg-primary/20 rounded-sm disabled:opacity-40">▶ Commit archetype</button>
+        {error && <span className="font-mono text-[10px] text-[color:var(--danger)]">{error}</span>}
+        <span className="font-mono text-[10px] text-muted-foreground">{isPending ? "FORGING…" : canSubmit ? "READY TO FORGE" : "COMPLETE REQUIRED FIELDS"}</span>
+        <button type="submit" disabled={!canSubmit || isPending} className="text-[10px] font-mono uppercase tracking-widest px-4 py-2 border border-primary text-primary bg-primary/10 hover:bg-primary/20 rounded-sm disabled:opacity-40">▶ Commit archetype</button>
       </div>
     </form>
   );

@@ -143,6 +143,132 @@ export type Database = {
         }
         Relationships: []
       }
+      secp_archetypes: {
+        Row: {
+          autonomy: number
+          codename: string
+          created_at: string
+          department: string
+          deployed: number
+          guardrails: string[]
+          id: string
+          layer: string
+          owner_id: string
+          packs: string[]
+          role: string
+          skills: string[]
+          status: string
+          trained: number
+          updated_at: string
+          updated_label: string
+        }
+        Insert: {
+          autonomy: number
+          codename: string
+          created_at?: string
+          department: string
+          deployed?: number
+          guardrails?: string[]
+          id: string
+          layer: string
+          owner_id?: string
+          packs?: string[]
+          role: string
+          skills?: string[]
+          status?: string
+          trained?: number
+          updated_at?: string
+          updated_label?: string
+        }
+        Update: {
+          autonomy?: number
+          codename?: string
+          created_at?: string
+          department?: string
+          deployed?: number
+          guardrails?: string[]
+          id?: string
+          layer?: string
+          owner_id?: string
+          packs?: string[]
+          role?: string
+          skills?: string[]
+          status?: string
+          trained?: number
+          updated_at?: string
+          updated_label?: string
+        }
+        Relationships: []
+      }
+      secp_pack_state: {
+        Row: {
+          pack_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          pack_id: string
+          status: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          pack_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      secp_requests: {
+        Row: {
+          autonomy: number
+          brief: string
+          created_at: string
+          id: string
+          origin: string
+          owner_id: string
+          priority: string
+          progress: number
+          steps: Json
+          title: string
+          updated_at: string
+          updated_label: string
+          validators: Json
+        }
+        Insert: {
+          autonomy: number
+          brief: string
+          created_at?: string
+          id: string
+          origin: string
+          owner_id?: string
+          priority: string
+          progress?: number
+          steps?: Json
+          title: string
+          updated_at?: string
+          updated_label?: string
+          validators?: Json
+        }
+        Update: {
+          autonomy?: number
+          brief?: string
+          created_at?: string
+          id?: string
+          origin?: string
+          owner_id?: string
+          priority?: string
+          progress?: number
+          steps?: Json
+          title?: string
+          updated_at?: string
+          updated_label?: string
+          validators?: Json
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           granted_at: string

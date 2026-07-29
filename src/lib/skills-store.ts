@@ -1,25 +1,19 @@
-import { useSyncExternalStore } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  advanceArchetypeFn,
+  createArchetypeFn,
+  listArchetypesFn,
+  listPackStateFn,
+  retireArchetypeFn,
+  togglePackFn,
+  type ArchetypeRow,
+} from "./skills.functions";
 
 export type ArchetypeStatus = "draft" | "training" | "deployed" | "retired";
 export type PackStatus = "installed" | "available" | "pending";
 
-export interface Archetype {
-  id: string;
-  codename: string;
-  role: string;
-  layer: "L3" | "L5";
-  department: string;
-  autonomy: 1 | 2 | 3 | 4;
-  skills: string[];
-  packs: string[];
-  guardrails: string[];
-  status: ArchetypeStatus;
-  trained: number;
-  deployed: number;
-  updated: string;
-  seed?: boolean;
-}
-
+export type Archetype = ArchetypeRow & { seed?: boolean };
 export interface DomainPack {
   id: string;
   name: string;
@@ -32,9 +26,6 @@ export interface DomainPack {
   summary: string;
   seed?: boolean;
 }
-
-const A_KEY = "secp.archetypes.v1";
-const P_KEY = "secp.packs.v1";
 
 const SEED_PACKS: DomainPack[] = [
   { id: "PK-FIN-CORE", name: "Financial Controls Core", domain: "Finance", version: "3.2.1", skills: 42, policies: 128, corpora: 17, status: "installed", summary: "IFRS, GAAP, revenue recognition, materiality thresholds, close cycle playbooks.", seed: true },
@@ -55,106 +46,71 @@ const SEED_ARCHETYPES: Archetype[] = [
   { id: "AT-CON-MA",  codename: "MERGER LENS", role: "M&A Consultant", layer: "L3", department: "Strategy", autonomy: 1, skills: ["Synergy modeling", "Diligence checklist", "Cultural fit assay"], packs: ["PK-FIN-CORE", "PK-LGL-EU"], guardrails: ["Recommend only — never bind"], status: "draft", trained: 0.18, deployed: 0, updated: "08:07 UTC", seed: true },
 ];
 
-type Listener = () => void;
-const listeners = new Set<Listener>();
-let archetypes: Archetype[] = loadArchetypes();
-let packs: DomainPack[] = loadPacks();
-
-function loadArchetypes(): Archetype[] {
-  if (typeof window === "undefined") return SEED_ARCHETYPES;
-  try {
-    const raw = window.localStorage.getItem(A_KEY);
-    if (!raw) return SEED_ARCHETYPES;
-    const stored = JSON.parse(raw) as Archetype[];
-    const ids = new Set(stored.map((a) => a.id));
-    const seed = SEED_ARCHETYPES.filter((s) => !ids.has(s.id));
-    return [...stored, ...seed];
-  } catch { return SEED_ARCHETYPES; }
-}
-function loadPacks(): DomainPack[] {
-  if (typeof window === "undefined") return SEED_PACKS;
-  try {
-    const raw = window.localStorage.getItem(P_KEY);
-    if (!raw) return SEED_PACKS;
-    const stored = JSON.parse(raw) as DomainPack[];
-    const map = new Map(SEED_PACKS.map((p) => [p.id, p] as const));
-    stored.forEach((p) => map.set(p.id, { ...map.get(p.id), ...p }));
-    return Array.from(map.values());
-  } catch { return SEED_PACKS; }
-}
-function persist() {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(A_KEY, JSON.stringify(archetypes));
-    window.localStorage.setItem(P_KEY, JSON.stringify(packs));
-  } catch {}
-}
-function emit() { listeners.forEach((l) => l()); }
-function subscribe(l: Listener) { listeners.add(l); return () => { listeners.delete(l); }; }
+const A_KEY = ["secp", "archetypes"] as const;
+const P_KEY = ["secp", "packState"] as const;
 
 export function useArchetypes(): Archetype[] {
-  return useSyncExternalStore(subscribe, () => archetypes, () => SEED_ARCHETYPES);
+  const fetchArchetypes = useServerFn(listArchetypesFn);
+  const { data } = useQuery({
+    queryKey: A_KEY,
+    queryFn: () => fetchArchetypes(),
+    staleTime: 15_000,
+  });
+  const remote = (data ?? []) as Archetype[];
+  const ids = new Set(remote.map((a) => a.id));
+  return [...remote, ...SEED_ARCHETYPES.filter((s) => !ids.has(s.id))];
 }
+
 export function usePacks(): DomainPack[] {
-  return useSyncExternalStore(subscribe, () => packs, () => SEED_PACKS);
-}
-
-function stamp(): string {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
-}
-
-export function createArchetype(input: {
-  codename: string;
-  role: string;
-  layer: "L3" | "L5";
-  department: string;
-  autonomy: 1 | 2 | 3 | 4;
-  skills: string[];
-  packs: string[];
-  guardrails: string[];
-}): Archetype {
-  const idBase = input.codename.replace(/[^A-Z0-9]/gi, "").slice(0, 6).toUpperCase() || "NEW";
-  const rec: Archetype = {
-    id: `AT-${idBase}-${Math.floor(Math.random() * 900 + 100)}`,
-    ...input,
-    status: "draft",
-    trained: 0,
-    deployed: 0,
-    updated: stamp(),
-  };
-  archetypes = [rec, ...archetypes];
-  persist(); emit();
-  return rec;
-}
-
-export function advanceArchetype(id: string) {
-  archetypes = archetypes.map((a) => {
-    if (a.id !== id) return a;
-    if (a.status === "draft") return { ...a, status: "training", trained: 0.25, updated: stamp() };
-    if (a.status === "training") {
-      const next = Math.min(1, a.trained + 0.25);
-      if (next >= 1) return { ...a, trained: 1, status: "deployed", deployed: Math.max(1, a.deployed), updated: stamp() };
-      return { ...a, trained: next, updated: stamp() };
-    }
-    if (a.status === "deployed") return { ...a, deployed: a.deployed + 1, updated: stamp() };
-    return a;
+  const fetchPackState = useServerFn(listPackStateFn);
+  const { data } = useQuery({
+    queryKey: P_KEY,
+    queryFn: () => fetchPackState(),
+    staleTime: 15_000,
   });
-  persist(); emit();
+  const overrides = new Map((data ?? []).map((r) => [r.id, r.status as PackStatus] as const));
+  return SEED_PACKS.map((p) => (overrides.has(p.id) ? { ...p, status: overrides.get(p.id)! } : p));
 }
 
-export function retireArchetype(id: string) {
-  archetypes = archetypes.map((a) => a.id === id ? { ...a, status: "retired", deployed: 0, updated: stamp() } : a);
-  persist(); emit();
-}
-
-export function togglePack(id: string) {
-  packs = packs.map((p) => {
-    if (p.id !== id) return p;
-    if (p.status === "installed") return { ...p, status: "available" };
-    if (p.status === "available") return { ...p, status: "pending" };
-    return { ...p, status: "installed" };
+export function useCreateArchetype() {
+  const qc = useQueryClient();
+  const call = useServerFn(createArchetypeFn);
+  const mut = useMutation({
+    mutationFn: (input: {
+      codename: string; role: string; layer: "L3" | "L5"; department: string;
+      autonomy: 1 | 2 | 3 | 4; skills: string[]; packs: string[]; guardrails: string[];
+    }) => call({ data: input }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: A_KEY }),
   });
-  persist(); emit();
+  return { create: (i: Parameters<typeof mut.mutateAsync>[0]) => mut.mutateAsync(i), isPending: mut.isPending };
+}
+
+export function useAdvanceArchetype() {
+  const qc = useQueryClient();
+  const call = useServerFn(advanceArchetypeFn);
+  const mut = useMutation({
+    mutationFn: (id: string) => call({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: A_KEY }),
+  });
+  return (id: string) => mut.mutateAsync(id);
+}
+
+export function useRetireArchetype() {
+  const qc = useQueryClient();
+  const call = useServerFn(retireArchetypeFn);
+  const mut = useMutation({
+    mutationFn: (id: string) => call({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: A_KEY }),
+  });
+  return (id: string) => mut.mutateAsync(id);
+}
+
+export function useTogglePack() {
+  const qc = useQueryClient();
+  const call = useServerFn(togglePackFn);
+  const mut = useMutation({
+    mutationFn: (input: { id: string; status: PackStatus }) => call({ data: input }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: P_KEY }),
+  });
+  return (input: { id: string; status: PackStatus }) => mut.mutateAsync(input);
 }
