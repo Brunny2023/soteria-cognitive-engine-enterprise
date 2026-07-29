@@ -6,7 +6,7 @@ import {
   type Autonomy,
   type RequestRecord,
 } from "@/lib/secp-data";
-import { useAdvanceRequest, useRequest } from "@/lib/secp-store";
+import { useAdvanceRequest, useAutoRunRequest, useRequest } from "@/lib/secp-store";
 import { useState } from "react";
 import { REQUESTS } from "@/lib/secp-data";
 
@@ -26,6 +26,7 @@ function RequestDetail() {
   const { id } = Route.useParams();
   const request = useRequest(id);
   const { advance, isPending } = useAdvanceRequest();
+  const auto = useAutoRunRequest();
   const [error, setError] = useState<string | null>(null);
   const isSeed = REQUESTS.some((r) => r.id.toLowerCase() === id.toLowerCase());
   const nextPending = request?.steps.find((s) => s.status === "pending" || s.status === "active");
@@ -60,7 +61,7 @@ function RequestDetail() {
           <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Cognition dispatch</div>
           <button
             type="button"
-            disabled={isPending}
+            disabled={isPending || auto.running}
             onClick={async () => {
               setError(null);
               try { await advance(request.id); }
@@ -70,10 +71,21 @@ function RequestDetail() {
           >
             {isPending ? "▸ Reasoning…" : `▸ Advance · ${nextPending.stage.toUpperCase()}`}
           </button>
+          <button
+            type="button"
+            disabled={isPending || auto.running}
+            onClick={() => auto.start(request.id)}
+            className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20 rounded-sm disabled:opacity-40"
+          >
+            {auto.running ? "▸▸ Live cognition running…" : "▸▸ Auto-run every stage"}
+          </button>
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            Dispatches <span className="font-mono text-accent">{nextPending.agent}</span> to reason through the {nextPending.stage} stage via Lovable AI.
+            Advance dispatches <span className="font-mono text-accent">{nextPending.agent}</span> for the next stage.
+            Auto-run cascades every remaining stage through Lovable AI in real time — decisions and execution steps are generated live, never mocked.
           </p>
-          {error && <div className="text-[10px] font-mono text-[color:var(--danger)]">{error}</div>}
+          {(error || auto.error) && (
+            <div className="text-[10px] font-mono text-[color:var(--danger)]">{error ?? auto.error}</div>
+          )}
         </div>
       )}
       <div className="p-5 flex flex-col gap-3 overflow-y-auto">
