@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { LAYERS } from "@/lib/secp-data";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 const NAV = [
   { to: "/dashboard", label: "MISSION CONTROL", code: "M0", glyph: "◎" },
@@ -23,6 +24,7 @@ const NAV = [
   { to: "/policy-sim", label: "POLICY SIMULATOR", code: "PS", glyph: "◐" },
   { to: "/admin", label: "ADMIN", code: "AD", glyph: "◇" },
   { to: "/gateway-health", label: "GATEWAY HEALTH", code: "GH", glyph: "♥" },
+  { to: "/audit-integrity", label: "AUDIT INTEGRITY", code: "AI", glyph: "∎" },
   { to: "/publish", label: "PUBLISH READINESS", code: "PB", glyph: "▶" },
 ] as const;
 
@@ -128,6 +130,8 @@ export function AppShell({
               <span className="size-1.5 rounded-full bg-[color:var(--signal)] animate-pulse" />
               <span>LIVE</span>
             </div>
+            <div className="h-4 w-px bg-border" />
+            <NotificationsBell />
             <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-3">
               <span className="text-foreground truncate max-w-[140px]" title={user?.email ?? undefined}>

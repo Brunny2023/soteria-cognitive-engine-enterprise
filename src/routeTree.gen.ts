@@ -29,6 +29,7 @@ import { Route as AuthenticatedGatewayHealthRouteImport } from './routes/_authen
 import { Route as AuthenticatedExecutivesRouteImport } from './routes/_authenticated/executives'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConsultantsRouteImport } from './routes/_authenticated/consultants'
+import { Route as AuthenticatedAuditIntegrityRouteImport } from './routes/_authenticated/audit-integrity'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedRequestsNewRouteImport } from './routes/_authenticated/requests.new'
 import { Route as AuthenticatedRequestsIdRouteImport } from './routes/_authenticated/requests.$id'
@@ -135,6 +136,12 @@ const AuthenticatedConsultantsRoute =
     path: '/consultants',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuditIntegrityRoute =
+  AuthenticatedAuditIntegrityRouteImport.update({
+    id: '/audit-integrity',
+    path: '/audit-integrity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -156,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/audit-integrity': typeof AuthenticatedAuditIntegrityRoute
   '/consultants': typeof AuthenticatedConsultantsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/executives': typeof AuthenticatedExecutivesRoute
@@ -180,6 +188,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/audit-integrity': typeof AuthenticatedAuditIntegrityRoute
   '/consultants': typeof AuthenticatedConsultantsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/executives': typeof AuthenticatedExecutivesRoute
@@ -206,6 +215,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/audit-integrity': typeof AuthenticatedAuditIntegrityRoute
   '/_authenticated/consultants': typeof AuthenticatedConsultantsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/executives': typeof AuthenticatedExecutivesRoute
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/audit-integrity'
     | '/consultants'
     | '/dashboard'
     | '/executives'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/audit-integrity'
     | '/consultants'
     | '/dashboard'
     | '/executives'
@@ -281,6 +293,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/_authenticated/audit-integrity'
     | '/_authenticated/consultants'
     | '/_authenticated/dashboard'
     | '/_authenticated/executives'
@@ -450,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsultantsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/audit-integrity': {
+      id: '/_authenticated/audit-integrity'
+      path: '/audit-integrity'
+      fullPath: '/audit-integrity'
+      preLoaderRoute: typeof AuthenticatedAuditIntegrityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -491,6 +511,7 @@ const AuthenticatedRequestsRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAuditIntegrityRoute: typeof AuthenticatedAuditIntegrityRoute
   AuthenticatedConsultantsRoute: typeof AuthenticatedConsultantsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExecutivesRoute: typeof AuthenticatedExecutivesRoute
@@ -512,6 +533,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAuditIntegrityRoute: AuthenticatedAuditIntegrityRoute,
   AuthenticatedConsultantsRoute: AuthenticatedConsultantsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExecutivesRoute: AuthenticatedExecutivesRoute,
