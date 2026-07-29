@@ -50,3 +50,31 @@ export function useAdvanceRequest() {
   });
   return { advance: (id: string) => mut.mutateAsync(id), isPending: mut.isPending };
 }
+
+export function useAutoRunRequest() {
+  const qc = useQueryClient();
+  const call = useServerFn(advanceRequestFn);
+  const [running, setRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const start = useCallback(
+    async (id: string) => {
+      setRunning(true);
+      setError(null);
+      try {
+        // Advance until every stage is complete. Cap iterations for safety.
+        for (let i = 0; i < 14; i += 1) {
+          const record = await call({ data: { id } });
+          const done = record.steps.every((s) => s.status === "complete");
+          if (done) break;
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Auto-run failed");
+      } finally {
+        setRunning(false);
+        qc.invalidateQueries({ queryKey: KEY });
+      }
+    },
+    [call, qc],
+  );
+  return { start, running, error };
+}
