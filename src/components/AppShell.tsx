@@ -1,9 +1,12 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState, type ReactNode } from "react";
 import { LAYERS } from "@/lib/secp-data";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const NAV = [
-  { to: "/", label: "MISSION CONTROL", code: "M0", glyph: "◎" },
+  { to: "/dashboard", label: "MISSION CONTROL", code: "M0", glyph: "◎" },
   { to: "/organizational", label: "ORGANIZATIONAL", code: "L1", glyph: "▣" },
   { to: "/executives", label: "EXECUTIVE", code: "L2", glyph: "▲" },
   { to: "/consultants", label: "CONSULTANT", code: "L3", glyph: "◆" },
@@ -11,6 +14,7 @@ const NAV = [
   { to: "/workforce", label: "WORKFORCE", code: "L5", glyph: "◈" },
   { to: "/governance", label: "GOVERNANCE", code: "L6", glyph: "◉" },
   { to: "/requests", label: "REQUESTS", code: "RQ", glyph: "▸" },
+  { to: "/learning", label: "LEARNING LOOP", code: "L∞", glyph: "↻" },
   { to: "/knowledge", label: "KNOWLEDGE GRAPH", code: "KG", glyph: "◊" },
   { to: "/admin", label: "ADMIN", code: "AD", glyph: "◇" },
 ] as const;
@@ -29,12 +33,33 @@ export function AppShell({
   inspector?: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [displayName, setDisplayName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => setDisplayName(data?.display_name ?? null));
+  }, [user]);
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
       <nav className="w-16 shrink-0 border-r border-border flex flex-col items-center py-5 gap-6 bg-surface">
         <Link
-          to="/"
+          to="/dashboard"
           className="size-8 bg-primary rounded-sm flex items-center justify-center font-bold text-primary-foreground text-xs tracking-tight"
           aria-label="Soteria SECP home"
         >
@@ -42,7 +67,7 @@ export function AppShell({
         </Link>
         <div className="flex flex-col gap-3">
           {NAV.map((n) => {
-            const active = n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
+            const active = pathname === n.to || pathname.startsWith(n.to + "/");
             return (
               <Link
                 key={n.to}
@@ -95,6 +120,19 @@ export function AppShell({
             <div className="flex items-center gap-2">
               <span className="size-1.5 rounded-full bg-[color:var(--signal)] animate-pulse" />
               <span>LIVE</span>
+            </div>
+            <div className="h-4 w-px bg-border" />
+            <div className="flex items-center gap-3">
+              <span className="text-foreground truncate max-w-[140px]" title={user?.email ?? undefined}>
+                {displayName || user?.email?.split("@")[0] || "OPERATOR"}
+              </span>
+              <button
+                onClick={handleSignOut}
+                className="text-muted-foreground hover:text-[color:var(--danger)] uppercase tracking-widest"
+                type="button"
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </header>
