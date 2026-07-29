@@ -22,6 +22,7 @@ const NAV = [
   { to: "/retention", label: "RETENTION & PURGE", code: "RT", glyph: "⌛" },
   { to: "/policy-sim", label: "POLICY SIMULATOR", code: "PS", glyph: "◐" },
   { to: "/admin", label: "ADMIN", code: "AD", glyph: "◇" },
+  { to: "/publish", label: "PUBLISH READINESS", code: "PB", glyph: "▶" },
 ] as const;
 
 export function AppShell({

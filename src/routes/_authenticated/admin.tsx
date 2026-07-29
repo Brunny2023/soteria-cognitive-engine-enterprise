@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
+import { pingLayerFn, LAYER_MODEL_CATALOG, type LayerPingResult } from "@/lib/gateway.functions";
+import { LAYERS } from "@/lib/secp-data";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -34,6 +38,25 @@ const INTEGRATIONS = [
 ];
 
 function AdminPage() {
+  const ping = useServerFn(pingLayerFn);
+  const [results, setResults] = useState<Record<string, LayerPingResult | { pending: true } | undefined>>({});
+  const [running, setRunning] = useState(false);
+
+  async function pingOne(layer: (typeof LAYERS)[number]["id"]) {
+    setResults((r) => ({ ...r, [layer]: { pending: true } }));
+    const res = await ping({ data: { layer } });
+    setResults((r) => ({ ...r, [layer]: res }));
+    return res;
+  }
+  async function pingAll() {
+    setRunning(true);
+    for (const l of LAYERS) {
+      // eslint-disable-next-line no-await-in-loop
+      await pingOne(l.id);
+    }
+    setRunning(false);
+  }
+
   return (
     <AppShell title="Enterprise Administration" crumb="AD · Tenant & policy">
       <div className="p-6 flex flex-col gap-8 animate-entry">
@@ -42,6 +65,79 @@ function AdminPage() {
           <StatChip label="Seats provisioned" value="248" tone="accent" />
           <StatChip label="Integrations live" value="9 / 10" tone="signal" />
           <StatChip label="Model spend (24h)" value="$4,218" tone="warn" />
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <SectionHeading code="AD.0" title="AI Gateway · Model routing & connectivity" />
+            <button
+              type="button"
+              onClick={pingAll}
+              disabled={running}
+              className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 disabled:opacity-40"
+            >
+              {running ? "▸ Pinging all layers…" : "▸ Validate every layer"}
+            </button>
+          </div>
+          <div className="bg-surface border border-border rounded-sm">
+            <div className="grid grid-cols-[80px_1fr_1fr_120px_120px_140px] gap-4 px-5 py-3 border-b border-border font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span>Layer</span>
+              <span>Model (Lovable AI Gateway)</span>
+              <span>Reply</span>
+              <span>Latency</span>
+              <span>Status</span>
+              <span className="text-right">Action</span>
+            </div>
+            {LAYERS.map((l) => {
+              const r = results[l.id];
+              const pending = r && "pending" in r;
+              const done = r && !("pending" in r);
+              const ok = done && (r as LayerPingResult).ok;
+              const res = done ? (r as LayerPingResult) : null;
+              return (
+                <div key={l.id} className="grid grid-cols-[80px_1fr_1fr_120px_120px_140px] gap-4 px-5 py-3 border-b border-border last:border-b-0 items-center">
+                  <span className="font-mono text-[10px] text-accent">{l.code}</span>
+                  <div>
+                    <div className="text-sm font-bold">{l.name}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground">{LAYER_MODEL_CATALOG[l.id]}</div>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 min-h-[16px]">
+                    {res ? (res.ok ? res.reply : res.error) : pending ? "…" : "— not yet validated"}
+                  </div>
+                  <div className="font-mono text-[10px] text-muted-foreground">
+                    {res ? `${res.latency_ms} ms` : pending ? "…" : "—"}
+                  </div>
+                  <span
+                    className={
+                      "font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 w-fit " +
+                      (pending
+                        ? "text-accent bg-accent/10"
+                        : ok
+                          ? "text-[color:var(--signal)] bg-[color:var(--signal)]/10"
+                          : done
+                            ? "text-[color:var(--danger)] bg-[color:var(--danger)]/10"
+                            : "text-muted-foreground bg-secondary")
+                    }
+                  >
+                    {pending ? "pinging" : ok ? "connected" : done ? "failed" : "unchecked"}
+                  </span>
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => pingOne(l.id)}
+                      disabled={pending || running}
+                      className="font-mono text-[9px] uppercase tracking-widest px-2 py-1 border border-border text-muted-foreground hover:text-primary hover:border-primary/60 disabled:opacity-40"
+                    >
+                      Ping
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[10px] font-mono text-muted-foreground">
+            Ping issues a live request through the Lovable AI Gateway with reasoning off and records latency per layer.
+          </p>
         </section>
 
         <section className="grid grid-cols-2 gap-6">
