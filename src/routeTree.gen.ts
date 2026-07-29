@@ -17,6 +17,7 @@ import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedRetentionRouteImport } from './routes/_authenticated/retention'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
+import { Route as AuthenticatedPublishRouteImport } from './routes/_authenticated/publish'
 import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticated/program'
 import { Route as AuthenticatedPolicySimRouteImport } from './routes/_authenticated/policy-sim'
 import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
@@ -68,6 +69,11 @@ const AuthenticatedRetentionRoute = AuthenticatedRetentionRouteImport.update({
 const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPublishRoute = AuthenticatedPublishRouteImport.update({
+  id: '/publish',
+  path: '/publish',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProgramRoute = AuthenticatedProgramRouteImport.update({
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/policy-sim': typeof AuthenticatedPolicySimRoute
   '/program': typeof AuthenticatedProgramRoute
+  '/publish': typeof AuthenticatedPublishRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
   '/retention': typeof AuthenticatedRetentionRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/policy-sim': typeof AuthenticatedPolicySimRoute
   '/program': typeof AuthenticatedProgramRoute
+  '/publish': typeof AuthenticatedPublishRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
   '/retention': typeof AuthenticatedRetentionRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
   '/_authenticated/policy-sim': typeof AuthenticatedPolicySimRoute
   '/_authenticated/program': typeof AuthenticatedProgramRoute
+  '/_authenticated/publish': typeof AuthenticatedPublishRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRouteWithChildren
   '/_authenticated/retention': typeof AuthenticatedRetentionRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/organizational'
     | '/policy-sim'
     | '/program'
+    | '/publish'
     | '/requests'
     | '/retention'
     | '/security'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/organizational'
     | '/policy-sim'
     | '/program'
+    | '/publish'
     | '/requests'
     | '/retention'
     | '/security'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/_authenticated/organizational'
     | '/_authenticated/policy-sim'
     | '/_authenticated/program'
+    | '/_authenticated/publish'
     | '/_authenticated/requests'
     | '/_authenticated/retention'
     | '/_authenticated/security'
@@ -339,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: '/requests'
       fullPath: '/requests'
       preLoaderRoute: typeof AuthenticatedRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/publish': {
+      id: '/_authenticated/publish'
+      path: '/publish'
+      fullPath: '/publish'
+      preLoaderRoute: typeof AuthenticatedPublishRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/program': {
@@ -462,6 +481,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
   AuthenticatedPolicySimRoute: typeof AuthenticatedPolicySimRoute
   AuthenticatedProgramRoute: typeof AuthenticatedProgramRoute
+  AuthenticatedPublishRoute: typeof AuthenticatedPublishRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRouteWithChildren
   AuthenticatedRetentionRoute: typeof AuthenticatedRetentionRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
@@ -481,6 +501,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
   AuthenticatedPolicySimRoute: AuthenticatedPolicySimRoute,
   AuthenticatedProgramRoute: AuthenticatedProgramRoute,
+  AuthenticatedPublishRoute: AuthenticatedPublishRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRouteWithChildren,
   AuthenticatedRetentionRoute: AuthenticatedRetentionRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
@@ -499,3 +520,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
