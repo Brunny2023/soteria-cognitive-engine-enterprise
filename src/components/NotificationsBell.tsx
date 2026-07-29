@@ -27,14 +27,14 @@ export function NotificationsBell() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   const pending = useMemo(() => {
-    return requests
-      .map((r) => {
-        const next = r.steps.find((s) => s.status === "pending" || s.status === "active");
-        if (!next) return null;
-        if (!APPROVAL_STAGES.includes(next.stage)) return null;
-        return { id: r.id, title: r.title, stage: next.stage, priority: r.priority };
-      })
-      .filter((v): v is { id: string; title: string; stage: string; priority: string } => v !== null);
+    const out: { id: string; title: string; stage: string; priority: string }[] = [];
+    for (const r of requests) {
+      const next = r.steps.find((s) => s.status === "pending" || s.status === "active");
+      if (!next) continue;
+      if (!APPROVAL_STAGES.includes(next.stage)) continue;
+      out.push({ id: r.id, title: r.title, stage: next.stage, priority: r.priority });
+    }
+    return out;
   }, [requests]);
 
   useEffect(() => {
