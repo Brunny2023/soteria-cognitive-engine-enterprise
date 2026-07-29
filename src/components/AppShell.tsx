@@ -18,6 +18,7 @@ const NAV = [
   { to: "/learning", label: "LEARNING LOOP", code: "L∞", glyph: "↻" },
   { to: "/skills", label: "SKILLS & TRAINING", code: "SK", glyph: "⚙" },
   { to: "/knowledge", label: "KNOWLEDGE GRAPH", code: "KG", glyph: "◊" },
+  { to: "/security", label: "SECURITY & COMPLIANCE", code: "SC", glyph: "⛨" },
   { to: "/admin", label: "ADMIN", code: "AD", glyph: "◇" },
 ] as const;
 
