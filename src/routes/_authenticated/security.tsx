@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
-import { LAYERS } from "@/lib/secp-data";
+import { AUDIT_LOG, LAYERS } from "@/lib/secp-data";
+import { exportDataset } from "@/lib/export";
 
 export const Route = createFileRoute("/_authenticated/security")({
   head: () => ({
@@ -98,6 +99,28 @@ function SecurityPage() {
   const operating = CONTROLS.filter((c) => c.status === "operating").length;
   const remediation = CONTROLS.filter((c) => c.status === "remediation").length;
   const hitsTotal = pii.reduce((n, p) => n + p.hits24h, 0);
+
+  const exportedAt = () => new Date().toISOString();
+  const controlRows = () =>
+    filtered.map((c) => ({
+      control_code: c.code,
+      trust_service_domain: c.domain,
+      control_name: c.name,
+      owner: c.owner,
+      status: c.status,
+      last_evidence_date: c.lastEvidence,
+      evidence_reference: c.evidence,
+      exported_at: exportedAt(),
+    }));
+  const auditRows = () =>
+    AUDIT_LOG.map((a) => ({
+      timestamp: a.time,
+      layer: a.layer,
+      actor: a.actor,
+      action: a.action,
+      request_id: a.requestId ?? "",
+      exported_at: exportedAt(),
+    }));
 
   return (
     <AppShell title="Security & Compliance" crumb="SC · Posture & evidence">
@@ -228,7 +251,13 @@ function SecurityPage() {
               <span className="font-mono text-[10px] text-accent">SC.4</span>
               <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">SOC 2 evidence register</h2>
             </div>
-            <div className="flex gap-1">
+            <div className="flex items-center gap-3">
+              <ExportGroup
+                label="Evidence"
+                onExport={(fmt) => exportDataset("soc2-evidence", controlRows(), fmt)}
+              />
+              <div className="h-4 w-px bg-border" />
+              <div className="flex gap-1">
               {(["all", "Security", "Availability", "Confidentiality", "Processing Integrity", "Privacy"] as const).map((s) => (
                 <button
                   key={s}
@@ -244,6 +273,7 @@ function SecurityPage() {
                   {s === "all" ? "All TSC" : s}
                 </button>
               ))}
+              </div>
             </div>
           </div>
           <div className="bg-surface border border-border rounded-sm">
@@ -272,6 +302,33 @@ function SecurityPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section>
+          <div className="flex items-end justify-between mb-4">
+            <div className="flex items-baseline gap-3">
+              <span className="font-mono text-[10px] text-accent">SC.8</span>
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Security audit log</h2>
+            </div>
+            <ExportGroup
+              label="Audit log"
+              onExport={(fmt) => exportDataset("security-audit-log", auditRows(), fmt)}
+            />
+          </div>
+          <div className="bg-surface border border-border rounded-sm p-5 font-mono text-[11px] text-muted-foreground leading-relaxed">
+            {AUDIT_LOG.map((a, i) => (
+              <div key={i} className="flex gap-4 border-b border-border last:border-b-0 py-2">
+                <span className="text-accent shrink-0 w-20">{a.time}</span>
+                <span className="text-muted-foreground shrink-0 w-32 uppercase">{a.layer}</span>
+                <span className="shrink-0 w-40 text-foreground">{a.actor}</span>
+                <span className="flex-1">{a.action}</span>
+                {a.requestId && <span className="text-primary shrink-0">{a.requestId}</span>}
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-2">
+            Exports are generated client-side from the current view. Every download stamps an <span className="text-foreground">exported_at</span> UTC timestamp on each row for chain-of-custody.
+          </p>
         </section>
 
         <section className="grid grid-cols-3 gap-6">
@@ -328,6 +385,24 @@ function RoleTags({ roles }: { roles: string[] }) {
         >
           {r}
         </span>
+      ))}
+    </div>
+  );
+}
+
+function ExportGroup({ label, onExport }: { label: string; onExport: (fmt: "csv" | "json") => void }) {
+  return (
+    <div className="flex items-center gap-1">
+      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">{label} ·</span>
+      {(["csv", "json"] as const).map((fmt) => (
+        <button
+          key={fmt}
+          type="button"
+          onClick={() => onExport(fmt)}
+          className="font-mono text-[9px] uppercase tracking-widest px-2 py-1 border border-border text-muted-foreground hover:text-primary hover:border-primary/60 transition-colors"
+        >
+          ↓ {fmt}
+        </button>
       ))}
     </div>
   );
