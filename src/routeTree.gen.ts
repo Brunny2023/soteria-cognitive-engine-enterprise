@@ -19,6 +19,7 @@ import { Route as ExecutivesRouteImport } from './routes/executives'
 import { Route as ConsultantsRouteImport } from './routes/consultants'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RequestsNewRouteImport } from './routes/requests.new'
 import { Route as RequestsIdRouteImport } from './routes/requests.$id'
 
 const WorkforceRoute = WorkforceRouteImport.update({
@@ -71,6 +72,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequestsNewRoute = RequestsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => RequestsRoute,
+} as any)
 const RequestsIdRoute = RequestsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/requests': typeof RequestsRouteWithChildren
   '/workforce': typeof WorkforceRoute
   '/requests/$id': typeof RequestsIdRoute
+  '/requests/new': typeof RequestsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/requests': typeof RequestsRouteWithChildren
   '/workforce': typeof WorkforceRoute
   '/requests/$id': typeof RequestsIdRoute
+  '/requests/new': typeof RequestsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/requests': typeof RequestsRouteWithChildren
   '/workforce': typeof WorkforceRoute
   '/requests/$id': typeof RequestsIdRoute
+  '/requests/new': typeof RequestsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/workforce'
     | '/requests/$id'
+    | '/requests/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/workforce'
     | '/requests/$id'
+    | '/requests/new'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/workforce'
     | '/requests/$id'
+    | '/requests/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/requests/new': {
+      id: '/requests/new'
+      path: '/new'
+      fullPath: '/requests/new'
+      preLoaderRoute: typeof RequestsNewRouteImport
+      parentRoute: typeof RequestsRoute
+    }
     '/requests/$id': {
       id: '/requests/$id'
       path: '/$id'
@@ -256,10 +275,12 @@ declare module '@tanstack/react-router' {
 
 interface RequestsRouteChildren {
   RequestsIdRoute: typeof RequestsIdRoute
+  RequestsNewRoute: typeof RequestsNewRoute
 }
 
 const RequestsRouteChildren: RequestsRouteChildren = {
   RequestsIdRoute: RequestsIdRoute,
+  RequestsNewRoute: RequestsNewRoute,
 }
 
 const RequestsRouteWithChildren = RequestsRoute._addFileChildren(

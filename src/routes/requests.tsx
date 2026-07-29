@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
-import { AUTONOMY_LABELS, REQUESTS } from "@/lib/secp-data";
+import { AUTONOMY_LABELS } from "@/lib/secp-data";
+import { useRequests } from "@/lib/secp-store";
 
 export const Route = createFileRoute("/requests")({
   head: () => ({
@@ -15,19 +16,31 @@ export const Route = createFileRoute("/requests")({
 });
 
 function RequestsPage() {
-  const open = REQUESTS.filter((r) => r.progress < 1).length;
+  const requests = useRequests();
+  const open = requests.filter((r) => r.progress < 1).length;
   return (
     <AppShell title="Request Queue" crumb="RQ · Cognition pipeline">
       <div className="p-6 flex flex-col gap-8 animate-entry">
         <section className="grid grid-cols-4 gap-3">
-          <StatChip label="Requests total" value={String(REQUESTS.length + 47)} />
+          <StatChip label="Requests total" value={String(requests.length + 47)} />
           <StatChip label="Open" value={String(open + 12)} tone="accent" />
           <StatChip label="Closed today" value="14" tone="signal" />
           <StatChip label="Median cycle" value="6h 24m" />
         </section>
 
         <section>
-          <SectionHeading code="RQ.1" title="Active Requests" />
+          <SectionHeading
+            code="RQ.1"
+            title="Active Requests"
+            action={
+              <Link
+                to="/requests/new"
+                className="px-3 py-1.5 bg-primary text-primary-foreground text-[10px] font-mono uppercase tracking-widest rounded-sm hover:bg-primary/90 transition-colors"
+              >
+                + New directive
+              </Link>
+            }
+          />
           <div className="bg-surface border border-border rounded-sm overflow-hidden">
             <div className="grid grid-cols-12 gap-4 px-5 py-3 text-[10px] font-mono uppercase text-muted-foreground border-b border-border bg-secondary/40">
               <div className="col-span-1">ID</div>
@@ -37,7 +50,7 @@ function RequestsPage() {
               <div className="col-span-2">Autonomy</div>
               <div className="col-span-2">Progress</div>
             </div>
-            {REQUESTS.map((r) => (
+            {requests.map((r) => (
               <Link
                 key={r.id}
                 to="/requests/$id"
