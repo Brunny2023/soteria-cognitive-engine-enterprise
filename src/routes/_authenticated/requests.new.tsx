@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, SectionHeading } from "@/components/AppShell";
 import { AUTONOMY_LABELS, type Autonomy } from "@/lib/secp-data";
-import { createRequest } from "@/lib/secp-store";
+import { useCreateRequest } from "@/lib/secp-store";
 
 export const Route = createFileRoute("/_authenticated/requests/new")({
   head: () => ({
@@ -39,14 +39,21 @@ function NewRequest() {
   const [origin, setOrigin] = useState<string>(ORIGINS[0]);
   const [autonomy, setAutonomy] = useState<Autonomy>(3);
   const [priority, setPriority] = useState<"P0" | "P1" | "P2">("P1");
+  const { create, isPending } = useCreateRequest();
+  const [error, setError] = useState<string | null>(null);
 
   const canSubmit = title.trim().length >= 4 && brief.trim().length >= 20;
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit) return;
-    const rec = createRequest({ title: title.trim(), brief: brief.trim(), origin, autonomy, priority });
-    navigate({ to: "/requests/$id", params: { id: rec.id } });
+    if (!canSubmit || isPending) return;
+    setError(null);
+    try {
+      const rec = await create({ title: title.trim(), brief: brief.trim(), origin, autonomy, priority });
+      navigate({ to: "/requests/$id", params: { id: rec.id } });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to dispatch directive");
+    }
   }
 
   return (
@@ -156,12 +163,17 @@ function NewRequest() {
               </p>
               <button
                 type="submit"
-                disabled={!canSubmit}
+                disabled={!canSubmit || isPending}
                 className="px-5 py-2.5 bg-primary text-primary-foreground text-xs font-mono uppercase tracking-widest rounded-sm hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                ▸ Dispatch directive
+                {isPending ? "▸ Dispatching…" : "▸ Dispatch directive"}
               </button>
             </div>
+            {error && (
+              <div className="text-[11px] font-mono text-[color:var(--danger)] border border-[color:var(--danger)]/40 bg-[color:var(--danger)]/5 rounded-sm px-3 py-2">
+                {error}
+              </div>
+            )}
           </form>
         </section>
       </div>
