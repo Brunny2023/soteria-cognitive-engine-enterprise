@@ -384,6 +384,98 @@ function RequestDetail() {
             )}
           </div>
         </section>
+
+        <section>
+          <SectionHeading code="EXPLAIN" title="Explainability · inputs · tool calls · evidence" />
+          <div className="bg-surface border border-border rounded-sm">
+            {request.steps.filter((s) => s.status !== "pending").map((s) => {
+              const layer = LAYERS.find((l) => l.id === s.layer);
+              const model = LAYER_MODEL_CATALOG[s.layer];
+              const isOpen = explainOpen === s.stage;
+              const upstream = request.steps
+                .slice(0, request.steps.indexOf(s))
+                .filter((x) => x.status === "complete" && (x.artifact || x.reasoning));
+              const contextInputs = upstream.slice(-3).map((x) => `${x.stage}:${x.artifact ?? x.title}`);
+              const isDecision = APPROVAL_STAGES.includes(s.stage);
+              const evidence = isDecision
+                ? request.validators.filter((v) => v.status !== "pending")
+                : request.validators.filter((v) => v.status === "passed").slice(0, 2);
+              return (
+                <div key={s.stage} className="border-b border-border last:border-b-0">
+                  <button
+                    type="button"
+                    onClick={() => setExplainOpen(isOpen ? null : s.stage)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary"
+                  >
+                    <span className="font-mono text-[10px] text-accent w-10">{layer?.code}</span>
+                    <span className="text-xs font-bold uppercase tracking-widest w-24">{s.stage}</span>
+                    <span className="text-[12px] truncate flex-1">{s.title}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">{isOpen ? "▾" : "▸"} EXPLAIN</span>
+                  </button>
+                  {isOpen && (
+                    <div className="grid grid-cols-3 gap-4 px-4 pb-4">
+                      <div className="border border-border rounded-sm p-3">
+                        <div className="font-mono text-[9px] uppercase tracking-widest text-accent mb-2">Inputs consumed</div>
+                        <div className="text-[11px] text-muted-foreground leading-relaxed">
+                          Directive · <span className="text-foreground">{request.id}</span><br />
+                          Autonomy ceiling · <span className="text-foreground">L{request.autonomy}</span><br />
+                          Priority · <span className="text-foreground">{request.priority}</span>
+                        </div>
+                        {contextInputs.length > 0 && (
+                          <div className="mt-2">
+                            <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Upstream context</div>
+                            {contextInputs.map((c) => (
+                              <div key={c} className="font-mono text-[10px] text-foreground truncate" title={c}>· {c}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="border border-border rounded-sm p-3">
+                        <div className="font-mono text-[9px] uppercase tracking-widest text-accent mb-2">Tool calls</div>
+                        <div className="text-[11px]">
+                          <div className="text-muted-foreground">Agent · <span className="text-foreground">{s.agent}</span></div>
+                          <div className="text-muted-foreground">Model · <span className="text-foreground font-mono text-[10px]">{model}</span></div>
+                          <div className="text-muted-foreground">Layer · <span className="text-foreground">{layer?.name}</span></div>
+                          {s.artifact && (
+                            <div className="mt-2 border-t border-border pt-2">
+                              <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Output artifact</div>
+                              <div className="font-mono text-[10px] text-accent">▤ {s.artifact}</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="border border-border rounded-sm p-3">
+                        <div className="font-mono text-[9px] uppercase tracking-widest text-accent mb-2">Validator evidence</div>
+                        {evidence.length === 0 && (
+                          <div className="text-[11px] text-muted-foreground">No validator has weighed in yet.</div>
+                        )}
+                        {evidence.map((v) => (
+                          <div key={v.name} className="mb-2 last:mb-0">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold">{v.name}</span>
+                              <span className={"font-mono text-[9px] uppercase tracking-widest px-1.5 " +
+                                (v.status === "passed" ? "text-[color:var(--signal)] bg-[color:var(--signal)]/10"
+                                  : v.status === "failed" ? "text-[color:var(--danger)] bg-[color:var(--danger)]/10"
+                                  : "text-muted-foreground bg-secondary")}>{v.status}</span>
+                            </div>
+                            <div className="text-[10px] text-muted-foreground mt-1 leading-relaxed">{v.detail}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="col-span-3 border border-border rounded-sm p-3">
+                        <div className="font-mono text-[9px] uppercase tracking-widest text-accent mb-2">Reasoning trace</div>
+                        <p className="text-[12px] text-muted-foreground leading-relaxed">{s.reasoning}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[10px] font-mono text-muted-foreground">
+            Expand any completed stage to see the exact inputs, model + agent tool call, and validator evidence that informed the decision or output.
+          </p>
+        </section>
       </div>
     </AppShell>
   );
