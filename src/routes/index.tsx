@@ -71,6 +71,34 @@ function Landing() {
           </div>
         </section>
 
+        <section id="demo" className="border-t border-border bg-surface">
+          <div className="max-w-6xl mx-auto px-6 py-16">
+            <div className="flex items-baseline justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <p className="font-mono text-[10px] tracking-widest text-accent mb-2">M0.LIVE · WALKTHROUGH</p>
+                <h2 className="text-3xl font-bold tracking-tight">See mission control in motion.</h2>
+              </div>
+              <span className="font-mono text-[10px] text-muted-foreground">Recorded from the live SECP shell · loops continuously</span>
+            </div>
+            <div className="relative border border-border rounded-sm overflow-hidden bg-background">
+              <video
+                className="w-full aspect-video block"
+                src="/secp-demo.webm"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                aria-label="Soteria SECP dashboard walkthrough"
+              />
+              <div className="absolute top-3 left-3 flex items-center gap-2 bg-background/70 backdrop-blur px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-accent border border-border">
+                <span className="size-1.5 rounded-full bg-[color:var(--signal)] animate-pulse" />
+                LIVE_WALKTHROUGH
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="layers" className="border-t border-border bg-surface">
           <div className="max-w-6xl mx-auto px-6 py-20">
             <p className="font-mono text-[10px] tracking-widest text-accent mb-2">M0.1 · COGNITION LAYERS</p>
