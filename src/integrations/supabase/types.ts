@@ -143,6 +143,60 @@ export type Database = {
         }
         Relationships: []
       }
+      retention_audit_entries: {
+        Row: {
+          actor_id: string | null
+          actor_name: string
+          after: string
+          approver_name: string | null
+          before: string
+          category_code: string
+          category_name: string
+          created_at: string
+          disposition: string
+          field: string
+          id: string
+          kind: string
+          note: string
+          records_affected: number
+          ts: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name: string
+          after?: string
+          approver_name?: string | null
+          before?: string
+          category_code: string
+          category_name: string
+          created_at?: string
+          disposition?: string
+          field: string
+          id?: string
+          kind: string
+          note?: string
+          records_affected?: number
+          ts?: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string
+          after?: string
+          approver_name?: string | null
+          before?: string
+          category_code?: string
+          category_name?: string
+          created_at?: string
+          disposition?: string
+          field?: string
+          id?: string
+          kind?: string
+          note?: string
+          records_affected?: number
+          ts?: string
+        }
+        Relationships: []
+      }
       secp_archetypes: {
         Row: {
           autonomy: number
