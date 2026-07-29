@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkforceRouteImport } from './routes/_authenticated/workforce'
+import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticated/program'
 import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
@@ -43,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedWorkforceRoute = AuthenticatedWorkforceRouteImport.update({
   id: '/workforce',
   path: '/workforce',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSkillsRoute = AuthenticatedSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/program': typeof AuthenticatedProgramRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
+  '/skills': typeof AuthenticatedSkillsRoute
   '/workforce': typeof AuthenticatedWorkforceRoute
   '/requests/$id': typeof AuthenticatedRequestsIdRoute
   '/requests/new': typeof AuthenticatedRequestsNewRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/program': typeof AuthenticatedProgramRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
+  '/skills': typeof AuthenticatedSkillsRoute
   '/workforce': typeof AuthenticatedWorkforceRoute
   '/requests/$id': typeof AuthenticatedRequestsIdRoute
   '/requests/new': typeof AuthenticatedRequestsNewRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
   '/_authenticated/program': typeof AuthenticatedProgramRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRouteWithChildren
+  '/_authenticated/skills': typeof AuthenticatedSkillsRoute
   '/_authenticated/workforce': typeof AuthenticatedWorkforceRoute
   '/_authenticated/requests/$id': typeof AuthenticatedRequestsIdRoute
   '/_authenticated/requests/new': typeof AuthenticatedRequestsNewRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/organizational'
     | '/program'
     | '/requests'
+    | '/skills'
     | '/workforce'
     | '/requests/$id'
     | '/requests/new'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/organizational'
     | '/program'
     | '/requests'
+    | '/skills'
     | '/workforce'
     | '/requests/$id'
     | '/requests/new'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/organizational'
     | '/_authenticated/program'
     | '/_authenticated/requests'
+    | '/_authenticated/skills'
     | '/_authenticated/workforce'
     | '/_authenticated/requests/$id'
     | '/_authenticated/requests/new'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/workforce'
       fullPath: '/workforce'
       preLoaderRoute: typeof AuthenticatedWorkforceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/skills': {
+      id: '/_authenticated/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AuthenticatedSkillsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/requests': {
@@ -366,6 +385,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
   AuthenticatedProgramRoute: typeof AuthenticatedProgramRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRouteWithChildren
+  AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
   AuthenticatedWorkforceRoute: typeof AuthenticatedWorkforceRoute
 }
 
@@ -380,6 +400,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
   AuthenticatedProgramRoute: AuthenticatedProgramRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRouteWithChildren,
+  AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
   AuthenticatedWorkforceRoute: AuthenticatedWorkforceRoute,
 }
 
@@ -394,13 +415,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
