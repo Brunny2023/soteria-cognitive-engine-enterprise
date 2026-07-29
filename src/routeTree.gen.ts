@@ -16,6 +16,7 @@ import { Route as AuthenticatedWorkforceRouteImport } from './routes/_authentica
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticated/program'
 import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
+import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticated/learning'
 import { Route as AuthenticatedKnowledgeRouteImport } from './routes/_authenticated/knowledge'
 import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
 import { Route as AuthenticatedExecutivesRouteImport } from './routes/_authenticated/executives'
@@ -60,6 +61,11 @@ const AuthenticatedOrganizationalRoute =
     path: '/organizational',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLearningRoute = AuthenticatedLearningRouteImport.update({
+  id: '/learning',
+  path: '/learning',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedKnowledgeRoute = AuthenticatedKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/executives': typeof AuthenticatedExecutivesRoute
   '/governance': typeof AuthenticatedGovernanceRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
+  '/learning': typeof AuthenticatedLearningRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/program': typeof AuthenticatedProgramRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/executives': typeof AuthenticatedExecutivesRoute
   '/governance': typeof AuthenticatedGovernanceRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
+  '/learning': typeof AuthenticatedLearningRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/program': typeof AuthenticatedProgramRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/executives': typeof AuthenticatedExecutivesRoute
   '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
   '/_authenticated/knowledge': typeof AuthenticatedKnowledgeRoute
+  '/_authenticated/learning': typeof AuthenticatedLearningRoute
   '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
   '/_authenticated/program': typeof AuthenticatedProgramRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRouteWithChildren
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/executives'
     | '/governance'
     | '/knowledge'
+    | '/learning'
     | '/organizational'
     | '/program'
     | '/requests'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/executives'
     | '/governance'
     | '/knowledge'
+    | '/learning'
     | '/organizational'
     | '/program'
     | '/requests'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/_authenticated/executives'
     | '/_authenticated/governance'
     | '/_authenticated/knowledge'
+    | '/_authenticated/learning'
     | '/_authenticated/organizational'
     | '/_authenticated/program'
     | '/_authenticated/requests'
@@ -260,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/organizational'
       fullPath: '/organizational'
       preLoaderRoute: typeof AuthenticatedOrganizationalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/learning': {
+      id: '/_authenticated/learning'
+      path: '/learning'
+      fullPath: '/learning'
+      preLoaderRoute: typeof AuthenticatedLearningRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/knowledge': {
@@ -343,6 +362,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedExecutivesRoute: typeof AuthenticatedExecutivesRoute
   AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
   AuthenticatedKnowledgeRoute: typeof AuthenticatedKnowledgeRoute
+  AuthenticatedLearningRoute: typeof AuthenticatedLearningRoute
   AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
   AuthenticatedProgramRoute: typeof AuthenticatedProgramRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRouteWithChildren
@@ -356,6 +376,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedExecutivesRoute: AuthenticatedExecutivesRoute,
   AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
   AuthenticatedKnowledgeRoute: AuthenticatedKnowledgeRoute,
+  AuthenticatedLearningRoute: AuthenticatedLearningRoute,
   AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
   AuthenticatedProgramRoute: AuthenticatedProgramRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRouteWithChildren,
@@ -373,3 +394,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
