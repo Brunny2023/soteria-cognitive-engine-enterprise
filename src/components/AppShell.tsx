@@ -22,6 +22,7 @@ const NAV = [
   { to: "/retention", label: "RETENTION & PURGE", code: "RT", glyph: "⌛" },
   { to: "/policy-sim", label: "POLICY SIMULATOR", code: "PS", glyph: "◐" },
   { to: "/admin", label: "ADMIN", code: "AD", glyph: "◇" },
+  { to: "/gateway-health", label: "GATEWAY HEALTH", code: "GH", glyph: "♥" },
   { to: "/publish", label: "PUBLISH READINESS", code: "PB", glyph: "▶" },
 ] as const;
 
