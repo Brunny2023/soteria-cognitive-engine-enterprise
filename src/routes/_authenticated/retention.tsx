@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { exportDataset } from "@/lib/export";
 import {
-  retentionAudit,
   useRetentionAudit,
+  useLogRetentionAudit,
   filterAudit,
   type RetentionAuditKind,
 } from "@/lib/retention-audit";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect, useState as useReactState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/retention")({
@@ -170,8 +169,9 @@ function RetentionPage() {
   const [approver, setApprover] = useState("");
   const [auditFilter, setAuditFilter] = useState<RetentionAuditKind | "all">("all");
   const audit = useRetentionAudit();
+  const logAudit = useLogRetentionAudit();
   const { user } = useAuth();
-  const [actorName, setActorName] = useReactState<string>("");
+  const [actorName, setActorName] = useState<string>("");
 
   useEffect(() => {
     if (!user) return;
@@ -199,11 +199,10 @@ function RetentionPage() {
     setRows((prev) => {
       const target = prev.find((r) => r.code === code);
       if (target && target.retentionDays !== days) {
-        retentionAudit.log({
+        logAudit({
           kind: "retention_window",
           category_code: target.code,
           category_name: target.name,
-          actor_id: actor.id,
           actor_name: actor.name,
           approver_name: null,
           field: "retentionDays",
@@ -221,11 +220,10 @@ function RetentionPage() {
     setRows((prev) => {
       const target = prev.find((r) => r.code === code);
       if (target && target.purgeMode !== mode) {
-        retentionAudit.log({
+        logAudit({
           kind: "disposition_mode",
           category_code: target.code,
           category_name: target.name,
-          actor_id: actor.id,
           actor_name: actor.name,
           approver_name: null,
           field: "purgeMode",
@@ -243,11 +241,10 @@ function RetentionPage() {
     setRows((prev) => {
       const target = prev.find((r) => r.code === code);
       if (target) {
-        retentionAudit.log({
+        logAudit({
           kind: "legal_hold",
           category_code: target.code,
           category_name: target.name,
-          actor_id: actor.id,
           actor_name: actor.name,
           approver_name: null,
           field: "legalHold",
@@ -264,11 +261,10 @@ function RetentionPage() {
 
   function executePurge(cat: Category, approverName: string) {
     const disposed = cat.legalHold ? 0 : cat.eligible;
-    retentionAudit.log({
+    logAudit({
       kind: "purge_execution",
       category_code: cat.code,
       category_name: cat.name,
-      actor_id: actor.id,
       actor_name: actor.name,
       approver_name: approverName,
       field: "purge",
