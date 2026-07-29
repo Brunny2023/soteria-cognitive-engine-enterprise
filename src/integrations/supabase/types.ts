@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      knowledge_sources: {
+        Row: {
+          created_at: string
+          edges: number
+          entities: number
+          id: string
+          kind: string
+          mime: string | null
+          name: string
+          notes: string | null
+          progress: number
+          size_bytes: number
+          source: string
+          status: string
+          storage_path: string | null
+          tags: string[]
+          target_layer: string
+          updated_at: string
+          uploader_id: string
+        }
+        Insert: {
+          created_at?: string
+          edges?: number
+          entities?: number
+          id?: string
+          kind: string
+          mime?: string | null
+          name: string
+          notes?: string | null
+          progress?: number
+          size_bytes?: number
+          source?: string
+          status?: string
+          storage_path?: string | null
+          tags?: string[]
+          target_layer?: string
+          updated_at?: string
+          uploader_id: string
+        }
+        Update: {
+          created_at?: string
+          edges?: number
+          entities?: number
+          id?: string
+          kind?: string
+          mime?: string | null
+          name?: string
+          notes?: string | null
+          progress?: number
+          size_bytes?: number
+          source?: string
+          status?: string
+          storage_path?: string | null
+          tags?: string[]
+          target_layer?: string
+          updated_at?: string
+          uploader_id?: string
+        }
+        Relationships: []
+      }
       learning_entries: {
         Row: {
           applied: boolean

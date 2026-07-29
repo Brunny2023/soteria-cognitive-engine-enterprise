@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 const NAV = [
   { to: "/dashboard", label: "MISSION CONTROL", code: "M0", glyph: "◎" },
   { to: "/organizational", label: "ORGANIZATIONAL", code: "L1", glyph: "▣" },
+  { to: "/ingest", label: "INGESTION", code: "IN", glyph: "⇪" },
   { to: "/executives", label: "EXECUTIVE", code: "L2", glyph: "▲" },
   { to: "/consultants", label: "CONSULTANT", code: "L3", glyph: "◆" },
   { to: "/program", label: "PROGRAM", code: "L4", glyph: "▤" },
