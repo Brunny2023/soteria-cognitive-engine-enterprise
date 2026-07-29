@@ -79,9 +79,9 @@ export const listArchetypesFn = createServerFn({ method: "GET" })
 export const listPackStateFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.from("secp_pack_state").select("id,status");
+    const { data, error } = await context.supabase.from("secp_pack_state").select("pack_id,status");
     if (error) throw new Error(error.message);
-    return (data ?? []) as PackStateRow[];
+    return (data ?? []).map((r) => ({ id: r.pack_id, status: r.status as PackStatus }));
   });
 
 export const createArchetypeFn = createServerFn({ method: "POST" })
@@ -99,9 +99,9 @@ export const createArchetypeFn = createServerFn({ method: "POST" })
       layer: data.layer,
       department: data.department,
       autonomy: data.autonomy,
-      skills: data.skills as unknown as never,
-      packs: data.packs as unknown as never,
-      guardrails: data.guardrails as unknown as never,
+      skills: data.skills,
+      packs: data.packs,
+      guardrails: data.guardrails,
       status: "draft",
       trained: 0,
       deployed: 0,
@@ -122,7 +122,8 @@ export const advanceArchetypeFn = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Archetype not found");
-    let patch: Record<string, unknown> = { updated_label: stamp() };
+    type Patch = { updated_label: string; status?: string; trained?: number; deployed?: number };
+    let patch: Patch = { updated_label: stamp() };
     if (row.status === "draft") patch = { ...patch, status: "training", trained: 0.25 };
     else if (row.status === "training") {
       const next = Math.min(1, row.trained + 0.25);
@@ -154,7 +155,7 @@ export const togglePackFn = createServerFn({ method: "POST" })
     const next: PackStatus = data.status === "installed" ? "available" : data.status === "available" ? "pending" : "installed";
     const { error } = await context.supabase
       .from("secp_pack_state")
-      .upsert({ id: data.id, status: next }, { onConflict: "id" });
+      .upsert({ pack_id: data.id, status: next }, { onConflict: "pack_id" });
     if (error) throw new Error(error.message);
     return { id: data.id, status: next };
   });
