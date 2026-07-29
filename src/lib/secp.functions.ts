@@ -78,9 +78,9 @@ export const listRequestsFn = createServerFn({ method: "GET" })
     return (data ?? []).map(rowToRecord);
   });
 
-async function nextRequestId(supabase: { from: (t: string) => { select: (c: string) => { order: (col: string, o: object) => { limit: (n: number) => Promise<{ data: { id: string }[] | null }> } } } }) {
+async function nextRequestId(supabase: { from: (t: string) => any }) {
   const { data } = await supabase.from("secp_requests").select("id").order("created_at", { ascending: false }).limit(50);
-  const nums = (data ?? []).map((r) => Number.parseInt(r.id.replace(/[^0-9]/g, ""), 10)).filter(Number.isFinite);
+  const nums = ((data as { id: string }[] | null) ?? []).map((r) => Number.parseInt(r.id.replace(/[^0-9]/g, ""), 10)).filter(Number.isFinite);
   const next = (nums.length ? Math.max(...nums) : 800) + 1;
   return `RE-${next}`;
 }
@@ -112,8 +112,8 @@ export const createRequestFn = createServerFn({ method: "POST" })
       priority: record.priority,
       progress: record.progress,
       updated_label: record.updated,
-      steps: record.steps as unknown as object,
-      validators: record.validators as unknown as object,
+      steps: record.steps as unknown as never,
+      validators: record.validators as unknown as never,
     });
     if (error) throw new Error(error.message);
     return record;
@@ -216,8 +216,8 @@ Respond in 2-4 tight sentences. No headers, no lists, no markdown. Speak as the 
     const { error: updErr } = await context.supabase
       .from("secp_requests")
       .update({
-        steps: nextSteps as unknown as object,
-        validators: nextValidators as unknown as object,
+        steps: nextSteps as unknown as never,
+        validators: nextValidators as unknown as never,
         progress: nextProgress,
         updated_label: stamp(),
       })
