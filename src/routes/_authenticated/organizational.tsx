@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { KPIS, KNOWLEDGE_NODES } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/organizational")({
+export const Route = createFileRoute("/_authenticated/organizational")({
   head: () => ({
     meta: [
       { title: "Organizational Intelligence — Soteria SECP" },

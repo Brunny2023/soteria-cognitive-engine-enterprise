@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { AUDIT_LOG, REQUESTS } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/governance")({
+export const Route = createFileRoute("/_authenticated/governance")({
   head: () => ({
     meta: [
       { title: "Validation & Governance — Soteria SECP" },

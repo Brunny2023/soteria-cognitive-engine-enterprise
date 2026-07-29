@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { KNOWLEDGE_NODES } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/knowledge")({
+export const Route = createFileRoute("/_authenticated/knowledge")({
   head: () => ({
     meta: [
       { title: "Knowledge Graph — Soteria SECP" },

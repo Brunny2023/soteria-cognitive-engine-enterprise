@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { AUTONOMY_LABELS, DEPARTMENTS, SPECIALISTS, type Department } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/workforce")({
+export const Route = createFileRoute("/_authenticated/workforce")({
   head: () => ({
     meta: [
       { title: "Specialist Workforce — Soteria SECP" },
