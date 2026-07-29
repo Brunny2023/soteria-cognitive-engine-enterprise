@@ -25,6 +25,7 @@ import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedKnowledgeRouteImport } from './routes/_authenticated/knowledge'
 import { Route as AuthenticatedIngestRouteImport } from './routes/_authenticated/ingest'
 import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
+import { Route as AuthenticatedGatewayHealthRouteImport } from './routes/_authenticated/gateway-health'
 import { Route as AuthenticatedExecutivesRouteImport } from './routes/_authenticated/executives'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConsultantsRouteImport } from './routes/_authenticated/consultants'
@@ -112,6 +113,12 @@ const AuthenticatedGovernanceRoute = AuthenticatedGovernanceRouteImport.update({
   path: '/governance',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGatewayHealthRoute =
+  AuthenticatedGatewayHealthRouteImport.update({
+    id: '/gateway-health',
+    path: '/gateway-health',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedExecutivesRoute = AuthenticatedExecutivesRouteImport.update({
   id: '/executives',
   path: '/executives',
@@ -152,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/consultants': typeof AuthenticatedConsultantsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/executives': typeof AuthenticatedExecutivesRoute
+  '/gateway-health': typeof AuthenticatedGatewayHealthRoute
   '/governance': typeof AuthenticatedGovernanceRoute
   '/ingest': typeof AuthenticatedIngestRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
@@ -175,6 +183,7 @@ export interface FileRoutesByTo {
   '/consultants': typeof AuthenticatedConsultantsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/executives': typeof AuthenticatedExecutivesRoute
+  '/gateway-health': typeof AuthenticatedGatewayHealthRoute
   '/governance': typeof AuthenticatedGovernanceRoute
   '/ingest': typeof AuthenticatedIngestRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
@@ -200,6 +209,7 @@ export interface FileRoutesById {
   '/_authenticated/consultants': typeof AuthenticatedConsultantsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/executives': typeof AuthenticatedExecutivesRoute
+  '/_authenticated/gateway-health': typeof AuthenticatedGatewayHealthRoute
   '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
   '/_authenticated/ingest': typeof AuthenticatedIngestRoute
   '/_authenticated/knowledge': typeof AuthenticatedKnowledgeRoute
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/consultants'
     | '/dashboard'
     | '/executives'
+    | '/gateway-health'
     | '/governance'
     | '/ingest'
     | '/knowledge'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/consultants'
     | '/dashboard'
     | '/executives'
+    | '/gateway-health'
     | '/governance'
     | '/ingest'
     | '/knowledge'
@@ -272,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authenticated/consultants'
     | '/_authenticated/dashboard'
     | '/_authenticated/executives'
+    | '/_authenticated/gateway-health'
     | '/_authenticated/governance'
     | '/_authenticated/ingest'
     | '/_authenticated/knowledge'
@@ -409,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGovernanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gateway-health': {
+      id: '/_authenticated/gateway-health'
+      path: '/gateway-health'
+      fullPath: '/gateway-health'
+      preLoaderRoute: typeof AuthenticatedGatewayHealthRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/executives': {
       id: '/_authenticated/executives'
       path: '/executives'
@@ -474,6 +494,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConsultantsRoute: typeof AuthenticatedConsultantsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExecutivesRoute: typeof AuthenticatedExecutivesRoute
+  AuthenticatedGatewayHealthRoute: typeof AuthenticatedGatewayHealthRoute
   AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
   AuthenticatedIngestRoute: typeof AuthenticatedIngestRoute
   AuthenticatedKnowledgeRoute: typeof AuthenticatedKnowledgeRoute
@@ -494,6 +515,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConsultantsRoute: AuthenticatedConsultantsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExecutivesRoute: AuthenticatedExecutivesRoute,
+  AuthenticatedGatewayHealthRoute: AuthenticatedGatewayHealthRoute,
   AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
   AuthenticatedIngestRoute: AuthenticatedIngestRoute,
   AuthenticatedKnowledgeRoute: AuthenticatedKnowledgeRoute,
