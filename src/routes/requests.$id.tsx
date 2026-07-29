@@ -1,34 +1,48 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import {
   AUTONOMY_LABELS,
-  getRequest,
   LAYERS,
   type Autonomy,
   type RequestRecord,
 } from "@/lib/secp-data";
+import { useRequest } from "@/lib/secp-store";
 
 export const Route = createFileRoute("/requests/$id")({
-  loader: ({ params }) => {
-    const request = getRequest(params.id);
-    if (!request) throw notFound();
-    return { request };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.request.id} · ${loaderData.request.title} — Soteria SECP` },
-          { name: "description", content: loaderData.request.brief },
-          { property: "og:title", content: `${loaderData.request.id} · ${loaderData.request.title}` },
-          { property: "og:description", content: loaderData.request.brief },
-        ]
-      : [{ title: "Request not found — Soteria SECP" }, { name: "robots", content: "noindex" }],
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.id} — Soteria SECP` },
+      { name: "description", content: `Reasoning trace and validation battery for directive ${params.id}.` },
+      { property: "og:title", content: `${params.id} — Soteria SECP` },
+      { property: "og:description", content: `Reasoning trace and validation battery for directive ${params.id}.` },
+    ],
   }),
   component: RequestDetail,
 });
 
 function RequestDetail() {
-  const { request } = Route.useLoaderData() as { request: RequestRecord };
+  const { id } = Route.useParams();
+  const request = useRequest(id);
+  if (!request) {
+    return (
+      <AppShell title="Request not found" crumb={`${id} · missing`}>
+        <div className="p-6 animate-entry">
+          <div className="bg-surface border border-border rounded-sm p-6 max-w-lg">
+            <div className="font-mono text-[10px] text-[color:var(--warn)] mb-2">404 · NO_RECORD</div>
+            <p className="text-sm text-muted-foreground">
+              No directive matches <span className="font-mono text-foreground">{id}</span>.
+            </p>
+            <Link
+              to="/requests"
+              className="inline-block mt-4 font-mono text-[11px] text-accent hover:text-foreground"
+            >
+              ← RETURN_TO_QUEUE
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
   const inspector = (
     <div className="flex flex-col h-full">
       <div className="px-5 py-4 border-b border-border">
