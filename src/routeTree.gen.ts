@@ -19,6 +19,7 @@ import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
 import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticated/learning'
 import { Route as AuthenticatedKnowledgeRouteImport } from './routes/_authenticated/knowledge'
+import { Route as AuthenticatedIngestRouteImport } from './routes/_authenticated/ingest'
 import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
 import { Route as AuthenticatedExecutivesRouteImport } from './routes/_authenticated/executives'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -77,6 +78,11 @@ const AuthenticatedKnowledgeRoute = AuthenticatedKnowledgeRouteImport.update({
   path: '/knowledge',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIngestRoute = AuthenticatedIngestRouteImport.update({
+  id: '/ingest',
+  path: '/ingest',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedGovernanceRoute = AuthenticatedGovernanceRouteImport.update({
   id: '/governance',
   path: '/governance',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/executives': typeof AuthenticatedExecutivesRoute
   '/governance': typeof AuthenticatedGovernanceRoute
+  '/ingest': typeof AuthenticatedIngestRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
   '/learning': typeof AuthenticatedLearningRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/executives': typeof AuthenticatedExecutivesRoute
   '/governance': typeof AuthenticatedGovernanceRoute
+  '/ingest': typeof AuthenticatedIngestRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
   '/learning': typeof AuthenticatedLearningRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/executives': typeof AuthenticatedExecutivesRoute
   '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
+  '/_authenticated/ingest': typeof AuthenticatedIngestRoute
   '/_authenticated/knowledge': typeof AuthenticatedKnowledgeRoute
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
   '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/executives'
     | '/governance'
+    | '/ingest'
     | '/knowledge'
     | '/learning'
     | '/organizational'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/executives'
     | '/governance'
+    | '/ingest'
     | '/knowledge'
     | '/learning'
     | '/organizational'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/executives'
     | '/_authenticated/governance'
+    | '/_authenticated/ingest'
     | '/_authenticated/knowledge'
     | '/_authenticated/learning'
     | '/_authenticated/organizational'
@@ -307,6 +319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedKnowledgeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ingest': {
+      id: '/_authenticated/ingest'
+      path: '/ingest'
+      fullPath: '/ingest'
+      preLoaderRoute: typeof AuthenticatedIngestRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/governance': {
       id: '/_authenticated/governance'
       path: '/governance'
@@ -380,6 +399,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExecutivesRoute: typeof AuthenticatedExecutivesRoute
   AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
+  AuthenticatedIngestRoute: typeof AuthenticatedIngestRoute
   AuthenticatedKnowledgeRoute: typeof AuthenticatedKnowledgeRoute
   AuthenticatedLearningRoute: typeof AuthenticatedLearningRoute
   AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
@@ -395,6 +415,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExecutivesRoute: AuthenticatedExecutivesRoute,
   AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
+  AuthenticatedIngestRoute: AuthenticatedIngestRoute,
   AuthenticatedKnowledgeRoute: AuthenticatedKnowledgeRoute,
   AuthenticatedLearningRoute: AuthenticatedLearningRoute,
   AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
