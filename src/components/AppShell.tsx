@@ -19,6 +19,8 @@ const NAV = [
   { to: "/skills", label: "SKILLS & TRAINING", code: "SK", glyph: "⚙" },
   { to: "/knowledge", label: "KNOWLEDGE GRAPH", code: "KG", glyph: "◊" },
   { to: "/security", label: "SECURITY & COMPLIANCE", code: "SC", glyph: "⛨" },
+  { to: "/retention", label: "RETENTION & PURGE", code: "RT", glyph: "⌛" },
+  { to: "/policy-sim", label: "POLICY SIMULATOR", code: "PS", glyph: "◐" },
   { to: "/admin", label: "ADMIN", code: "AD", glyph: "◇" },
 ] as const;
 
