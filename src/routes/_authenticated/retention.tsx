@@ -461,13 +461,16 @@ function RetentionPage() {
             onClick={() => setPreview(null)}
           >
             <div
-              className="w-full max-w-lg bg-surface border border-border rounded-sm p-6"
+              className="w-full max-w-2xl bg-surface border border-border rounded-sm p-6 max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-baseline justify-between mb-4">
                 <div>
-                  <div className="font-mono text-[10px] text-accent">{preview.code} · PURGE SIMULATION</div>
+                  <div className="font-mono text-[10px] text-accent">{preview.code} · DRY-RUN SIMULATOR</div>
                   <div className="text-base font-bold mt-1">{preview.name}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground mt-1">
+                    Nothing is disposed. Every projected write is shown before you commit.
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -477,17 +480,14 @@ function RetentionPage() {
                   Close
                 </button>
               </div>
-              <p className="text-[11px] text-muted-foreground mb-4">
-                Dry run against the current window ({preview.retentionDays}d) and disposition mode ({preview.purgeMode}).
-                Nothing is disposed; every row lands in the governance ledger.
-              </p>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-3 gap-3 mb-4">
                 <StatChip label="In scope" value={preview.volume.toLocaleString()} />
                 <StatChip
                   label="Would dispose"
                   value={preview.legalHold ? "0 (hold)" : preview.eligible.toLocaleString()}
                   tone={preview.legalHold ? "warn" : "accent"}
                 />
+                <StatChip label="Would retain" value={(preview.volume - (preview.legalHold ? 0 : preview.eligible)).toLocaleString()} tone="signal" />
               </div>
               <div className="border border-border rounded-sm p-4 font-mono text-[11px] text-muted-foreground leading-relaxed">
                 <div>SIMULATION · {new Date().toISOString()}</div>
@@ -500,21 +500,55 @@ function RetentionPage() {
                     : `${preview.eligible.toLocaleString()} rows would be ${preview.purgeMode.replace("-", " ")}d; L6 tombstone written for each.`}
                 </div>
               </div>
+              <div className="mt-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Projected sample rows (dry-run · anonymized)</div>
+                <div className="border border-border rounded-sm">
+                  <div className="grid grid-cols-[100px_1fr_120px_120px] gap-3 px-3 py-2 border-b border-border font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                    <span>Record id</span><span>Reason</span><span>Age (days)</span><span>Action</span>
+                  </div>
+                  {Array.from({ length: Math.min(5, preview.legalHold ? 0 : 5) }).map((_, i) => {
+                    const age = preview.retentionDays + 30 + i * 47;
+                    const rid = `${preview.code}-${(Math.floor(Math.random() * 900000) + 100000).toString()}`;
+                    return (
+                      <div key={i} className="grid grid-cols-[100px_1fr_120px_120px] gap-3 px-3 py-2 border-b border-border last:border-b-0 text-[11px]">
+                        <span className="font-mono text-accent">{rid}</span>
+                        <span className="text-muted-foreground">Past retention window · no active legal hold</span>
+                        <span className="font-mono">{age}</span>
+                        <span className="font-mono uppercase text-[color:var(--warn)]">{preview.purgeMode}</span>
+                      </div>
+                    );
+                  })}
+                  {preview.legalHold && (
+                    <div className="px-3 py-3 text-[11px] font-mono text-muted-foreground">— none · legal hold active</div>
+                  )}
+                </div>
+              </div>
+              <div className="mt-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Projected audit ledger entries</div>
+                <div className="border border-border rounded-sm p-3 font-mono text-[10px] text-muted-foreground space-y-1">
+                  <div>▸ <span className="text-accent">purge_execution</span> · {preview.code} · records_affected={preview.legalHold ? 0 : preview.eligible} · disposition={preview.purgeMode}</div>
+                  <div>▸ <span className="text-accent">l6_tombstone</span> · {preview.legalHold ? 0 : preview.eligible} rows · WORM archive @ region-of-record</div>
+                  <div>▸ <span className="text-accent">actor</span> · {actor.name} · <span className="text-foreground">co-approver required on commit</span></div>
+                  <div>▸ <span className="text-accent">chain_of_custody</span> · SHA-256 signed export sidecar available post-execution</div>
+                </div>
+              </div>
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setPreview(null)}
                   className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-foreground"
                 >
-                  Cancel
+                  Close dry-run
                 </button>
                 <button
                   type="button"
-                  disabled
-                  className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary/60 cursor-not-allowed"
-                  title="Execution requires two-operator approval and is disabled in this build."
+                  onClick={() => { const target = preview; setPreview(null); setExecuting(target); }}
+                  disabled={preview.legalHold}
+                  className={"font-mono text-[10px] uppercase tracking-widest px-3 py-2 border " +
+                    (preview.legalHold ? "border-border text-muted-foreground cursor-not-allowed"
+                      : "border-primary/40 text-primary hover:bg-primary/10")}
                 >
-                  Schedule (two-operator)
+                  Proceed to two-operator execute
                 </button>
               </div>
             </div>
