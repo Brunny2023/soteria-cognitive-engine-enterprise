@@ -4,7 +4,7 @@ import { AppShell, SectionHeading } from "@/components/AppShell";
 import { AUTONOMY_LABELS, type Autonomy } from "@/lib/secp-data";
 import { createRequest } from "@/lib/secp-store";
 
-export const Route = createFileRoute("/requests/new")({
+export const Route = createFileRoute("/_authenticated/requests/new")({
   head: () => ({
     meta: [
       { title: "New Directive — Soteria SECP" },

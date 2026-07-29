@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { AUTONOMY_LABELS, EXECUTIVES } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/executives")({
+export const Route = createFileRoute("/_authenticated/executives")({
   head: () => ({
     meta: [
       { title: "Executive Council — Soteria SECP" },

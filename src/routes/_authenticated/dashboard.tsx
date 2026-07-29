@@ -10,7 +10,7 @@ import {
   SPECIALISTS,
 } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Mission Control — Soteria SECP" },

@@ -9,129 +9,132 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkforceRouteImport } from './routes/workforce'
-import { Route as RequestsRouteImport } from './routes/requests'
-import { Route as ProgramRouteImport } from './routes/program'
-import { Route as OrganizationalRouteImport } from './routes/organizational'
-import { Route as KnowledgeRouteImport } from './routes/knowledge'
-import { Route as GovernanceRouteImport } from './routes/governance'
-import { Route as ExecutivesRouteImport } from './routes/executives'
-import { Route as ConsultantsRouteImport } from './routes/consultants'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as RequestsNewRouteImport } from './routes/requests.new'
-import { Route as RequestsIdRouteImport } from './routes/requests.$id'
+import { Route as AuthenticatedWorkforceRouteImport } from './routes/_authenticated/workforce'
+import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
+import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticated/program'
+import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
+import { Route as AuthenticatedKnowledgeRouteImport } from './routes/_authenticated/knowledge'
+import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
+import { Route as AuthenticatedExecutivesRouteImport } from './routes/_authenticated/executives'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedConsultantsRouteImport } from './routes/_authenticated/consultants'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedRequestsNewRouteImport } from './routes/_authenticated/requests.new'
+import { Route as AuthenticatedRequestsIdRouteImport } from './routes/_authenticated/requests.$id'
 
-const WorkforceRoute = WorkforceRouteImport.update({
-  id: '/workforce',
+const AuthenticatedWorkforceRoute = AuthenticatedWorkforceRouteImport.update({
+  id: '/_authenticated/workforce',
   path: '/workforce',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RequestsRoute = RequestsRouteImport.update({
-  id: '/requests',
+const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
+  id: '/_authenticated/requests',
   path: '/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramRoute = ProgramRouteImport.update({
-  id: '/program',
+const AuthenticatedProgramRoute = AuthenticatedProgramRouteImport.update({
+  id: '/_authenticated/program',
   path: '/program',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OrganizationalRoute = OrganizationalRouteImport.update({
-  id: '/organizational',
-  path: '/organizational',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeRoute = KnowledgeRouteImport.update({
-  id: '/knowledge',
+const AuthenticatedOrganizationalRoute =
+  AuthenticatedOrganizationalRouteImport.update({
+    id: '/_authenticated/organizational',
+    path: '/organizational',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedKnowledgeRoute = AuthenticatedKnowledgeRouteImport.update({
+  id: '/_authenticated/knowledge',
   path: '/knowledge',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GovernanceRoute = GovernanceRouteImport.update({
-  id: '/governance',
+const AuthenticatedGovernanceRoute = AuthenticatedGovernanceRouteImport.update({
+  id: '/_authenticated/governance',
   path: '/governance',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExecutivesRoute = ExecutivesRouteImport.update({
-  id: '/executives',
+const AuthenticatedExecutivesRoute = AuthenticatedExecutivesRouteImport.update({
+  id: '/_authenticated/executives',
   path: '/executives',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConsultantsRoute = ConsultantsRouteImport.update({
-  id: '/consultants',
-  path: '/consultants',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/_authenticated/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
+const AuthenticatedConsultantsRoute =
+  AuthenticatedConsultantsRouteImport.update({
+    id: '/_authenticated/consultants',
+    path: '/consultants',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/_authenticated/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RequestsNewRoute = RequestsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => RequestsRoute,
-} as any)
-const RequestsIdRoute = RequestsIdRouteImport.update({
+const AuthenticatedRequestsNewRoute =
+  AuthenticatedRequestsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedRequestsRoute,
+  } as any)
+const AuthenticatedRequestsIdRoute = AuthenticatedRequestsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => RequestsRoute,
+  getParentRoute: () => AuthenticatedRequestsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/consultants': typeof ConsultantsRoute
-  '/executives': typeof ExecutivesRoute
-  '/governance': typeof GovernanceRoute
-  '/knowledge': typeof KnowledgeRoute
-  '/organizational': typeof OrganizationalRoute
-  '/program': typeof ProgramRoute
-  '/requests': typeof RequestsRouteWithChildren
-  '/workforce': typeof WorkforceRoute
-  '/requests/$id': typeof RequestsIdRoute
-  '/requests/new': typeof RequestsNewRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/consultants': typeof AuthenticatedConsultantsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/executives': typeof AuthenticatedExecutivesRoute
+  '/governance': typeof AuthenticatedGovernanceRoute
+  '/knowledge': typeof AuthenticatedKnowledgeRoute
+  '/organizational': typeof AuthenticatedOrganizationalRoute
+  '/program': typeof AuthenticatedProgramRoute
+  '/requests': typeof AuthenticatedRequestsRouteWithChildren
+  '/workforce': typeof AuthenticatedWorkforceRoute
+  '/requests/$id': typeof AuthenticatedRequestsIdRoute
+  '/requests/new': typeof AuthenticatedRequestsNewRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/consultants': typeof ConsultantsRoute
-  '/executives': typeof ExecutivesRoute
-  '/governance': typeof GovernanceRoute
-  '/knowledge': typeof KnowledgeRoute
-  '/organizational': typeof OrganizationalRoute
-  '/program': typeof ProgramRoute
-  '/requests': typeof RequestsRouteWithChildren
-  '/workforce': typeof WorkforceRoute
-  '/requests/$id': typeof RequestsIdRoute
-  '/requests/new': typeof RequestsNewRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/consultants': typeof AuthenticatedConsultantsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/executives': typeof AuthenticatedExecutivesRoute
+  '/governance': typeof AuthenticatedGovernanceRoute
+  '/knowledge': typeof AuthenticatedKnowledgeRoute
+  '/organizational': typeof AuthenticatedOrganizationalRoute
+  '/program': typeof AuthenticatedProgramRoute
+  '/requests': typeof AuthenticatedRequestsRouteWithChildren
+  '/workforce': typeof AuthenticatedWorkforceRoute
+  '/requests/$id': typeof AuthenticatedRequestsIdRoute
+  '/requests/new': typeof AuthenticatedRequestsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/consultants': typeof ConsultantsRoute
-  '/executives': typeof ExecutivesRoute
-  '/governance': typeof GovernanceRoute
-  '/knowledge': typeof KnowledgeRoute
-  '/organizational': typeof OrganizationalRoute
-  '/program': typeof ProgramRoute
-  '/requests': typeof RequestsRouteWithChildren
-  '/workforce': typeof WorkforceRoute
-  '/requests/$id': typeof RequestsIdRoute
-  '/requests/new': typeof RequestsNewRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/consultants': typeof AuthenticatedConsultantsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/executives': typeof AuthenticatedExecutivesRoute
+  '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
+  '/_authenticated/knowledge': typeof AuthenticatedKnowledgeRoute
+  '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
+  '/_authenticated/program': typeof AuthenticatedProgramRoute
+  '/_authenticated/requests': typeof AuthenticatedRequestsRouteWithChildren
+  '/_authenticated/workforce': typeof AuthenticatedWorkforceRoute
+  '/_authenticated/requests/$id': typeof AuthenticatedRequestsIdRoute
+  '/_authenticated/requests/new': typeof AuthenticatedRequestsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/admin'
     | '/consultants'
+    | '/dashboard'
     | '/executives'
     | '/governance'
     | '/knowledge'
@@ -143,9 +146,9 @@ export interface FileRouteTypes {
     | '/requests/new'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/admin'
     | '/consultants'
+    | '/dashboard'
     | '/executives'
     | '/governance'
     | '/knowledge'
@@ -157,158 +160,149 @@ export interface FileRouteTypes {
     | '/requests/new'
   id:
     | '__root__'
-    | '/'
-    | '/admin'
-    | '/consultants'
-    | '/executives'
-    | '/governance'
-    | '/knowledge'
-    | '/organizational'
-    | '/program'
-    | '/requests'
-    | '/workforce'
-    | '/requests/$id'
-    | '/requests/new'
+    | '/_authenticated/admin'
+    | '/_authenticated/consultants'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/executives'
+    | '/_authenticated/governance'
+    | '/_authenticated/knowledge'
+    | '/_authenticated/organizational'
+    | '/_authenticated/program'
+    | '/_authenticated/requests'
+    | '/_authenticated/workforce'
+    | '/_authenticated/requests/$id'
+    | '/_authenticated/requests/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
-  ConsultantsRoute: typeof ConsultantsRoute
-  ExecutivesRoute: typeof ExecutivesRoute
-  GovernanceRoute: typeof GovernanceRoute
-  KnowledgeRoute: typeof KnowledgeRoute
-  OrganizationalRoute: typeof OrganizationalRoute
-  ProgramRoute: typeof ProgramRoute
-  RequestsRoute: typeof RequestsRouteWithChildren
-  WorkforceRoute: typeof WorkforceRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedConsultantsRoute: typeof AuthenticatedConsultantsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedExecutivesRoute: typeof AuthenticatedExecutivesRoute
+  AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
+  AuthenticatedKnowledgeRoute: typeof AuthenticatedKnowledgeRoute
+  AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
+  AuthenticatedProgramRoute: typeof AuthenticatedProgramRoute
+  AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRouteWithChildren
+  AuthenticatedWorkforceRoute: typeof AuthenticatedWorkforceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workforce': {
-      id: '/workforce'
+    '/_authenticated/workforce': {
+      id: '/_authenticated/workforce'
       path: '/workforce'
       fullPath: '/workforce'
-      preLoaderRoute: typeof WorkforceRouteImport
+      preLoaderRoute: typeof AuthenticatedWorkforceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/requests': {
-      id: '/requests'
+    '/_authenticated/requests': {
+      id: '/_authenticated/requests'
       path: '/requests'
       fullPath: '/requests'
-      preLoaderRoute: typeof RequestsRouteImport
+      preLoaderRoute: typeof AuthenticatedRequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/program': {
-      id: '/program'
+    '/_authenticated/program': {
+      id: '/_authenticated/program'
       path: '/program'
       fullPath: '/program'
-      preLoaderRoute: typeof ProgramRouteImport
+      preLoaderRoute: typeof AuthenticatedProgramRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/organizational': {
-      id: '/organizational'
+    '/_authenticated/organizational': {
+      id: '/_authenticated/organizational'
       path: '/organizational'
       fullPath: '/organizational'
-      preLoaderRoute: typeof OrganizationalRouteImport
+      preLoaderRoute: typeof AuthenticatedOrganizationalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/knowledge': {
-      id: '/knowledge'
+    '/_authenticated/knowledge': {
+      id: '/_authenticated/knowledge'
       path: '/knowledge'
       fullPath: '/knowledge'
-      preLoaderRoute: typeof KnowledgeRouteImport
+      preLoaderRoute: typeof AuthenticatedKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/governance': {
-      id: '/governance'
+    '/_authenticated/governance': {
+      id: '/_authenticated/governance'
       path: '/governance'
       fullPath: '/governance'
-      preLoaderRoute: typeof GovernanceRouteImport
+      preLoaderRoute: typeof AuthenticatedGovernanceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/executives': {
-      id: '/executives'
+    '/_authenticated/executives': {
+      id: '/_authenticated/executives'
       path: '/executives'
       fullPath: '/executives'
-      preLoaderRoute: typeof ExecutivesRouteImport
+      preLoaderRoute: typeof AuthenticatedExecutivesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/consultants': {
-      id: '/consultants'
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/consultants': {
+      id: '/_authenticated/consultants'
       path: '/consultants'
       fullPath: '/consultants'
-      preLoaderRoute: typeof ConsultantsRouteImport
+      preLoaderRoute: typeof AuthenticatedConsultantsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/requests/new': {
-      id: '/requests/new'
+    '/_authenticated/requests/new': {
+      id: '/_authenticated/requests/new'
       path: '/new'
       fullPath: '/requests/new'
-      preLoaderRoute: typeof RequestsNewRouteImport
-      parentRoute: typeof RequestsRoute
+      preLoaderRoute: typeof AuthenticatedRequestsNewRouteImport
+      parentRoute: typeof AuthenticatedRequestsRoute
     }
-    '/requests/$id': {
-      id: '/requests/$id'
+    '/_authenticated/requests/$id': {
+      id: '/_authenticated/requests/$id'
       path: '/$id'
       fullPath: '/requests/$id'
-      preLoaderRoute: typeof RequestsIdRouteImport
-      parentRoute: typeof RequestsRoute
+      preLoaderRoute: typeof AuthenticatedRequestsIdRouteImport
+      parentRoute: typeof AuthenticatedRequestsRoute
     }
   }
 }
 
-interface RequestsRouteChildren {
-  RequestsIdRoute: typeof RequestsIdRoute
-  RequestsNewRoute: typeof RequestsNewRoute
+interface AuthenticatedRequestsRouteChildren {
+  AuthenticatedRequestsIdRoute: typeof AuthenticatedRequestsIdRoute
+  AuthenticatedRequestsNewRoute: typeof AuthenticatedRequestsNewRoute
 }
 
-const RequestsRouteChildren: RequestsRouteChildren = {
-  RequestsIdRoute: RequestsIdRoute,
-  RequestsNewRoute: RequestsNewRoute,
+const AuthenticatedRequestsRouteChildren: AuthenticatedRequestsRouteChildren = {
+  AuthenticatedRequestsIdRoute: AuthenticatedRequestsIdRoute,
+  AuthenticatedRequestsNewRoute: AuthenticatedRequestsNewRoute,
 }
 
-const RequestsRouteWithChildren = RequestsRoute._addFileChildren(
-  RequestsRouteChildren,
-)
+const AuthenticatedRequestsRouteWithChildren =
+  AuthenticatedRequestsRoute._addFileChildren(
+    AuthenticatedRequestsRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
-  ConsultantsRoute: ConsultantsRoute,
-  ExecutivesRoute: ExecutivesRoute,
-  GovernanceRoute: GovernanceRoute,
-  KnowledgeRoute: KnowledgeRoute,
-  OrganizationalRoute: OrganizationalRoute,
-  ProgramRoute: ProgramRoute,
-  RequestsRoute: RequestsRouteWithChildren,
-  WorkforceRoute: WorkforceRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedConsultantsRoute: AuthenticatedConsultantsRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedExecutivesRoute: AuthenticatedExecutivesRoute,
+  AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
+  AuthenticatedKnowledgeRoute: AuthenticatedKnowledgeRoute,
+  AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
+  AuthenticatedProgramRoute: AuthenticatedProgramRoute,
+  AuthenticatedRequestsRoute: AuthenticatedRequestsRouteWithChildren,
+  AuthenticatedWorkforceRoute: AuthenticatedWorkforceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

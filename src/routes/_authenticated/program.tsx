@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 
-export const Route = createFileRoute("/program")({
+export const Route = createFileRoute("/_authenticated/program")({
   head: () => ({
     meta: [
       { title: "Program Management — Soteria SECP" },

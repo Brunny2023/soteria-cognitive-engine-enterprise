@@ -8,7 +8,7 @@ import {
 } from "@/lib/secp-data";
 import { useRequest } from "@/lib/secp-store";
 
-export const Route = createFileRoute("/requests/$id")({
+export const Route = createFileRoute("/_authenticated/requests/$id")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.id} — Soteria SECP` },

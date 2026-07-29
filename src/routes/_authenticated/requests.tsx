@@ -3,7 +3,7 @@ import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { AUTONOMY_LABELS } from "@/lib/secp-data";
 import { useRequests } from "@/lib/secp-store";
 
-export const Route = createFileRoute("/requests")({
+export const Route = createFileRoute("/_authenticated/requests")({
   head: () => ({
     meta: [
       { title: "Requests — Soteria SECP" },

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { CONSULTANTS } from "@/lib/secp-data";
 
-export const Route = createFileRoute("/consultants")({
+export const Route = createFileRoute("/_authenticated/consultants")({
   head: () => ({
     meta: [
       { title: "Consultant Tier — Soteria SECP" },
