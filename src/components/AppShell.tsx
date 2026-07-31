@@ -3,7 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { LAYERS } from "@/lib/secp-data";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, useUserRoles } from "@/hooks/useAuth";
+import { ROLE_PROFILES, primaryRole } from "@/lib/onboarding";
 import { NotificationsBell } from "@/components/NotificationsBell";
 
 const NAV = [
@@ -43,6 +44,10 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
+  const roles = useUserRoles();
+  // Roles resolve asynchronously; show the full rail until we know the role.
+  const allowedNav = roles.length ? ROLE_PROFILES[primaryRole(roles)].nav : null;
+  const visibleNav = allowedNav ? NAV.filter((n) => allowedNav.includes(n.to)) : NAV;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -75,7 +80,7 @@ export function AppShell({
           S
         </Link>
         <div className="flex flex-col gap-3">
-          {NAV.map((n) => {
+          {visibleNav.map((n) => {
             const active = pathname === n.to || pathname.startsWith(n.to + "/");
             return (
               <Link

@@ -25,10 +25,10 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) navigate({ to: "/onboarding", replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (s) navigate({ to: "/dashboard", replace: true });
+      if (s) navigate({ to: "/onboarding", replace: true });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);

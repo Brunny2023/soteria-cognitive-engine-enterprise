@@ -21,6 +21,7 @@ import { Route as AuthenticatedPublishRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticated/program'
 import { Route as AuthenticatedPolicySimRouteImport } from './routes/_authenticated/policy-sim'
 import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticated/learning'
 import { Route as AuthenticatedKnowledgeRouteImport } from './routes/_authenticated/knowledge'
 import { Route as AuthenticatedIngestRouteImport } from './routes/_authenticated/ingest'
@@ -94,6 +95,11 @@ const AuthenticatedOrganizationalRoute =
     path: '/organizational',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLearningRoute = AuthenticatedLearningRouteImport.update({
   id: '/learning',
   path: '/learning',
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/ingest': typeof AuthenticatedIngestRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
   '/learning': typeof AuthenticatedLearningRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/policy-sim': typeof AuthenticatedPolicySimRoute
   '/program': typeof AuthenticatedProgramRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/ingest': typeof AuthenticatedIngestRoute
   '/knowledge': typeof AuthenticatedKnowledgeRoute
   '/learning': typeof AuthenticatedLearningRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/policy-sim': typeof AuthenticatedPolicySimRoute
   '/program': typeof AuthenticatedProgramRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/_authenticated/ingest': typeof AuthenticatedIngestRoute
   '/_authenticated/knowledge': typeof AuthenticatedKnowledgeRoute
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
   '/_authenticated/policy-sim': typeof AuthenticatedPolicySimRoute
   '/_authenticated/program': typeof AuthenticatedProgramRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/ingest'
     | '/knowledge'
     | '/learning'
+    | '/onboarding'
     | '/organizational'
     | '/policy-sim'
     | '/program'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/ingest'
     | '/knowledge'
     | '/learning'
+    | '/onboarding'
     | '/organizational'
     | '/policy-sim'
     | '/program'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ingest'
     | '/_authenticated/knowledge'
     | '/_authenticated/learning'
+    | '/_authenticated/onboarding'
     | '/_authenticated/organizational'
     | '/_authenticated/policy-sim'
     | '/_authenticated/program'
@@ -405,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/organizational'
       fullPath: '/organizational'
       preLoaderRoute: typeof AuthenticatedOrganizationalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/learning': {
@@ -520,6 +539,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIngestRoute: typeof AuthenticatedIngestRoute
   AuthenticatedKnowledgeRoute: typeof AuthenticatedKnowledgeRoute
   AuthenticatedLearningRoute: typeof AuthenticatedLearningRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
   AuthenticatedPolicySimRoute: typeof AuthenticatedPolicySimRoute
   AuthenticatedProgramRoute: typeof AuthenticatedProgramRoute
@@ -542,6 +562,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIngestRoute: AuthenticatedIngestRoute,
   AuthenticatedKnowledgeRoute: AuthenticatedKnowledgeRoute,
   AuthenticatedLearningRoute: AuthenticatedLearningRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
   AuthenticatedPolicySimRoute: AuthenticatedPolicySimRoute,
   AuthenticatedProgramRoute: AuthenticatedProgramRoute,

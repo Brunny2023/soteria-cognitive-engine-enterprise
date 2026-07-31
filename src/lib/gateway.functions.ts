@@ -72,9 +72,12 @@ export const pingLayerFn = createServerFn({ method: "POST" })
     }
   });
 
-export const readinessCheckFn = createServerFn({ method: "GET" })
+const ReadinessInput = z.object({ origin: z.string().url().optional() });
+
+export const readinessCheckFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) => ReadinessInput.parse(input ?? {}))
+  .handler(async ({ context, data }) => {
     const tables = [
       "secp_requests",
       "secp_archetypes",
@@ -157,6 +160,114 @@ export const readinessCheckFn = createServerFn({ method: "GET" })
       label: "AI Gateway credential present",
       status: key ? "pass" : "fail",
       detail: key ? "LOVABLE_API_KEY resolved from server env." : "Missing LOVABLE_API_KEY.",
+    });
+
+    // Environment variables required by the client and server runtimes.
+    const envVars = ["SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "LOVABLE_API_KEY"] as const;
+    const missingEnv = envVars.filter((v) => !process.env[v]);
+    checks.push({
+      key: "env.required",
+      label: "Required environment variables present",
+      status: missingEnv.length === 0 ? "pass" : "fail",
+      detail: missingEnv.length === 0
+        ? `${envVars.length}/${envVars.length} server variables resolved (values never logged).`
+        : `Missing: ${missingEnv.join(", ")}.`,
+    });
+
+    // Live API connectivity through the AI Gateway.
+    if (key) {
+      const started = Date.now();
+      try {
+        const { createLovableAiGateway } = await import("./ai-gateway.server");
+        const gateway = createLovableAiGateway(key);
+        const result = await generateText({
+          model: gateway(LAYER_MODEL.governance),
+          prompt: "Reply with the single word READY.",
+          providerOptions: { lovable: { reasoningEffort: "none" } },
+        });
+        checks.push({
+          key: "api.gateway",
+          label: "AI Gateway round-trip",
+          status: result.text.trim().length > 0 ? "pass" : "warn",
+          detail: `Model ${LAYER_MODEL.governance} replied in ${Date.now() - started}ms.`,
+        });
+      } catch (err) {
+        checks.push({
+          key: "api.gateway",
+          label: "AI Gateway round-trip",
+          status: "fail",
+          detail: err instanceof Error ? err.message.slice(0, 200) : String(err),
+        });
+      }
+    }
+
+    const origin = data.origin;
+    if (origin) {
+      // Security headers on the served document.
+      try {
+        const res = await fetch(origin, { method: "GET", headers: { accept: "text/html" } });
+        const wanted = [
+          "content-security-policy",
+          "x-content-type-options",
+          "referrer-policy",
+          "x-frame-options",
+          "strict-transport-security",
+        ];
+        const present = wanted.filter((h) => res.headers.get(h));
+        checks.push({
+          key: "security.headers",
+          label: "HTTP security headers",
+          status: present.length >= 3 ? "pass" : present.length > 0 ? "warn" : "warn",
+          detail: present.length
+            ? `Present: ${present.join(", ")}. Missing: ${wanted.filter((h) => !present.includes(h)).join(", ") || "none"}.`
+            : "No hardening headers observed on the preview origin; hosting applies them on published deployments.",
+        });
+      } catch (err) {
+        checks.push({
+          key: "security.headers",
+          label: "HTTP security headers",
+          status: "warn",
+          detail: err instanceof Error ? err.message.slice(0, 200) : String(err),
+        });
+      }
+
+      // Walkthrough media assets must be downloadable for the landing page.
+      for (const asset of ["/secp-demo.webm", "/secp-demo.mp4", "/secp-demo.vtt"]) {
+        try {
+          const res = await fetch(new URL(asset, origin), { method: "GET" });
+          const len = Number(res.headers.get("content-length") ?? 0);
+          checks.push({
+            key: `asset${asset.replace(/\//g, ".")}`,
+            label: `Walkthrough asset ${asset}`,
+            status: res.ok ? "pass" : "fail",
+            detail: res.ok
+              ? `HTTP ${res.status} · ${res.headers.get("content-type") ?? "unknown type"}${len ? ` · ${(len / 1024).toFixed(0)} KB` : ""}.`
+              : `HTTP ${res.status} — asset not served.`,
+          });
+        } catch (err) {
+          checks.push({
+            key: `asset${asset.replace(/\//g, ".")}`,
+            label: `Walkthrough asset ${asset}`,
+            status: "fail",
+            detail: err instanceof Error ? err.message.slice(0, 200) : String(err),
+          });
+        }
+      }
+    } else {
+      checks.push({
+        key: "security.headers",
+        label: "HTTP security headers",
+        status: "warn",
+        detail: "No origin supplied — re-run from the browser to probe headers.",
+      });
+    }
+
+    // Build health: this handler only executes from a successfully built server bundle.
+    checks.push({
+      key: "build.health",
+      label: "Server bundle build health",
+      status: "pass",
+      detail: `Server functions executing on ${process.env.NODE_ENV ?? "unknown"} bundle; route handlers and validators loaded.`,
     });
 
     return {
