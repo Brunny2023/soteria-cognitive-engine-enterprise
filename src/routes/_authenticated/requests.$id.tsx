@@ -451,6 +451,17 @@ function RequestDetail() {
                                   </div>
                                   <div className="font-mono text-[9px] text-muted-foreground mt-1 break-all line-clamp-2">in {t.input}</div>
                                   <div className="font-mono text-[9px] text-foreground/80 mt-1 break-all line-clamp-3">out {t.output}</div>
+                                  {(t.sql || t.scope || t.fallback || (t.attempts ?? 1) > 1) && (
+                                    <div className="mt-1 space-y-0.5">
+                                      {t.sql && <div className="font-mono text-[9px] text-accent break-all">sql {t.sql}</div>}
+                                      {t.scope && <div className="font-mono text-[9px] text-muted-foreground break-all">scope {t.scope}</div>}
+                                      {((t.attempts ?? 1) > 1 || t.fallback) && (
+                                        <div className="font-mono text-[9px] text-[color:var(--warn)]">
+                                          attempts {t.attempts ?? 1}{t.fallback ? " · safe fallback served" : ""}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
@@ -469,6 +480,44 @@ function RequestDetail() {
                       </div>
                       <div className="border border-border rounded-sm p-3">
                         <div className="font-mono text-[9px] uppercase tracking-widest text-accent mb-2">Validator evidence</div>
+                        {s.validation && (
+                          <div className="mb-3 border border-border rounded-sm p-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Deterministic KG validator</span>
+                              <span
+                                className={
+                                  "font-mono text-[9px] uppercase " +
+                                  (s.validation.verdict === "validated"
+                                    ? "text-[color:var(--signal)]"
+                                    : s.validation.verdict === "rejected"
+                                      ? "text-destructive"
+                                      : "text-[color:var(--warn)]")
+                                }
+                              >
+                                {s.validation.verdict} · {s.validation.passed}/{s.validation.checked}
+                              </span>
+                            </div>
+                            <div className="mt-2 flex flex-col gap-1">
+                              {s.validation.findings.map((f) => (
+                                <div key={f.rule} className="font-mono text-[9px] flex gap-2">
+                                  <span
+                                    className={
+                                      f.status === "pass"
+                                        ? "text-[color:var(--signal)]"
+                                        : f.status === "fail"
+                                          ? "text-destructive"
+                                          : "text-muted-foreground"
+                                    }
+                                  >
+                                    {f.status === "pass" ? "✓" : f.status === "fail" ? "✕" : "–"}
+                                  </span>
+                                  <span className="text-foreground/80">{f.rule}</span>
+                                  <span className="text-muted-foreground truncate" title={f.detail}>{f.detail}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         {evidence.length === 0 && (
                           <div className="text-[11px] text-muted-foreground">No validator has weighed in yet.</div>
                         )}
