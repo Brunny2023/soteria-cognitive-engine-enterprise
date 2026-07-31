@@ -1,10 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
-import { listArtifactsFn, toolHealthFn, type ArtifactRow, type ToolHealthRow } from "@/lib/artifacts.functions";
+import { auditPackageFn, listArtifactsFn, toolHealthFn, type ArtifactRow, type AuditPackage, type ToolHealthRow } from "@/lib/artifacts.functions";
 import { EXECUTIVE_SCOPES } from "@/lib/secp-scopes";
+import { dispatchToolHealthAlertFn, type AlertDispatchResult } from "@/lib/alerts.functions";
+import {
+  DEFAULT_CHANNELS,
+  DEFAULT_THRESHOLDS,
+  evaluateBreaches,
+  loadAlertConfig,
+  renderAlertText,
+  saveAlertConfig,
+  type AlertChannels,
+  type AlertThresholds,
+} from "@/lib/tool-health-alerts";
+import { downloadAuditPackage } from "@/lib/audit-package";
 
 export const Route = createFileRoute("/_authenticated/artifacts")({
   head: () => ({
@@ -28,10 +40,28 @@ async function sha256Hex(text: string) {
 function ArtifactLedgerPage() {
   const listArtifacts = useServerFn(listArtifactsFn);
   const health = useServerFn(toolHealthFn);
+  const fetchAuditPackage = useServerFn(auditPackageFn);
+  const dispatchAlert = useServerFn(dispatchToolHealthAlertFn);
   const [selected, setSelected] = useState<ArtifactRow | null>(null);
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<string>("all");
   const [verify, setVerify] = useState<Record<string, "ok" | "tampered" | "checking">>({});
+  const [thresholds, setThresholds] = useState<AlertThresholds>(DEFAULT_THRESHOLDS);
+  const [channels, setChannels] = useState<AlertChannels>(DEFAULT_CHANNELS);
+  const [alertResult, setAlertResult] = useState<AlertDispatchResult | null>(null);
+  const [alertBusy, setAlertBusy] = useState(false);
+  const [exportBusy, setExportBusy] = useState<string | null>(null);
+  const [exportNote, setExportNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cfg = loadAlertConfig();
+    setThresholds(cfg.thresholds);
+    setChannels(cfg.channels);
+  }, []);
+
+  useEffect(() => {
+    saveAlertConfig({ thresholds, channels });
+  }, [thresholds, channels]);
 
   const artifacts = useQuery<ArtifactRow[]>({ queryKey: ["artifacts"], queryFn: () => listArtifacts() as Promise<ArtifactRow[]> });
   const toolHealth = useQuery<ToolHealthRow[]>({ queryKey: ["tool-health"], queryFn: () => health() as Promise<ToolHealthRow[]>, refetchInterval: 30000 });
@@ -49,6 +79,50 @@ function ArtifactLedgerPage() {
   const kinds = useMemo<string[]>(() => ["all", ...new Set((artifacts.data ?? []).map((a) => a.kind))], [artifacts.data]);
   const degraded = (toolHealth.data ?? []).reduce((n, t) => n + t.fallbacks, 0);
   const failures = (toolHealth.data ?? []).reduce((n, t) => n + t.failed, 0);
+  const breaches = useMemo(() => evaluateBreaches(toolHealth.data ?? [], thresholds), [toolHealth.data, thresholds]);
+
+  async function sendAlert() {
+    setAlertBusy(true);
+    setAlertResult(null);
+    try {
+      const res = (await dispatchAlert({
+        data: {
+          breaches,
+          text: renderAlertText(breaches),
+          slackWebhookUrl: channels.slackWebhookUrl,
+          emailTo: channels.emailTo,
+          emailFrom: channels.emailFrom,
+        },
+      })) as AlertDispatchResult;
+      setAlertResult(res);
+    } finally {
+      setAlertBusy(false);
+    }
+  }
+
+  // Auto-dispatch once per breach signature while alerting is enabled.
+  const signature = breaches.map((b) => `${b.tool}:${b.metric}:${b.observed}`).join("|");
+  useEffect(() => {
+    if (!channels.enabled || !signature) return;
+    void sendAlert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signature, channels.enabled]);
+
+  async function exportAuditPackage(requestId: string) {
+    setExportBusy(requestId);
+    setExportNote(null);
+    try {
+      const pkg = (await fetchAuditPackage({ data: { requestId } })) as AuditPackage;
+      const res = await downloadAuditPackage(pkg);
+      setExportNote(
+        `${requestId} · JSON ${res.json.slice(0, 16)}… · report ${res.report.slice(0, 16)}…${res.tampered ? ` · ${res.tampered} checksum mismatch(es)` : " · all checksums match"}`,
+      );
+    } catch (e) {
+      setExportNote(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExportBusy(null);
+    }
+  }
 
   async function verifyChecksum(a: ArtifactRow) {
     setVerify((v) => ({ ...v, [a.id]: "checking" }));
