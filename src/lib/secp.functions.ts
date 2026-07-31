@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { generateText } from "ai";
+import { generateText, stepCountIs } from "ai";
 import { z } from "zod";
 import type { RequestRecord, StageStep, Stage, Autonomy } from "./secp-data";
 
@@ -158,6 +158,13 @@ export const advanceRequestFn = createServerFn({ method: "POST" })
     const gateway = createLovableAiGateway(key);
 
     const step = record.steps[nextIdx];
+    const { buildExecutionTools } = await import("./secp-tools.server");
+    const { tools, trace } = buildExecutionTools({
+      supabase: context.supabase as unknown as { from: (t: string) => any },
+      requestId: record.id,
+      stage: step.stage,
+      agent: step.agent,
+    });
     const priorTrace = record.steps
       .slice(0, nextIdx)
       .filter((s) => s.status === "complete")
@@ -184,13 +191,25 @@ Agent: ${step.agent}
 TASK
 ${STAGE_PROMPT[step.stage]}
 
-Respond in 2-4 tight sentences. No headers, no lists, no markdown. Speak as the agent in first-person operational voice.`;
+EXECUTION CAPABILITY
+You are execution-capable. You hold real tools against this organization's governed data plane:
+- query_org_data: read real rows (requests, knowledge sources, learning entries, retention audit, archetypes).
+- search_knowledge: locate ingested knowledge sources relevant to the directive.
+- compute_metric: deterministic arithmetic — never do arithmetic in your head.
+- produce_artifact: persist a real work product to the artifact ledger.
+
+Rules: ground every factual or numeric claim in a tool result; call query_org_data or search_knowledge at least once before asserting organizational facts. At the execute, validate and deliver stages you MUST call produce_artifact with the actual deliverable body. If a tool returns TOOL_ERROR, say so plainly rather than inventing the result.
+
+Respond in 2-4 tight sentences summarizing what you actually did and what the tool results showed. No headers, no lists, no markdown. Speak as the agent in first-person operational voice.`;
 
     let reasoning = step.reasoning;
+    let artifactName: string | undefined = step.artifact;
     try {
       const result = await generateText({
         model: gateway("openai/gpt-5.6-luna"),
         prompt,
+        tools,
+        stopWhen: stepCountIs(50),
         providerOptions: { lovable: { reasoningEffort: "none" } },
       });
       reasoning = result.text.trim() || reasoning;
@@ -198,10 +217,24 @@ Respond in 2-4 tight sentences. No headers, no lists, no markdown. Speak as the 
       const msg = err instanceof Error ? err.message : String(err);
       reasoning = `[cognition dispatch failed — ${msg.slice(0, 200)}]`;
     }
+    const producedArtifact = [...trace]
+      .reverse()
+      .find((t) => t.name === "produce_artifact" && t.ok);
+    if (producedArtifact) {
+      const input = producedArtifact.input as { name?: string } | undefined;
+      if (input?.name) artifactName = input.name;
+    }
 
     const nextSteps = record.steps.map((s, i) => {
       if (i < nextIdx) return s;
-      if (i === nextIdx) return { ...s, status: "complete" as const, reasoning };
+      if (i === nextIdx)
+        return {
+          ...s,
+          status: "complete" as const,
+          reasoning,
+          artifact: artifactName,
+          toolCalls: trace,
+        };
       if (i === nextIdx + 1) return { ...s, status: "active" as const };
       return s;
     });
