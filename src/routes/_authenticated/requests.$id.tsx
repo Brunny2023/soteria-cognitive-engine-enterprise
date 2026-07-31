@@ -12,6 +12,8 @@ import { useMemo, useState } from "react";
 import { REQUESTS } from "@/lib/secp-data";
 import { downloadComplianceReport } from "@/lib/compliance-report";
 import { LAYER_MODEL_CATALOG } from "@/lib/gateway.functions";
+import { ScopePreview } from "@/components/ScopePreview";
+import { scopeForAgent, WAREHOUSE } from "@/lib/secp-scopes";
 
 export const Route = createFileRoute("/_authenticated/requests/$id")({
   head: ({ params }) => ({
@@ -168,6 +170,16 @@ function RequestDetail() {
           <p className="text-[10px] text-muted-foreground leading-relaxed">
             Bundles stage outputs, validator results, and the co-approval ledger. The <span className="text-accent">.sha256</span> sidecar lets reviewers confirm the PDF/JSON were not altered after export.
           </p>
+        </div>
+      )}
+      {request && (
+        <div className="px-5 py-4 border-b border-border flex flex-col gap-2">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Data-scope preview</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Exactly what each assigned executive may query when this directive executes — tables, readable columns,
+            row caps and masked fields. Statements are <span className="text-accent">SELECT-only</span> and every value is bound as a parameter.
+          </p>
+          <ScopePreview agents={request.steps.map((s) => s.agent)} />
         </div>
       )}
       <div className="p-5 flex flex-col gap-3 overflow-y-auto">
