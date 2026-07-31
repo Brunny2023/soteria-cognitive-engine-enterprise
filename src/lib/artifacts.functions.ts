@@ -27,6 +27,8 @@ export type ToolHealthRow = {
   lastError: string | null;
 };
 
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
 export type AuditPackage = {
   request: {
     id: string;
@@ -36,8 +38,8 @@ export type AuditPackage = {
     priority: string;
     autonomy: number;
     progress: number;
-    steps: unknown;
-    validators: unknown;
+    steps: Json;
+    validators: Json;
     created_at: string;
     updated_at: string;
   } | null;
