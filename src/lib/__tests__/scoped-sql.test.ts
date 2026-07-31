@@ -64,7 +64,7 @@ describe("scoped SQL execution", () => {
       columns: ["id", "title; DROP TABLE x", "not_a_column"],
       limit: 5,
     });
-    expect(check.query?.columns).toEqual(["id", "title"]);
+    expect(check.query?.columns).toEqual(["id"]);
   });
 
   it("rejects any non-SELECT statement at the allowlist", () => {
