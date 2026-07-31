@@ -31,6 +31,7 @@ const ALL_NAV = [
   "/learning",
   "/skills",
   "/knowledge",
+  "/artifacts",
   "/security",
   "/retention",
   "/policy-sim",
@@ -73,6 +74,7 @@ export const ROLE_PROFILES: Record<AppRole, RoleProfile> = {
       "/learning",
       "/skills",
       "/knowledge",
+      "/artifacts",
       "/policy-sim",
     ],
     steps: [
@@ -98,6 +100,7 @@ export const ROLE_PROFILES: Record<AppRole, RoleProfile> = {
       "/governance",
       "/requests",
       "/knowledge",
+      "/artifacts",
     ],
     steps: [
       { code: "L6", title: "Open the governance ledger", detail: "Validator scores and the immutable audit trail.", to: "/governance" },
