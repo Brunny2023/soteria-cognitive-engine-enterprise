@@ -124,6 +124,67 @@ export interface ScopeCheck {
   reason?: string;
   query?: ScopedQuery;
   sql?: string;
+  /** Bound parameter values for the placeholders in `sql`. */
+  params?: string[];
+  /** Allowlist / parameterization findings recorded for the audit trail. */
+  guard?: SqlGuardReport;
+}
+
+// ---------------------------------------------------------------------------
+// SQL statement allowlist + safe parameterization
+// ---------------------------------------------------------------------------
+
+/** The only statement verb the warehouse tool may ever emit. */
+export const ALLOWED_STATEMENTS = ["SELECT"] as const;
+
+/** Tokens that must never appear in a generated statement or a bound value. */
+export const BLOCKED_TOKENS = [
+  "insert", "update", "delete", "drop", "alter", "truncate", "grant", "revoke",
+  "create", "merge", "copy", "call", "do", "vacuum", "pg_sleep", "pg_read_file",
+  "union", "into", "returning", "information_schema", "pg_catalog", "set_config",
+  "current_setting", "dblink", "lo_import", "lo_export",
+];
+
+const IDENTIFIER_RE = /^[a-z_][a-z0-9_]*$/;
+const VALUE_METACHARS = /[;'"`\\]|--|\/\*|\*\//;
+
+export interface SqlGuardReport {
+  ok: boolean;
+  statement: string;
+  violations: string[];
+  /** Number of values passed as bound parameters rather than inlined literals. */
+  boundParams: number;
+}
+
+export function isSafeIdentifier(name: string): boolean {
+  return IDENTIFIER_RE.test(name) && !BLOCKED_TOKENS.includes(name.toLowerCase());
+}
+
+/** A bound value must be a plain scalar: no quotes, comments, or statement separators. */
+export function isSafeParameterValue(value: string): boolean {
+  if (value.length > 200) return false;
+  if (VALUE_METACHARS.test(value)) return false;
+  const lowered = value.toLowerCase();
+  return !BLOCKED_TOKENS.some((t) => new RegExp(`\\b${t}\\b`).test(lowered));
+}
+
+/** Deterministic allowlist check over a fully rendered statement. */
+export function checkStatementAllowlist(sql: string, boundParams: number): SqlGuardReport {
+  const violations: string[] = [];
+  const trimmed = sql.trim();
+  const statement = (trimmed.split(/\s+/)[0] ?? "").toUpperCase();
+  if (!ALLOWED_STATEMENTS.includes(statement as (typeof ALLOWED_STATEMENTS)[number])) {
+    violations.push(`Statement "${statement || "∅"}" is not on the allowlist (${ALLOWED_STATEMENTS.join(", ")}).`);
+  }
+  const withoutTrailingSemicolon = trimmed.replace(/;$/, "");
+  if (withoutTrailingSemicolon.includes(";")) violations.push("Statement batching (`;`) is blocked.");
+  if (/--|\/\*/.test(withoutTrailingSemicolon)) violations.push("SQL comments are blocked.");
+  const lowered = withoutTrailingSemicolon.toLowerCase();
+  for (const t of BLOCKED_TOKENS) {
+    if (new RegExp(`\\b${t}\\b`).test(lowered)) violations.push(`Blocked keyword "${t}".`);
+  }
+  if (/'/.test(withoutTrailingSemicolon)) violations.push("Inline string literals are blocked — values must be parameterized.");
+  return { ok: violations.length === 0, statement: statement || "∅", violations: [...new Set(violations)], boundParams };
 }
 
 /** Deterministically validate + normalize a query against an executive's scope. */
@@ -132,6 +193,7 @@ export function authorizeQuery(agent: string, raw: Partial<ScopedQuery>): ScopeC
   const table = raw.table as WarehouseTable;
   const spec = table ? WAREHOUSE[table] : undefined;
   if (!spec) return { allowed: false, reason: `Unknown warehouse table "${String(table)}"` };
+  if (!isSafeIdentifier(String(table))) return { allowed: false, reason: `Illegal table identifier "${String(table)}"` };
   if (!scope.tables.includes(table)) {
     return {
       allowed: false,
@@ -139,18 +201,52 @@ export function authorizeQuery(agent: string, raw: Partial<ScopedQuery>): ScopeC
     };
   }
   const requested = raw.columns?.length ? raw.columns : spec.columns;
-  const columns = requested.filter((c) => spec.columns.includes(c) && !scope.masked.includes(c));
+  const columns = requested.filter((c) => isSafeIdentifier(c) && spec.columns.includes(c) && !scope.masked.includes(c));
   if (columns.length === 0) {
     return { allowed: false, reason: `No readable columns remain after scope masking for ${table}` };
   }
-  const filters = (raw.filters ?? []).filter((f) => spec.columns.includes(f.column) && !scope.masked.includes(f.column));
-  const orderBy = raw.orderBy && spec.columns.includes(raw.orderBy) ? raw.orderBy : null;
+  const rawFilters = raw.filters ?? [];
+  const unsafeValue = rawFilters.find((f) => !isSafeParameterValue(String(f.value ?? "")));
+  if (unsafeValue) {
+    return {
+      allowed: false,
+      reason: `SQL_GUARD: filter value on "${unsafeValue.column}" contains characters or keywords that cannot be safely parameterized.`,
+    };
+  }
+  const filters = rawFilters.filter(
+    (f) => isSafeIdentifier(f.column) && spec.columns.includes(f.column) && !scope.masked.includes(f.column) && OP_SQL[f.op] !== undefined,
+  );
+  const orderBy = raw.orderBy && isSafeIdentifier(raw.orderBy) && spec.columns.includes(raw.orderBy) ? raw.orderBy : null;
   const limit = Math.max(1, Math.min(scope.rowCap, Math.round(raw.limit || 25)));
   const query: ScopedQuery = { table, columns, filters, orderBy, descending: raw.descending ?? true, limit };
-  return { allowed: true, query, sql: renderSql(query) };
+  const { sql, params } = renderParameterizedSql(query);
+  const guard = checkStatementAllowlist(sql, params.length);
+  if (!guard.ok) {
+    return { allowed: false, reason: `SQL_GUARD: ${guard.violations.join(" ")}`, guard };
+  }
+  return { allowed: true, query, sql, params, guard };
 }
 
 const OP_SQL: Record<Operator, string> = { eq: "=", neq: "<>", gt: ">", gte: ">=", lt: "<", lte: "<=", ilike: "ILIKE" };
+
+/**
+ * Render the scoped query with bound placeholders ($1, $2, …). No user value is
+ * ever inlined into the statement text — only identifiers the scope allowlist
+ * has already validated appear literally.
+ */
+export function renderParameterizedSql(q: ScopedQuery): { sql: string; params: string[] } {
+  const params: string[] = [];
+  const where = q.filters.length
+    ? ` WHERE ${q.filters
+        .map((f) => {
+          params.push(f.op === "ilike" ? `%${f.value}%` : String(f.value));
+          return `${f.column} ${OP_SQL[f.op]} $${params.length}`;
+        })
+        .join(" AND ")}`
+    : "";
+  const order = q.orderBy ? ` ORDER BY ${q.orderBy} ${q.descending ? "DESC" : "ASC"}` : "";
+  return { sql: `SELECT ${q.columns.join(", ")} FROM ${q.table}${where}${order} LIMIT ${q.limit};`, params };
+}
 
 /** Human-auditable SQL rendering of the scoped query (audit trail, not execution). */
 export function renderSql(q: ScopedQuery): string {

@@ -12,6 +12,8 @@ import { useMemo, useState } from "react";
 import { REQUESTS } from "@/lib/secp-data";
 import { downloadComplianceReport } from "@/lib/compliance-report";
 import { LAYER_MODEL_CATALOG } from "@/lib/gateway.functions";
+import { ScopePreview } from "@/components/ScopePreview";
+import { scopeForAgent, WAREHOUSE } from "@/lib/secp-scopes";
 
 export const Route = createFileRoute("/_authenticated/requests/$id")({
   head: ({ params }) => ({
@@ -168,6 +170,16 @@ function RequestDetail() {
           <p className="text-[10px] text-muted-foreground leading-relaxed">
             Bundles stage outputs, validator results, and the co-approval ledger. The <span className="text-accent">.sha256</span> sidecar lets reviewers confirm the PDF/JSON were not altered after export.
           </p>
+        </div>
+      )}
+      {request && (
+        <div className="px-5 py-4 border-b border-border flex flex-col gap-2">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Data-scope preview</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Exactly what each assigned executive may query when this directive executes — tables, readable columns,
+            row caps and masked fields. Statements are <span className="text-accent">SELECT-only</span> and every value is bound as a parameter.
+          </p>
+          <ScopePreview agents={request.steps.map((s) => s.agent)} />
         </div>
       )}
       <div className="p-5 flex flex-col gap-3 overflow-y-auto">
@@ -436,6 +448,22 @@ function RequestDetail() {
                           <div className="text-muted-foreground">Agent · <span className="text-foreground">{s.agent}</span></div>
                           <div className="text-muted-foreground">Model · <span className="text-foreground font-mono text-[10px]">{model}</span></div>
                           <div className="text-muted-foreground">Layer · <span className="text-foreground">{layer?.name}</span></div>
+                          {(() => {
+                            const sc = scopeForAgent(s.agent);
+                            return (
+                              <div className="mt-2 border-t border-border pt-2">
+                                <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">
+                                  Data scope · cap {sc.rowCap} · masked {sc.masked.join(", ") || "none"}
+                                </div>
+                                {sc.tables.map((t) => (
+                                  <div key={t} className="font-mono text-[9px] text-muted-foreground break-words">
+                                    <span className="text-foreground">{t}</span> ·{" "}
+                                    {WAREHOUSE[t].columns.filter((c) => !sc.masked.includes(c)).join(", ")}
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })()}
                           {s.toolCalls && s.toolCalls.length > 0 ? (
                             <div className="mt-2 border-t border-border pt-2 flex flex-col gap-2">
                               <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">

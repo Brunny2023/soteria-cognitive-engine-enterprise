@@ -222,10 +222,14 @@ export function validateStage(opts: {
   );
 
   const checked = findings.filter((f) => f.status !== "skip").length;
-  const failedCount = findings.filter((f) => f.status === "fail" && f.severity === "blocking").length;
+  const blockingFails = findings.filter((f) => f.status === "fail" && f.severity === "blocking");
+  // A stage with no evidence at all is "insufficient-evidence" rather than an
+  // outright rejection; anything else that fails a blocking rule is rejected.
+  const otherFails = blockingFails.filter((f) => !f.rule.startsWith("R1"));
+  const failedCount = blockingFails.length;
   const passed = findings.filter((f) => f.status === "pass").length;
   const verdict: ValidationReport["verdict"] =
-    failedCount > 0 ? "rejected" : okReads.length === 0 ? "insufficient-evidence" : "validated";
+    otherFails.length > 0 ? "rejected" : okReads.length === 0 ? "insufficient-evidence" : "validated";
 
   return { verdict, checked, passed, failed: failedCount, findings };
 }

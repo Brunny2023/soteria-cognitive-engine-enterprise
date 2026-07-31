@@ -150,7 +150,7 @@ export function buildExecutionTools(opts: {
         const q = check.query;
         return record(
           "run_sql_query",
-          { ...input, authorizedSql: check.sql },
+          { ...input, authorizedSql: check.sql, boundParams: check.params ?? [] },
           async () => {
             let builder = opts.supabase.from(q.table).select(q.columns.join(",")).limit(q.limit);
             for (const f of q.filters) {
@@ -162,7 +162,10 @@ export function buildExecutionTools(opts: {
             return { table: q.table, sql: check.sql, rowCount: (data ?? []).length, rows: data ?? [] };
           },
           () => ({ table: q.table, sql: check.sql, rowCount: 0, rows: [], degraded: true, note: "warehouse unavailable — safe empty result served" }),
-          { sql: check.sql, scope: `${scope.agent} · ${scope.title} · cap ${scope.rowCap}` },
+          {
+            sql: check.sql,
+            scope: `${scope.agent} · ${scope.title} · cap ${scope.rowCap} · SELECT-only · ${(check.params ?? []).length} bound param(s)`,
+          },
         );
       },
     }),

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type ArtifactRow = {
@@ -25,6 +26,64 @@ export type ToolHealthRow = {
   p95: number;
   lastError: string | null;
 };
+
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
+export type AuditPackage = {
+  request: {
+    id: string;
+    title: string;
+    brief: string;
+    origin: string;
+    priority: string;
+    autonomy: number;
+    progress: number;
+    steps: Json;
+    validators: Json;
+    created_at: string;
+    updated_at: string;
+  } | null;
+  artifacts: ArtifactRow[];
+  generated_at: string;
+};
+
+/** Full audit package for one execution: directive record + every ledger artifact. */
+export const auditPackageFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ requestId: z.string().min(1).max(120) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: reqRow, error: reqErr } = await context.supabase
+      .from("secp_requests")
+      .select("id,title,brief,origin,priority,autonomy,progress,steps,validators,created_at,updated_at")
+      .eq("id", data.requestId)
+      .maybeSingle();
+    if (reqErr) throw new Error(reqErr.message);
+
+    const { data: arts, error: artErr } = await context.supabase
+      .from("secp_artifacts")
+      .select("id,request_id,stage,agent,kind,name,content,checksum,inputs,created_at")
+      .eq("request_id", data.requestId)
+      .order("created_at", { ascending: true });
+    if (artErr) throw new Error(artErr.message);
+
+    const pkg: AuditPackage = {
+      request: (reqRow as AuditPackage["request"]) ?? null,
+      artifacts: ((arts ?? []) as Record<string, unknown>[]).map((r) => ({
+        id: String(r.id),
+        request_id: String(r.request_id),
+        stage: String(r.stage),
+        agent: String(r.agent),
+        kind: String(r.kind),
+        name: String(r.name),
+        content: String(r.content),
+        checksum: String(r.checksum),
+        inputs: JSON.stringify(r.inputs ?? {}, null, 2),
+        created_at: String(r.created_at),
+      })),
+      generated_at: new Date().toISOString(),
+    };
+    return pkg;
+  });
 
 export const listArtifactsFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
