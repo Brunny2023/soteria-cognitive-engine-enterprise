@@ -45,8 +45,9 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
   const roles = useUserRoles();
-  const allowedNav = ROLE_PROFILES[primaryRole(roles)].nav;
-  const visibleNav = NAV.filter((n) => allowedNav.includes(n.to));
+  // Roles resolve asynchronously; show the full rail until we know the role.
+  const allowedNav = roles.length ? ROLE_PROFILES[primaryRole(roles)].nav : null;
+  const visibleNav = allowedNav ? NAV.filter((n) => allowedNav.includes(n.to)) : NAV;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [displayName, setDisplayName] = useState<string | null>(null);
