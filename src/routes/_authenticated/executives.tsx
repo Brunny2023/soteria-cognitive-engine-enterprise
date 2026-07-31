@@ -27,6 +27,20 @@ function ExecutivesPage() {
         </section>
 
         <section>
+          <SectionHeading code="L2.0" title="Bound execution tools · officers act, not just advise" />
+          <div className="grid grid-cols-4 gap-3 mb-8">
+            {[
+              { name: "query_org_data", detail: "Governed read across requests, knowledge, learning and retention ledgers under row-level policy." },
+              { name: "search_knowledge", detail: "Keyword retrieval over the L1 ingested source index with coverage stats." },
+              { name: "compute_metric", detail: "Deterministic arithmetic engine — no estimated numbers in officer output." },
+              { name: "produce_artifact", detail: "Persists real deliverables to the artifact ledger with SHA-256 checksums." },
+            ].map((t) => (
+              <div key={t.name} className="bg-surface border border-border rounded-sm p-4">
+                <div className="font-mono text-[10px] text-accent mb-1">⌁ {t.name}</div>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{t.detail}</p>
+              </div>
+            ))}
+          </div>
           <SectionHeading code="L2.1" title="Full Council" />
           <div className="grid grid-cols-3 gap-3">
             {EXECUTIVES.map((e) => (
