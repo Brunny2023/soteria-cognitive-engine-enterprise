@@ -188,6 +188,13 @@ export interface StageStep {
   status: "complete" | "active" | "pending";
   reasoning: string;
   artifact?: string;
+  toolCalls?: {
+    name: string;
+    input: unknown;
+    output: string;
+    ms: number;
+    ok: boolean;
+  }[];
 }
 
 export interface RequestRecord {
