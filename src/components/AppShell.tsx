@@ -20,6 +20,7 @@ const NAV = [
   { to: "/learning", label: "LEARNING LOOP", code: "L∞", glyph: "↻" },
   { to: "/skills", label: "SKILLS & TRAINING", code: "SK", glyph: "⚙" },
   { to: "/knowledge", label: "KNOWLEDGE GRAPH", code: "KG", glyph: "◊" },
+  { to: "/artifacts", label: "ARTIFACT LEDGER", code: "AL", glyph: "▦" },
   { to: "/security", label: "SECURITY & COMPLIANCE", code: "SC", glyph: "⛨" },
   { to: "/retention", label: "RETENTION & PURGE", code: "RT", glyph: "⌛" },
   { to: "/policy-sim", label: "POLICY SIMULATOR", code: "PS", glyph: "◐" },

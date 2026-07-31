@@ -159,7 +159,7 @@ export const advanceRequestFn = createServerFn({ method: "POST" })
 
     const step = record.steps[nextIdx];
     const { buildExecutionTools } = await import("./secp-tools.server");
-    const { tools, trace } = buildExecutionTools({
+    const { tools, trace, scope } = buildExecutionTools({
       supabase: context.supabase as unknown as { from: (t: string) => any },
       requestId: record.id,
       stage: step.stage,
@@ -193,12 +193,14 @@ ${STAGE_PROMPT[step.stage]}
 
 EXECUTION CAPABILITY
 You are execution-capable. You hold real tools against this organization's governed data plane:
+- run_sql_query: scoped SQL read against the Supabase data warehouse. Your scope is ${scope.agent} (${scope.title}); permitted tables: ${scope.tables.join(", ")}; row cap ${scope.rowCap}${scope.masked.length ? `; masked columns: ${scope.masked.join(", ")}` : ""}.
+- describe_warehouse: inspect the tables/columns your scope permits before querying.
 - query_org_data: read real rows (requests, knowledge sources, learning entries, retention audit, archetypes).
 - search_knowledge: locate ingested knowledge sources relevant to the directive.
 - compute_metric: deterministic arithmetic — never do arithmetic in your head.
 - produce_artifact: persist a real work product to the artifact ledger.
 
-Rules: ground every factual or numeric claim in a tool result; call query_org_data or search_knowledge at least once before asserting organizational facts. At the execute, validate and deliver stages you MUST call produce_artifact with the actual deliverable body. If a tool returns TOOL_ERROR, say so plainly rather than inventing the result.
+Rules: ground every factual or numeric claim in a tool result; call run_sql_query, query_org_data or search_knowledge at least once before asserting organizational facts. At the execute, validate and deliver stages you MUST call produce_artifact with the actual deliverable body. If a tool returns TOOL_ERROR or SCOPE_DENIED, say so plainly rather than inventing the result — a deterministic knowledge-graph validator re-checks every query result and metric before this stage can be marked validated.
 
 Respond in 2-4 tight sentences summarizing what you actually did and what the tool results showed. No headers, no lists, no markdown. Speak as the agent in first-person operational voice.`;
 
@@ -227,6 +229,10 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
       } catch { /* keep prior artifact name */ }
     }
 
+    const { validateStage } = await import("./kg-rules");
+    const requireArtifact = ["execute", "validate", "deliver"].includes(step.stage);
+    const validation = validateStage({ agent: step.agent, stage: step.stage, trace, requireArtifact });
+
     const nextSteps = record.steps.map((s, i) => {
       if (i < nextIdx) return s;
       if (i === nextIdx)
@@ -236,6 +242,7 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
           reasoning,
           artifact: artifactName,
           toolCalls: trace,
+          validation,
         };
       if (i === nextIdx + 1) return { ...s, status: "active" as const };
       return s;
@@ -245,7 +252,29 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
 
     let nextValidators = record.validators;
     if (step.stage === "validate") {
-      nextValidators = record.validators.map((v) => ({ ...v, status: "passed" as const, detail: `Verified during ${record.id} validate stage.` }));
+      const blocking = validation.findings.filter((f) => f.severity === "blocking");
+      const failing = blocking.filter((f) => f.status === "fail");
+      const bucket: Record<string, string[]> = {
+        "Regulatory compliance": ["R2 · Scope containment", "R3 · Row-cap enforcement"],
+        "Financial correctness": ["R6 · Metric reproducibility", "R5 · Graph invariants"],
+        Explainability: ["R1 · Evidence grounding", "R7 · Artifact provenance"],
+        Reproducibility: ["R4 · Schema conformance", "R8 · Tool reliability", "R9 · Evidence integrity"],
+      };
+      nextValidators = record.validators.map((v) => {
+        const rules = bucket[v.name] ?? [];
+        const related = blocking.filter((f) => rules.includes(f.rule));
+        const failed = related.filter((f) => f.status === "fail");
+        if (related.length === 0) {
+          return { ...v, status: validation.verdict === "validated" ? ("passed" as const) : ("pending" as const), detail: `Deterministic validator verdict: ${validation.verdict}.` };
+        }
+        return failed.length
+          ? { ...v, status: "failed" as const, detail: failed.map((f) => `${f.rule}: ${f.detail}`).join(" · ") }
+          : { ...v, status: "passed" as const, detail: related.map((f) => `${f.rule}: ${f.detail}`).join(" · ") };
+      });
+      if (failing.length) {
+        reasoning = `${reasoning}\n\n[VALIDATOR: REJECTED — ${failing.map((f) => f.rule).join(", ")}]`;
+        nextSteps[nextIdx] = { ...nextSteps[nextIdx], reasoning };
+      }
     }
 
     const { error: updErr } = await context.supabase

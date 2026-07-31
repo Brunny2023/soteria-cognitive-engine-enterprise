@@ -194,7 +194,18 @@ export interface StageStep {
     output: string;
     ms: number;
     ok: boolean;
+    attempts?: number;
+    fallback?: boolean;
+    sql?: string;
+    scope?: string;
   }[];
+  validation?: {
+    verdict: "validated" | "rejected" | "insufficient-evidence";
+    checked: number;
+    passed: number;
+    failed: number;
+    findings: { rule: string; severity: "blocking" | "advisory"; status: "pass" | "fail" | "skip"; detail: string }[];
+  };
 }
 
 export interface RequestRecord {
