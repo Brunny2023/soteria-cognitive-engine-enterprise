@@ -436,6 +436,29 @@ function RequestDetail() {
                           <div className="text-muted-foreground">Agent · <span className="text-foreground">{s.agent}</span></div>
                           <div className="text-muted-foreground">Model · <span className="text-foreground font-mono text-[10px]">{model}</span></div>
                           <div className="text-muted-foreground">Layer · <span className="text-foreground">{layer?.name}</span></div>
+                          {s.toolCalls && s.toolCalls.length > 0 ? (
+                            <div className="mt-2 border-t border-border pt-2 flex flex-col gap-2">
+                              <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                                Executed tools · {s.toolCalls.length}
+                              </div>
+                              {s.toolCalls.map((t, i) => (
+                                <div key={`${t.name}-${i}`} className="border border-border rounded-sm p-2">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-mono text-[10px] text-accent">⌁ {t.name}</span>
+                                    <span className={"font-mono text-[9px] " + (t.ok ? "text-[color:var(--signal)]" : "text-destructive")}>
+                                      {t.ok ? "OK" : "ERR"} · {t.ms}ms
+                                    </span>
+                                  </div>
+                                  <div className="font-mono text-[9px] text-muted-foreground mt-1 break-all line-clamp-2">in {t.input}</div>
+                                  <div className="font-mono text-[9px] text-foreground/80 mt-1 break-all line-clamp-3">out {t.output}</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="mt-2 border-t border-border pt-2 font-mono text-[9px] text-muted-foreground">
+                              No tool invocations recorded for this stage.
+                            </div>
+                          )}
                           {s.artifact && (
                             <div className="mt-2 border-t border-border pt-2">
                               <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Output artifact</div>

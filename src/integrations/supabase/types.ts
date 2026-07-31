@@ -254,6 +254,48 @@ export type Database = {
         }
         Relationships: []
       }
+      secp_artifacts: {
+        Row: {
+          agent: string
+          checksum: string
+          content: string
+          created_at: string
+          id: string
+          inputs: Json
+          kind: string
+          name: string
+          owner_id: string
+          request_id: string
+          stage: string
+        }
+        Insert: {
+          agent: string
+          checksum: string
+          content: string
+          created_at?: string
+          id?: string
+          inputs?: Json
+          kind?: string
+          name: string
+          owner_id?: string
+          request_id: string
+          stage: string
+        }
+        Update: {
+          agent?: string
+          checksum?: string
+          content?: string
+          created_at?: string
+          id?: string
+          inputs?: Json
+          kind?: string
+          name?: string
+          owner_id?: string
+          request_id?: string
+          stage?: string
+        }
+        Relationships: []
+      }
       secp_pack_state: {
         Row: {
           pack_id: string
