@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
-import { listArtifactsFn, toolHealthFn, type ArtifactRow } from "@/lib/artifacts.functions";
+import { listArtifactsFn, toolHealthFn, type ArtifactRow, type ToolHealthRow } from "@/lib/artifacts.functions";
 import { EXECUTIVE_SCOPES } from "@/lib/secp-scopes";
 
 export const Route = createFileRoute("/_authenticated/artifacts")({
@@ -33,8 +33,8 @@ function ArtifactLedgerPage() {
   const [kind, setKind] = useState<string>("all");
   const [verify, setVerify] = useState<Record<string, "ok" | "tampered" | "checking">>({});
 
-  const artifacts = useQuery({ queryKey: ["artifacts"], queryFn: () => listArtifacts() });
-  const toolHealth = useQuery({ queryKey: ["tool-health"], queryFn: () => health(), refetchInterval: 30000 });
+  const artifacts = useQuery<ArtifactRow[]>({ queryKey: ["artifacts"], queryFn: () => listArtifacts() as Promise<ArtifactRow[]> });
+  const toolHealth = useQuery<ToolHealthRow[]>({ queryKey: ["tool-health"], queryFn: () => health() as Promise<ToolHealthRow[]>, refetchInterval: 30000 });
 
   const rows = useMemo(() => {
     const all = artifacts.data ?? [];
@@ -46,7 +46,7 @@ function ArtifactLedgerPage() {
     );
   }, [artifacts.data, query, kind]);
 
-  const kinds = useMemo(() => ["all", ...new Set((artifacts.data ?? []).map((a) => a.kind))], [artifacts.data]);
+  const kinds = useMemo<string[]>(() => ["all", ...new Set((artifacts.data ?? []).map((a) => a.kind))], [artifacts.data]);
   const degraded = (toolHealth.data ?? []).reduce((n, t) => n + t.fallbacks, 0);
   const failures = (toolHealth.data ?? []).reduce((n, t) => n + t.failed, 0);
 
@@ -175,7 +175,7 @@ function ArtifactLedgerPage() {
                           <div className="text-foreground">{a.agent}</div>
                           <div className="text-muted-foreground tracking-widest mt-2">EXECUTION INPUTS</div>
                           <pre className="whitespace-pre-wrap break-words text-foreground bg-surface-2 border border-border rounded-sm p-2">
-                            {JSON.stringify(a.inputs, null, 2)}
+                            {a.inputs}
                           </pre>
                         </div>
                         <div className="space-y-1">

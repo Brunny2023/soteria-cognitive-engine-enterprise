@@ -10,7 +10,7 @@ export type ArtifactRow = {
   name: string;
   content: string;
   checksum: string;
-  inputs: unknown;
+  inputs: string;
   created_at: string;
 };
 
@@ -35,7 +35,18 @@ export const listArtifactsFn = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(300);
     if (error) throw new Error(error.message);
-    return (data ?? []) as ArtifactRow[];
+    return ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+      id: String(r.id),
+      request_id: String(r.request_id),
+      stage: String(r.stage),
+      agent: String(r.agent),
+      kind: String(r.kind),
+      name: String(r.name),
+      content: String(r.content),
+      checksum: String(r.checksum),
+      inputs: JSON.stringify(r.inputs ?? {}, null, 2),
+      created_at: String(r.created_at),
+    })) as ArtifactRow[];
   });
 
 /** Aggregate tool health from every persisted stage trace. */
