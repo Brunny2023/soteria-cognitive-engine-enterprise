@@ -201,6 +201,103 @@ function ArtifactLedgerPage() {
 
         <section>
           <SectionHeading
+            code="AL·RT"
+            title="Alert thresholds · Slack & email escalation"
+            action={
+              <label className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={channels.enabled}
+                  onChange={(e) => setChannels((c) => ({ ...c, enabled: e.target.checked }))}
+                />
+                auto-escalate
+              </label>
+            }
+          />
+          <div className="border border-border rounded-sm p-4 bg-surface grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              {(
+                [
+                  ["failureRatePct", "Failure rate %", 0, 100],
+                  ["retryCount", "Retry count", 0, 50],
+                  ["fallbackCount", "Fallback count", 0, 50],
+                  ["p95Ms", "p95 latency (ms)", 100, 60000],
+                  ["minSample", "Min sample calls", 1, 100],
+                ] as [keyof AlertThresholds, string, number, number][]
+              ).map(([key, label, min, max]) => (
+                <label key={key} className="flex items-center justify-between gap-3 font-mono text-[10px] text-muted-foreground">
+                  <span className="uppercase tracking-widest">{label}</span>
+                  <input
+                    type="number"
+                    min={min}
+                    max={max}
+                    value={thresholds[key]}
+                    onChange={(e) => setThresholds((t) => ({ ...t, [key]: Number(e.target.value) }))}
+                    className="bg-surface-2 border border-border rounded-sm px-2 py-1 w-28 text-foreground"
+                  />
+                </label>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Slack incoming webhook
+                <input
+                  value={channels.slackWebhookUrl}
+                  onChange={(e) => setChannels((c) => ({ ...c, slackWebhookUrl: e.target.value }))}
+                  placeholder="https://hooks.slack.com/services/…"
+                  className="mt-1 w-full bg-surface-2 border border-border rounded-sm px-2 py-1 text-foreground normal-case tracking-normal"
+                />
+              </label>
+              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Alert recipient
+                <input
+                  value={channels.emailTo}
+                  onChange={(e) => setChannels((c) => ({ ...c, emailTo: e.target.value }))}
+                  placeholder="soc@yourdomain.com"
+                  className="mt-1 w-full bg-surface-2 border border-border rounded-sm px-2 py-1 text-foreground normal-case tracking-normal"
+                />
+              </label>
+              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Verified sender
+                <input
+                  value={channels.emailFrom}
+                  onChange={(e) => setChannels((c) => ({ ...c, emailFrom: e.target.value }))}
+                  placeholder="alerts@yourdomain.com"
+                  className="mt-1 w-full bg-surface-2 border border-border rounded-sm px-2 py-1 text-foreground normal-case tracking-normal"
+                />
+              </label>
+              <button
+                type="button"
+                disabled={alertBusy}
+                onClick={sendAlert}
+                className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20 rounded-sm disabled:opacity-40"
+              >
+                {alertBusy ? "Dispatching…" : `Send alert now (${breaches.length} breach)`}
+              </button>
+              {alertResult && (
+                <div className="font-mono text-[9px] text-muted-foreground space-y-0.5">
+                  <div>slack · {alertResult.slack.detail}</div>
+                  <div>email · {alertResult.email.detail}</div>
+                </div>
+              )}
+            </div>
+            <div className="md:col-span-2">
+              <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Current breaches</div>
+              {breaches.length === 0 ? (
+                <div className="font-mono text-[10px] text-[color:var(--signal)]">No thresholds breached — execution health nominal.</div>
+              ) : (
+                breaches.map((b, i) => (
+                  <div key={`${b.tool}-${b.metric}-${i}`} className="font-mono text-[10px] text-[color:var(--warn)]">
+                    [{b.severity}] {b.tool} · {b.metric}: {b.observed} exceeds {b.threshold}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <SectionHeading
             code="PR"
             title="Provenance ledger"
             action={
