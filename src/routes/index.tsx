@@ -20,7 +20,7 @@ function Landing() {
   // If already signed in, jump to dashboard.
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) navigate({ to: "/onboarding", replace: true });
     });
   }, [navigate]);
 
