@@ -190,7 +190,7 @@ export interface StageStep {
   artifact?: string;
   toolCalls?: {
     name: string;
-    input: unknown;
+    input: string;
     output: string;
     ms: number;
     ok: boolean;

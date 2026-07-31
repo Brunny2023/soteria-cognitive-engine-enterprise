@@ -221,8 +221,10 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
       .reverse()
       .find((t) => t.name === "produce_artifact" && t.ok);
     if (producedArtifact) {
-      const input = producedArtifact.input as { name?: string } | undefined;
-      if (input?.name) artifactName = input.name;
+      try {
+        const input = JSON.parse(producedArtifact.input) as { name?: string };
+        if (input?.name) artifactName = input.name;
+      } catch { /* keep prior artifact name */ }
     }
 
     const nextSteps = record.steps.map((s, i) => {

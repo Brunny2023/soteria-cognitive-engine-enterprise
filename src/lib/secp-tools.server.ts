@@ -7,7 +7,7 @@ import { datasetAggregates, evaluateExpression } from "./safe-math";
 
 export type ToolCallTrace = {
   name: string;
-  input: unknown;
+  input: string;
   output: string;
   ms: number;
   ok: boolean;
@@ -39,7 +39,8 @@ export function buildExecutionTools(opts: {
 }) {
   const trace: ToolCallTrace[] = [];
 
-  const record = async <T>(name: string, input: unknown, run: () => Promise<T>): Promise<T | string> => {
+  const record = async <T>(name: string, rawInput: unknown, run: () => Promise<T>): Promise<T | string> => {
+    const input = JSON.stringify(rawInput).slice(0, 2000);
     const started = Date.now();
     try {
       const result = await run();
