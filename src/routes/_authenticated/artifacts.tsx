@@ -338,6 +338,16 @@ function ArtifactLedgerPage() {
                     <span className="font-mono text-[10px] text-muted-foreground">{new Date(a.created_at).toISOString().replace("T", " ").slice(0, 19)}Z</span>
                     <span className="font-mono text-[10px] text-muted-foreground">{open ? "▾" : "▸"}</span>
                   </button>
+                  <div className="px-3 pb-2 -mt-1">
+                    <button
+                      type="button"
+                      disabled={exportBusy === a.request_id}
+                      onClick={() => exportAuditPackage(a.request_id)}
+                      className="font-mono text-[9px] uppercase tracking-widest border border-border rounded-sm px-2 py-1 hover:bg-secondary disabled:opacity-40"
+                    >
+                      {exportBusy === a.request_id ? "Packaging…" : "⤓ Export audit package (JSON + report)"}
+                    </button>
+                  </div>
                   {open && (
                     <div className="border-t border-border px-3 py-3 space-y-3">
                       <div className="grid md:grid-cols-2 gap-3 font-mono text-[10px]">
@@ -379,6 +389,7 @@ function ArtifactLedgerPage() {
               <div className="text-[11px] text-muted-foreground">No artifacts match. Executives write here whenever they execute, validate or deliver.</div>
             )}
           </div>
+          {exportNote && <div className="mt-2 font-mono text-[10px] text-muted-foreground break-all">{exportNote}</div>}
         </section>
       </div>
     </AppShell>
