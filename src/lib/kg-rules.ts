@@ -28,6 +28,8 @@ export interface TraceLike {
   output: string;
   ok: boolean;
   ms: number;
+  fallback?: boolean;
+  attempts?: number;
 }
 
 /** Domain invariants that must hold for any row surfaced from the graph. */
@@ -199,11 +201,24 @@ export function validateStage(opts: {
 
   // R8 — tool reliability: no unresolved tool failures left in the trace.
   const failed = opts.trace.filter((t) => !t.ok);
+  const degraded = opts.trace.filter((t) => t.fallback);
   push(
     "R8 · Tool reliability",
     "blocking",
     failed.length === 0 ? "pass" : "fail",
-    failed.length === 0 ? "Every tool call resolved successfully." : `${failed.length} unrecovered tool failure(s): ${[...new Set(failed.map((f) => f.name))].join(", ")}`,
+    failed.length === 0
+      ? `Every tool call resolved${degraded.length ? ` (${degraded.length} served via safe fallback)` : ""}.`
+      : `${failed.length} unrecovered tool failure(s): ${[...new Set(failed.map((f) => f.name))].join(", ")}`,
+  );
+
+  // R9 — degraded evidence: fallback results must not silently back a validated stage.
+  push(
+    "R9 · Evidence integrity",
+    "blocking",
+    degraded.length === 0 ? "pass" : "fail",
+    degraded.length === 0
+      ? "No degraded/fallback evidence was used."
+      : `${degraded.length} call(s) returned degraded fallback data: ${[...new Set(degraded.map((d) => d.name))].join(", ")}`,
   );
 
   const checked = findings.filter((f) => f.status !== "skip").length;
