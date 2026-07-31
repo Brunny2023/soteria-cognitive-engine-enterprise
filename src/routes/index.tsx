@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { WalkthroughPlayer } from "@/components/WalkthroughPlayer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -80,24 +81,7 @@ function Landing() {
               </div>
               <span className="font-mono text-[10px] text-muted-foreground">Recorded from the live SECP shell · loops continuously</span>
             </div>
-            <div className="relative border border-border rounded-sm overflow-hidden bg-background">
-              <video
-                className="w-full aspect-video block"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="metadata"
-                aria-label="Soteria SECP dashboard walkthrough"
-              >
-                <source src="/secp-demo.webm" type="video/webm" />
-                <source src="/secp-demo.mp4" type="video/mp4" />
-              </video>
-              <div className="absolute top-3 left-3 flex items-center gap-2 bg-background/70 backdrop-blur px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-accent border border-border">
-                <span className="size-1.5 rounded-full bg-[color:var(--signal)] animate-pulse" />
-                LIVE_WALKTHROUGH
-              </div>
-            </div>
+            <WalkthroughPlayer />
           </div>
         </section>
 
