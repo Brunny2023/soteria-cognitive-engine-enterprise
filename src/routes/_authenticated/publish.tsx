@@ -29,7 +29,9 @@ function PublishPage() {
   const verify = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await run();
+      const res = await run({
+        data: { origin: typeof window !== "undefined" ? window.location.origin : undefined },
+      });
       setChecks(res.checks as Check[]);
       setTs(res.generated_at);
     } finally {
@@ -50,6 +52,22 @@ function PublishPage() {
     } catch {
       setExportOk("fail");
     }
+  }
+
+  function downloadReport() {
+    if (!checks) return;
+    exportDataset(
+      "secp-publish-readiness-report",
+      checks.map((c) => ({
+        check: c.key,
+        label: c.label,
+        status: c.status,
+        detail: c.detail,
+        generated_at: ts ?? new Date().toISOString(),
+        gate: fail === 0 ? "READY" : "HOLD",
+      })),
+      "json",
+    );
   }
 
   const pass = checks?.filter((c) => c.status === "pass").length ?? 0;
@@ -79,6 +97,14 @@ function PublishPage() {
                 className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 disabled:opacity-40"
               >
                 {loading ? "▸ Running…" : "▸ Re-run checks"}
+              </button>
+              <button
+                type="button"
+                onClick={downloadReport}
+                disabled={!checks}
+                className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-foreground disabled:opacity-40"
+              >
+                ▪ Download signed report
               </button>
             </div>
           </div>
