@@ -17,6 +17,7 @@ const NAV = [
   { to: "/workforce", label: "WORKFORCE", code: "L5", glyph: "◈" },
   { to: "/governance", label: "GOVERNANCE", code: "L6", glyph: "◉" },
   { to: "/requests", label: "REQUESTS", code: "RQ", glyph: "▸" },
+  { to: "/academy", label: "OPERATOR ACADEMY", code: "AC", glyph: "✎" },
   { to: "/learning", label: "LEARNING LOOP", code: "L∞", glyph: "↻" },
   { to: "/skills", label: "SKILLS & TRAINING", code: "SK", glyph: "⚙" },
   { to: "/knowledge", label: "KNOWLEDGE GRAPH", code: "KG", glyph: "◊" },

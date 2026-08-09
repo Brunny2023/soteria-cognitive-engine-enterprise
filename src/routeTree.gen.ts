@@ -33,6 +33,7 @@ import { Route as AuthenticatedConsultantsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAuditIntegrityRouteImport } from './routes/_authenticated/audit-integrity'
 import { Route as AuthenticatedArtifactsRouteImport } from './routes/_authenticated/artifacts'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAcademyRouteImport } from './routes/_authenticated/academy'
 import { Route as AuthenticatedRequestsNewRouteImport } from './routes/_authenticated/requests.new'
 import { Route as AuthenticatedRequestsIdRouteImport } from './routes/_authenticated/requests.$id'
 
@@ -159,6 +160,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAcademyRoute = AuthenticatedAcademyRouteImport.update({
+  id: '/academy',
+  path: '/academy',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRequestsNewRoute =
   AuthenticatedRequestsNewRouteImport.update({
     id: '/new',
@@ -174,6 +180,7 @@ const AuthenticatedRequestsIdRoute = AuthenticatedRequestsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/artifacts': typeof AuthenticatedArtifactsRoute
   '/audit-integrity': typeof AuthenticatedAuditIntegrityRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/academy': typeof AuthenticatedAcademyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/artifacts': typeof AuthenticatedArtifactsRoute
   '/audit-integrity': typeof AuthenticatedAuditIntegrityRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/academy': typeof AuthenticatedAcademyRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/artifacts': typeof AuthenticatedArtifactsRoute
   '/_authenticated/audit-integrity': typeof AuthenticatedAuditIntegrityRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/academy'
     | '/admin'
     | '/artifacts'
     | '/audit-integrity'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/academy'
     | '/admin'
     | '/artifacts'
     | '/audit-integrity'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/academy'
     | '/_authenticated/admin'
     | '/_authenticated/artifacts'
     | '/_authenticated/audit-integrity'
@@ -515,6 +527,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/academy': {
+      id: '/_authenticated/academy'
+      path: '/academy'
+      fullPath: '/academy'
+      preLoaderRoute: typeof AuthenticatedAcademyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/requests/new': {
       id: '/_authenticated/requests/new'
       path: '/new'
@@ -548,6 +567,7 @@ const AuthenticatedRequestsRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAcademyRoute: typeof AuthenticatedAcademyRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedArtifactsRoute: typeof AuthenticatedArtifactsRoute
   AuthenticatedAuditIntegrityRoute: typeof AuthenticatedAuditIntegrityRoute
@@ -572,6 +592,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAcademyRoute: AuthenticatedAcademyRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedArtifactsRoute: AuthenticatedArtifactsRoute,
   AuthenticatedAuditIntegrityRoute: AuthenticatedAuditIntegrityRoute,
