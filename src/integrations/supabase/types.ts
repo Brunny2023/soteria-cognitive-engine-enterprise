@@ -365,6 +365,110 @@ export type Database = {
         }
         Relationships: []
       }
+      secp_tasks: {
+        Row: {
+          created_at: string
+          department: string
+          detail: string
+          effort_hours: number
+          id: string
+          owner_id: string
+          position: number
+          request_id: string
+          specialist_id: string
+          specialist_role: string
+          status: string
+          title: string
+          updated_at: string
+          workstream_id: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string
+          detail?: string
+          effort_hours?: number
+          id?: string
+          owner_id?: string
+          position?: number
+          request_id: string
+          specialist_id?: string
+          specialist_role?: string
+          status?: string
+          title: string
+          updated_at?: string
+          workstream_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          detail?: string
+          effort_hours?: number
+          id?: string
+          owner_id?: string
+          position?: number
+          request_id?: string
+          specialist_id?: string
+          specialist_role?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          workstream_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "secp_tasks_workstream_id_fkey"
+            columns: ["workstream_id"]
+            isOneToOne: false
+            referencedRelation: "secp_workstreams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      secp_workstreams: {
+        Row: {
+          acceptance: string
+          code: string
+          created_at: string
+          duration_days: number
+          id: string
+          objective: string
+          owner_id: string
+          owner_role: string
+          position: number
+          request_id: string
+          risk: string
+          title: string
+        }
+        Insert: {
+          acceptance?: string
+          code: string
+          created_at?: string
+          duration_days?: number
+          id?: string
+          objective?: string
+          owner_id?: string
+          owner_role?: string
+          position?: number
+          request_id: string
+          risk?: string
+          title: string
+        }
+        Update: {
+          acceptance?: string
+          code?: string
+          created_at?: string
+          duration_days?: number
+          id?: string
+          objective?: string
+          owner_id?: string
+          owner_role?: string
+          position?: number
+          request_id?: string
+          risk?: string
+          title?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           granted_at: string
