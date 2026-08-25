@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Soteria SECP</title>
+  <desc id="desc">The Soteria Executive Cognition Platform mark</desc>
+  <defs>
+    <linearGradient id="secp-blue" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#78e2ff"/>
+      <stop offset="1" stop-color="#3196cf"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="10" fill="#142842"/>
+  <rect x="7" y="7" width="50" height="50" rx="5" fill="url(#secp-blue)"/>
+  <path d="M46 17H22.5c-3.8 0-6.8 2.3-6.8 5.5 0 2.6 1.8 4.5 5.2 5.7l15.5 5.4c6.2 2.2 9 5.5 9 10.4 0 7.1-5.8 12-14 12H18v-7h13.1c4.2 0 7.1-1.8 7.1-5 0-2.2-1.6-3.8-5.2-5.1l-15-5.2C11.9 32.6 9 28.7 9 23.2 9 15.9 14.8 10 23 10h23v7Z" fill="#10213b"/>
+  <path d="M18 47h23.5c3.8 0 6.8-2.3 6.8-5.5 0-2.6-1.8-4.5-5.2-5.7l-15.5-5.4c-6.2-2.2-9-5.5-9-10.4 0-7.1 5.8-12 14-12H46v7H32.9c-4.2 0-7.1 1.8-7.1 5 0 2.2 1.6 3.8 5.2 5.1l15 5.2c6.1 2.1 9 6 9 11.5C55 49.1 49.2 55 41 55H18v-8Z" fill="#f4fbff" opacity=".95"/>
+</svg>
