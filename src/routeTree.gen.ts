@@ -19,6 +19,7 @@ import { Route as AuthenticatedRetentionRouteImport } from './routes/_authentica
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedPublishRouteImport } from './routes/_authenticated/publish'
 import { Route as AuthenticatedProgramRouteImport } from './routes/_authenticated/program'
+import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
 import { Route as AuthenticatedPolicySimRouteImport } from './routes/_authenticated/policy-sim'
 import { Route as AuthenticatedOrganizationalRouteImport } from './routes/_authenticated/organizational'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -84,6 +85,11 @@ const AuthenticatedPublishRoute = AuthenticatedPublishRouteImport.update({
 const AuthenticatedProgramRoute = AuthenticatedProgramRouteImport.update({
   id: '/program',
   path: '/program',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPolicySimRoute = AuthenticatedPolicySimRouteImport.update({
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/policy-sim': typeof AuthenticatedPolicySimRoute
+  '/portfolio': typeof AuthenticatedPortfolioRoute
   '/program': typeof AuthenticatedProgramRoute
   '/publish': typeof AuthenticatedPublishRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/organizational': typeof AuthenticatedOrganizationalRoute
   '/policy-sim': typeof AuthenticatedPolicySimRoute
+  '/portfolio': typeof AuthenticatedPortfolioRoute
   '/program': typeof AuthenticatedProgramRoute
   '/publish': typeof AuthenticatedPublishRoute
   '/requests': typeof AuthenticatedRequestsRouteWithChildren
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/organizational': typeof AuthenticatedOrganizationalRoute
   '/_authenticated/policy-sim': typeof AuthenticatedPolicySimRoute
+  '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
   '/_authenticated/program': typeof AuthenticatedProgramRoute
   '/_authenticated/publish': typeof AuthenticatedPublishRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRouteWithChildren
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/organizational'
     | '/policy-sim'
+    | '/portfolio'
     | '/program'
     | '/publish'
     | '/requests'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/organizational'
     | '/policy-sim'
+    | '/portfolio'
     | '/program'
     | '/publish'
     | '/requests'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/organizational'
     | '/_authenticated/policy-sim'
+    | '/_authenticated/portfolio'
     | '/_authenticated/program'
     | '/_authenticated/publish'
     | '/_authenticated/requests'
@@ -427,6 +439,13 @@ declare module '@tanstack/react-router' {
       path: '/program'
       fullPath: '/program'
       preLoaderRoute: typeof AuthenticatedProgramRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portfolio': {
+      id: '/_authenticated/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/policy-sim': {
@@ -582,6 +601,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedOrganizationalRoute: typeof AuthenticatedOrganizationalRoute
   AuthenticatedPolicySimRoute: typeof AuthenticatedPolicySimRoute
+  AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
   AuthenticatedProgramRoute: typeof AuthenticatedProgramRoute
   AuthenticatedPublishRoute: typeof AuthenticatedPublishRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRouteWithChildren
@@ -607,6 +627,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedOrganizationalRoute: AuthenticatedOrganizationalRoute,
   AuthenticatedPolicySimRoute: AuthenticatedPolicySimRoute,
+  AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
   AuthenticatedProgramRoute: AuthenticatedProgramRoute,
   AuthenticatedPublishRoute: AuthenticatedPublishRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRouteWithChildren,
