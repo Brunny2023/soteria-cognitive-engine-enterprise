@@ -16,6 +16,7 @@ const NAV = [
   { to: "/program", label: "PROGRAM", code: "L4", glyph: "▤" },
   { to: "/workforce", label: "WORKFORCE", code: "L5", glyph: "◈" },
   { to: "/governance", label: "GOVERNANCE", code: "L6", glyph: "◉" },
+  { to: "/portfolio", label: "PORTFOLIO CONTROL", code: "PF", glyph: "▥" },
   { to: "/requests", label: "REQUESTS", code: "RQ", glyph: "▸" },
   { to: "/academy", label: "OPERATOR ACADEMY", code: "AC", glyph: "✎" },
   { to: "/learning", label: "LEARNING LOOP", code: "L∞", glyph: "↻" },
