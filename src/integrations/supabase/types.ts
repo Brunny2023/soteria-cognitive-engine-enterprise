@@ -24,6 +24,7 @@ export type Database = {
           mime: string | null
           name: string
           notes: string | null
+          organization_id: string | null
           progress: number
           size_bytes: number
           source: string
@@ -43,6 +44,7 @@ export type Database = {
           mime?: string | null
           name: string
           notes?: string | null
+          organization_id?: string | null
           progress?: number
           size_bytes?: number
           source?: string
@@ -62,6 +64,7 @@ export type Database = {
           mime?: string | null
           name?: string
           notes?: string | null
+          organization_id?: string | null
           progress?: number
           size_bytes?: number
           source?: string
@@ -72,7 +75,15 @@ export type Database = {
           updated_at?: string
           uploader_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_sources_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       learning_entries: {
         Row: {
@@ -82,6 +93,7 @@ export type Database = {
           created_at: string
           id: string
           lesson: string
+          organization_id: string | null
           outcome: string
           rating: number
           request_id: string
@@ -95,6 +107,7 @@ export type Database = {
           created_at?: string
           id?: string
           lesson: string
+          organization_id?: string | null
           outcome: string
           rating: number
           request_id: string
@@ -108,16 +121,94 @@ export type Database = {
           created_at?: string
           id?: string
           lesson?: string
+          organization_id?: string | null
           outcome?: string
           rating?: number
           request_id?: string
           request_title?: string
           target_layer?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "learning_entries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          created_at: string
+          id: string
+          org_role: Database["public"]["Enums"]["org_role"]
+          organization_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_role?: Database["public"]["Enums"]["org_role"]
+          organization_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_role?: Database["public"]["Enums"]["org_role"]
+          organization_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          invite_code: string
+          name: string
+          plan_tier: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          invite_code?: string
+          name: string
+          plan_tier?: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          invite_code?: string
+          name?: string
+          plan_tier?: string
+          slug?: string
+          updated_at?: string
+        }
         Relationships: []
       }
       profiles: {
         Row: {
+          active_organization_id: string | null
           avatar_url: string | null
           created_at: string
           display_name: string | null
@@ -126,6 +217,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          active_organization_id?: string | null
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
@@ -134,6 +226,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          active_organization_id?: string | null
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
@@ -141,7 +234,15 @@ export type Database = {
           title?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_active_organization_id_fkey"
+            columns: ["active_organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       retention_audit_entries: {
         Row: {
@@ -207,6 +308,7 @@ export type Database = {
           guardrails: string[]
           id: string
           layer: string
+          organization_id: string | null
           owner_id: string
           packs: string[]
           role: string
@@ -225,6 +327,7 @@ export type Database = {
           guardrails?: string[]
           id: string
           layer: string
+          organization_id?: string | null
           owner_id?: string
           packs?: string[]
           role: string
@@ -243,6 +346,7 @@ export type Database = {
           guardrails?: string[]
           id?: string
           layer?: string
+          organization_id?: string | null
           owner_id?: string
           packs?: string[]
           role?: string
@@ -252,7 +356,15 @@ export type Database = {
           updated_at?: string
           updated_label?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "secp_archetypes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       secp_artifacts: {
         Row: {
@@ -264,6 +376,7 @@ export type Database = {
           inputs: Json
           kind: string
           name: string
+          organization_id: string | null
           owner_id: string
           request_id: string
           stage: string
@@ -277,6 +390,7 @@ export type Database = {
           inputs?: Json
           kind?: string
           name: string
+          organization_id?: string | null
           owner_id?: string
           request_id: string
           stage: string
@@ -290,11 +404,20 @@ export type Database = {
           inputs?: Json
           kind?: string
           name?: string
+          organization_id?: string | null
           owner_id?: string
           request_id?: string
           stage?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "secp_artifacts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       secp_pack_state: {
         Row: {
@@ -323,6 +446,7 @@ export type Database = {
           brief: string
           created_at: string
           id: string
+          organization_id: string | null
           origin: string
           owner_id: string
           priority: string
@@ -338,6 +462,7 @@ export type Database = {
           brief: string
           created_at?: string
           id: string
+          organization_id?: string | null
           origin: string
           owner_id?: string
           priority: string
@@ -353,6 +478,7 @@ export type Database = {
           brief?: string
           created_at?: string
           id?: string
+          organization_id?: string | null
           origin?: string
           owner_id?: string
           priority?: string
@@ -363,7 +489,15 @@ export type Database = {
           updated_label?: string
           validators?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "secp_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       secp_tasks: {
         Row: {
@@ -372,6 +506,7 @@ export type Database = {
           detail: string
           effort_hours: number
           id: string
+          organization_id: string | null
           owner_id: string
           position: number
           request_id: string
@@ -388,6 +523,7 @@ export type Database = {
           detail?: string
           effort_hours?: number
           id?: string
+          organization_id?: string | null
           owner_id?: string
           position?: number
           request_id: string
@@ -404,6 +540,7 @@ export type Database = {
           detail?: string
           effort_hours?: number
           id?: string
+          organization_id?: string | null
           owner_id?: string
           position?: number
           request_id?: string
@@ -415,6 +552,13 @@ export type Database = {
           workstream_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "secp_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "secp_tasks_workstream_id_fkey"
             columns: ["workstream_id"]
@@ -432,6 +576,7 @@ export type Database = {
           duration_days: number
           id: string
           objective: string
+          organization_id: string | null
           owner_id: string
           owner_role: string
           position: number
@@ -446,6 +591,7 @@ export type Database = {
           duration_days?: number
           id?: string
           objective?: string
+          organization_id?: string | null
           owner_id?: string
           owner_role?: string
           position?: number
@@ -460,6 +606,7 @@ export type Database = {
           duration_days?: number
           id?: string
           objective?: string
+          organization_id?: string | null
           owner_id?: string
           owner_role?: string
           position?: number
@@ -467,7 +614,15 @@ export type Database = {
           risk?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "secp_workstreams_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -495,6 +650,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_org_role: {
+        Args: {
+          _org: string
+          _roles: Database["public"]["Enums"]["org_role"][]
+          _user: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -502,9 +665,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_org_member: { Args: { _org: string; _user: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "operator" | "viewer"
+      org_role: "owner" | "admin" | "member" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -633,6 +798,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "operator", "viewer"],
+      org_role: ["owner", "admin", "member", "viewer"],
     },
   },
 } as const
