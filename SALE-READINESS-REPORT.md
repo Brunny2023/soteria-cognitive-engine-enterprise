@@ -3,7 +3,8 @@
 **Product:** Soteria Cognitive Engine Enterprise
 **Assessment date:** 19 September 2026
 **Baseline assessed:** `c8c8538fd8ffd48ea809fb7c03478800f508b507`
-**Final release commit:** To be recorded after the verified release commit is created.
+**Primary verified implementation commit:** `32f44624b50a8a2105dfa0dcfe66e0f97887f97a`
+**Final publication commit:** Reported with the final delivery response after this documentation update is committed.
 
 ## Executive summary
 
@@ -118,4 +119,4 @@ A buyer should provide separate staging and production infrastructure, a disposa
 **Revenue-generating SaaS: Not evidenced.**
 **Rights and chain of title: Pending external confirmation.**
 
-The final release commit SHA must be inserted into this file after the verified commit is created. The release response must report that same SHA and the hosted CI result.
+The final publication commit SHA and hosted CI result must be recorded in the delivery response. The primary implementation commit above identifies the commit containing the functional remediation and sale-readiness package before this final report metadata update.
