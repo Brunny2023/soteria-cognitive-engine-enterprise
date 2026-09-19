@@ -23,7 +23,8 @@ export const Route = createFileRoute("/_authenticated/academy")({
       { property: "og:title", content: "Operator Academy — Soteria SECP" },
       {
         property: "og:description",
-        content: "Learn the platform one executive use case at a time, with click-paths into the live console.",
+        content:
+          "Learn the platform one executive use case at a time, with click-paths into the live console.",
       },
     ],
   }),
@@ -74,13 +75,23 @@ function AcademyPage() {
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatChip label="Courses" value={String(COURSES.length)} />
           <StatChip label="Lessons" value={String(TOTAL_LESSONS)} />
-          <StatChip label="Completed" value={`${completed}`} tone={completed ? "signal" : "default"} />
-          <StatChip label="Est. time" value={`${Math.round(totalMinutes / 6) / 10}h`} tone="accent" />
+          <StatChip
+            label="Completed"
+            value={`${completed}`}
+            tone={completed ? "signal" : "default"}
+          />
+          <StatChip
+            label="Est. time"
+            value={`${Math.round(totalMinutes / 6) / 10}h`}
+            tone="accent"
+          />
         </section>
 
         <section className="bg-surface border border-border rounded-sm p-5">
           <div className="flex items-baseline justify-between gap-4">
-            <p className="font-mono text-[10px] tracking-widest text-accent">AC.0 · CURRICULUM PROGRESS</p>
+            <p className="font-mono text-[10px] tracking-widest text-accent">
+              AC.0 · CURRICULUM PROGRESS
+            </p>
             <span className="font-mono text-[10px] text-muted-foreground">
               {completed}/{TOTAL_LESSONS} · {pct}%
             </span>
@@ -89,8 +100,9 @@ function AcademyPage() {
             <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
           </div>
           <p className="text-[11px] text-muted-foreground mt-3 leading-relaxed max-w-3xl">
-            Each course teaches the platform through one executive's real work. Lessons are click-paths into the live
-            console — open the surface, do the step, then mark it done. Progress is stored for your operator account.
+            Each course teaches the platform through one executive's real work. Lessons are
+            click-paths into the live console — open the surface, do the step, then mark it done.
+            Progress is stored for your operator account.
           </p>
         </section>
 
@@ -119,7 +131,9 @@ function AcademyPage() {
                   onClick={() => setOpenId(c.id)}
                   className={
                     "text-left border rounded-sm p-4 bg-surface transition-colors " +
-                    (open.id === c.id ? "border-primary/50 bg-primary/5" : "border-border hover:border-primary/30")
+                    (open.id === c.id
+                      ? "border-primary/50 bg-primary/5"
+                      : "border-border hover:border-primary/30")
                   }
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -137,7 +151,9 @@ function AcademyPage() {
                   <p className="font-mono text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
                     {c.exec} · {c.codename}
                   </p>
-                  <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed line-clamp-3">{c.summary}</p>
+                  <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed line-clamp-3">
+                    {c.summary}
+                  </p>
                   <p className="font-mono text-[10px] text-muted-foreground mt-3">
                     {c.lessons.length} lessons · ~{courseMinutes(c)} min
                   </p>
@@ -145,7 +161,9 @@ function AcademyPage() {
               );
             })}
             {filtered.length === 0 && (
-              <p className="font-mono text-[11px] text-muted-foreground">No course matches “{query}”.</p>
+              <p className="font-mono text-[11px] text-muted-foreground">
+                No course matches “{query}”.
+              </p>
             )}
           </div>
         </section>
@@ -177,12 +195,21 @@ function AcademyPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-3">
                       <span className="font-mono text-[10px] text-accent">{l.code}</span>
-                      <span className={"text-sm font-bold " + (complete ? "text-muted-foreground line-through" : "")}>
+                      <span
+                        className={
+                          "text-sm font-bold " +
+                          (complete ? "text-muted-foreground line-through" : "")
+                        }
+                      >
                         {i + 1}. {l.title}
                       </span>
-                      <span className="font-mono text-[10px] text-muted-foreground">~{l.minutes} min</span>
+                      <span className="font-mono text-[10px] text-muted-foreground">
+                        ~{l.minutes} min
+                      </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{l.outcome}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                      {l.outcome}
+                    </p>
                     <ol className="mt-2 flex flex-wrap gap-x-2 gap-y-1 font-mono text-[10px] text-muted-foreground">
                       {l.steps.map((s, si) => (
                         <li key={s} className="flex items-center gap-2">
@@ -225,7 +252,9 @@ function CourseInspector({ course, done }: { course: Course; done: string[] }) {
       </div>
       <p className="text-[11px] text-muted-foreground leading-relaxed">{course.summary}</p>
       <div>
-        <p className="font-mono text-[10px] tracking-widest text-accent mb-2">GUARDRAILS TO INTERNALIZE</p>
+        <p className="font-mono text-[10px] tracking-widest text-accent mb-2">
+          GUARDRAILS TO INTERNALIZE
+        </p>
         <ul className="flex flex-col gap-2">
           {course.guardrails.map((g) => (
             <li key={g} className="text-[11px] text-muted-foreground leading-relaxed flex gap-2">

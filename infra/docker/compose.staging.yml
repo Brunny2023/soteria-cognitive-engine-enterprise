@@ -1,0 +1,17 @@
+services:
+  app:
+    image: node:22.13.0-bookworm-slim
+    working_dir: /workspace
+    command: ["npm", "run", "preview", "--", "--host", "0.0.0.0"]
+    env_file:
+      - ../../.env.staging.local
+    ports:
+      - "4173:4173"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+    restart: unless-stopped

@@ -1,0 +1,19 @@
+name = "soteria-cognitive-engine"
+main = ".output/server/index.mjs"
+compatibility_date = "2026-09-19"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".output/public"
+
+[vars]
+APP_ENV = "staging"
+AI_MODEL = "provider-model-id"
+AI_GATEWAY_BASE_URL = "https://gateway.example.invalid"
+
+# Set secrets with `wrangler secret put`; never place values here.
+# SUPABASE_URL
+# SUPABASE_PUBLISHABLE_KEY
+# SUPABASE_SERVICE_ROLE_KEY
+# LOVABLE_API_KEY
+# ERROR_REPORTING_DSN

@@ -50,11 +50,15 @@ export type AuditPackage = {
 /** Full audit package for one execution: directive record + every ledger artifact. */
 export const auditPackageFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ requestId: z.string().min(1).max(120) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ requestId: z.string().min(1).max(120) }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     const { data: reqRow, error: reqErr } = await context.supabase
       .from("secp_requests")
-      .select("id,title,brief,origin,priority,autonomy,progress,steps,validators,created_at,updated_at")
+      .select(
+        "id,title,brief,origin,priority,autonomy,progress,steps,validators,created_at,updated_at",
+      )
       .eq("id", data.requestId)
       .maybeSingle();
     if (reqErr) throw new Error(reqErr.message);
@@ -119,12 +123,39 @@ export const toolHealthFn = createServerFn({ method: "GET" })
       .limit(100);
     if (error) throw new Error(error.message);
 
-    const buckets = new Map<string, { ms: number[]; ok: number; failed: number; retried: number; fallbacks: number; lastError: string | null }>();
+    const buckets = new Map<
+      string,
+      {
+        ms: number[];
+        ok: number;
+        failed: number;
+        retried: number;
+        fallbacks: number;
+        lastError: string | null;
+      }
+    >();
     for (const row of (data ?? []) as { steps: unknown }[]) {
-      const steps = (row.steps as { toolCalls?: { name: string; ms: number; ok: boolean; attempts?: number; fallback?: boolean; output: string }[] }[]) ?? [];
+      const steps =
+        (row.steps as {
+          toolCalls?: {
+            name: string;
+            ms: number;
+            ok: boolean;
+            attempts?: number;
+            fallback?: boolean;
+            output: string;
+          }[];
+        }[]) ?? [];
       for (const s of steps) {
         for (const t of s.toolCalls ?? []) {
-          const b = buckets.get(t.name) ?? { ms: [], ok: 0, failed: 0, retried: 0, fallbacks: 0, lastError: null };
+          const b = buckets.get(t.name) ?? {
+            ms: [],
+            ok: 0,
+            failed: 0,
+            retried: 0,
+            fallbacks: 0,
+            lastError: null,
+          };
           b.ms.push(t.ms);
           if (t.ok) b.ok += 1;
           else {

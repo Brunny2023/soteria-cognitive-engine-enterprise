@@ -32,7 +32,11 @@ export type OrgWorkspace = {
 };
 
 const slugify = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "org";
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 40) || "org";
 
 /** Full tenancy workspace: orgs the user belongs to, members of the active org, shared record counts. */
 export const orgWorkspaceFn = createServerFn({ method: "GET" })
@@ -54,7 +58,13 @@ export const orgWorkspaceFn = createServerFn({ method: "GET" })
     );
 
     let orgs: Organization[] = [];
-    let allMembers: { organization_id: string; user_id: string; org_role: OrgRole; id: string; created_at: string }[] = [];
+    let allMembers: {
+      organization_id: string;
+      user_id: string;
+      org_role: OrgRole;
+      id: string;
+      created_at: string;
+    }[] = [];
     if (ids.length) {
       const { data: orgRows } = await sb
         .from("organizations")
@@ -65,14 +75,16 @@ export const orgWorkspaceFn = createServerFn({ method: "GET" })
         .select("id,organization_id,user_id,org_role,created_at")
         .in("organization_id", ids);
       allMembers = (memberRows ?? []) as typeof allMembers;
-      orgs = ((orgRows ?? []) as {
-        id: string;
-        name: string;
-        slug: string;
-        invite_code: string;
-        plan_tier: string;
-        created_at: string;
-      }[]).map((o) => {
+      orgs = (
+        (orgRows ?? []) as {
+          id: string;
+          name: string;
+          slug: string;
+          invite_code: string;
+          plan_tier: string;
+          created_at: string;
+        }[]
+      ).map((o) => {
         const role = roleById.get(o.id) ?? "viewer";
         return {
           id: o.id,
@@ -95,7 +107,8 @@ export const orgWorkspaceFn = createServerFn({ method: "GET" })
       .eq("id", context.userId)
       .maybeSingle();
     let activeOrganizationId =
-      (profile as { active_organization_id?: string | null } | null)?.active_organization_id ?? null;
+      (profile as { active_organization_id?: string | null } | null)?.active_organization_id ??
+      null;
     if (activeOrganizationId && !ids.includes(activeOrganizationId)) activeOrganizationId = null;
 
     let members: OrgMember[] = [];
@@ -104,9 +117,14 @@ export const orgWorkspaceFn = createServerFn({ method: "GET" })
       const { data: profiles } = await sb
         .from("profiles")
         .select("id,display_name,title")
-        .in("id", rows.map((r) => r.user_id));
+        .in(
+          "id",
+          rows.map((r) => r.user_id),
+        );
       const pById = new Map(
-        ((profiles ?? []) as { id: string; display_name: string | null; title: string | null }[]).map((p) => [p.id, p]),
+        (
+          (profiles ?? []) as { id: string; display_name: string | null; title: string | null }[]
+        ).map((p) => [p.id, p]),
       );
       const rank: Record<OrgRole, number> = { owner: 0, admin: 1, member: 2, viewer: 3 };
       members = rows
@@ -118,10 +136,15 @@ export const orgWorkspaceFn = createServerFn({ method: "GET" })
           title: pById.get(r.user_id)?.title ?? null,
           created_at: r.created_at,
         }))
-        .sort((a, b) => rank[a.org_role] - rank[b.org_role] || a.display_name.localeCompare(b.display_name));
+        .sort(
+          (a, b) =>
+            rank[a.org_role] - rank[b.org_role] || a.display_name.localeCompare(b.display_name),
+        );
     }
 
-    const count = async (table: string) => {
+    const count = async (
+      table: "secp_requests" | "secp_workstreams" | "secp_tasks" | "secp_artifacts",
+    ) => {
       if (!activeOrganizationId) return 0;
       const { count: c } = await sb
         .from(table)
@@ -162,7 +185,10 @@ export const createOrgFn = createServerFn({ method: "POST" })
       .from("organization_members")
       .insert({ organization_id: id, user_id: context.userId, org_role: "owner" } as never);
     if (mErr) throw new Error(mErr.message);
-    await sb.from("profiles").update({ active_organization_id: id } as never).eq("id", context.userId);
+    await sb
+      .from("profiles")
+      .update({ active_organization_id: id } as never)
+      .eq("id", context.userId);
     return { id, slug };
   });
 
@@ -184,10 +210,9 @@ export const joinOrgFn = createServerFn({ method: "POST" })
     if (!found) throw new Error("No organization matches that invite code");
     const { error } = await context.supabase
       .from("organization_members")
-      .upsert(
-        { organization_id: found.id, user_id: context.userId, org_role: "viewer" } as never,
-        { onConflict: "organization_id,user_id" },
-      );
+      .upsert({ organization_id: found.id, user_id: context.userId, org_role: "viewer" } as never, {
+        onConflict: "organization_id,user_id",
+      });
     if (error) throw new Error(error.message);
     await context.supabase
       .from("profiles")
@@ -199,7 +224,9 @@ export const joinOrgFn = createServerFn({ method: "POST" })
 /** Switch the caller's active tenant (or return to a personal workspace with null). */
 export const setActiveOrgFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => z.object({ organizationId: z.string().uuid().nullable() }).parse(i))
+  .inputValidator((i: unknown) =>
+    z.object({ organizationId: z.string().uuid().nullable() }).parse(i),
+  )
   .handler(async ({ data, context }) => {
     if (data.organizationId) {
       const { data: m } = await context.supabase
@@ -243,7 +270,10 @@ export const removeMemberFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ memberId: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("organization_members").delete().eq("id", data.memberId);
+    const { error } = await context.supabase
+      .from("organization_members")
+      .delete()
+      .eq("id", data.memberId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -253,7 +283,10 @@ export const rotateInviteFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ organizationId: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
-    const code = Array.from({ length: 12 }, () => "0123456789abcdef"[Math.floor(Math.random() * 16)]).join("");
+    const code = Array.from(
+      { length: 12 },
+      () => "0123456789abcdef"[Math.floor(Math.random() * 16)],
+    ).join("");
     const { error } = await context.supabase
       .from("organizations")
       .update({ invite_code: code } as never)
@@ -272,7 +305,8 @@ export const shareWorkspaceFn = createServerFn({ method: "POST" })
       .select("active_organization_id")
       .eq("id", context.userId)
       .maybeSingle();
-    const orgId = (profile as { active_organization_id?: string | null } | null)?.active_organization_id;
+    const orgId = (profile as { active_organization_id?: string | null } | null)
+      ?.active_organization_id;
     if (!orgId) throw new Error("Select an active organization first");
     const tables = [
       "secp_requests",
@@ -286,11 +320,16 @@ export const shareWorkspaceFn = createServerFn({ method: "POST" })
     let shared = 0;
     for (const table of tables) {
       const ownerCol =
-        table === "knowledge_sources" ? "uploader_id" : table === "learning_entries" ? "author_id" : "owner_id";
+        table === "knowledge_sources"
+          ? "uploader_id"
+          : table === "learning_entries"
+            ? "author_id"
+            : "owner_id";
       const { data: rows, error } = await sb
         .from(table)
         .update({ organization_id: orgId } as never)
-        .eq(ownerCol, context.userId)
+        // Supabase's generated union type cannot express the table/owner-column discriminator.
+        .eq(ownerCol as never, context.userId)
         .is("organization_id", null)
         .select("id");
       if (error) throw new Error(`${table}: ${error.message}`);

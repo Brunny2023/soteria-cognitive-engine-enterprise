@@ -26,10 +26,15 @@ export const listInboxFn = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<InboxTask[]> => {
     const { data: tasks, error } = await context.supabase
       .from("secp_tasks")
-      .select("id,request_id,workstream_id,title,detail,specialist_id,specialist_role,department,effort_hours,status,updated_at,position")
+      .select(
+        "id,request_id,workstream_id,title,detail,specialist_id,specialist_role,department,effort_hours,status,updated_at,position",
+      )
       .order("position", { ascending: true });
     if (error) throw new Error(error.message);
-    const rows = (tasks ?? []) as (Omit<InboxTask, "request_title" | "workstream_code" | "workstream_title" | "artifact_id" | "artifact_checksum"> & { position: number })[];
+    const rows = (tasks ?? []) as (Omit<
+      InboxTask,
+      "request_title" | "workstream_code" | "workstream_title" | "artifact_id" | "artifact_checksum"
+    > & { position: number })[];
     if (!rows.length) return [];
 
     const { data: ws } = await context.supabase.from("secp_workstreams").select("id,code,title");
@@ -40,8 +45,12 @@ export const listInboxFn = createServerFn({ method: "GET" })
       .eq("stage", "workforce")
       .order("created_at", { ascending: false });
 
-    const wsMap = new Map(((ws ?? []) as { id: string; code: string; title: string }[]).map((w) => [w.id, w]));
-    const reqMap = new Map(((reqs ?? []) as { id: string; title: string }[]).map((r) => [r.id, r.title]));
+    const wsMap = new Map(
+      ((ws ?? []) as { id: string; code: string; title: string }[]).map((w) => [w.id, w]),
+    );
+    const reqMap = new Map(
+      ((reqs ?? []) as { id: string; title: string }[]).map((r) => [r.id, r.title]),
+    );
     const artMap = new Map<string, { id: string; checksum: string }>();
     for (const a of (arts ?? []) as { id: string; checksum: string; name: string }[]) {
       if (!artMap.has(a.name)) artMap.set(a.name, { id: a.id, checksum: a.checksum });
@@ -75,8 +84,14 @@ export const executeTaskFn = createServerFn({ method: "POST" })
     if (!task) throw new Error("Task not found");
 
     const t = task as {
-      id: string; request_id: string; workstream_id: string; title: string;
-      detail: string; specialist_id: string; specialist_role: string; department: string;
+      id: string;
+      request_id: string;
+      workstream_id: string;
+      title: string;
+      detail: string;
+      specialist_id: string;
+      specialist_role: string;
+      department: string;
     };
 
     const { data: req } = await context.supabase
@@ -92,7 +107,12 @@ export const executeTaskFn = createServerFn({ method: "POST" })
 
     const directive = (req as { title?: string } | null)?.title ?? t.request_id;
     const brief = (req as { brief?: string } | null)?.brief ?? "";
-    const stream = ws as { code?: string; title?: string; objective?: string; acceptance?: string } | null;
+    const stream = ws as {
+      code?: string;
+      title?: string;
+      objective?: string;
+      acceptance?: string;
+    } | null;
 
     const { sha256, synthesize, taskDeliverableFallback } = await import("./exec.server");
     const fallback = taskDeliverableFallback({
@@ -158,5 +178,12 @@ export const getTaskArtifactFn = createServerFn({ method: "GET" })
       .eq("id", data.artifactId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return row as { id: string; name: string; content: string; checksum: string; agent: string; created_at: string } | null;
+    return row as {
+      id: string;
+      name: string;
+      content: string;
+      checksum: string;
+      agent: string;
+      created_at: string;
+    } | null;
   });

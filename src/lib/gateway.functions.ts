@@ -41,7 +41,14 @@ export const pingLayerFn = createServerFn({ method: "POST" })
     const model = LAYER_MODEL[data.layer];
     const key = process.env.LOVABLE_API_KEY;
     if (!key) {
-      return { layer: data.layer, model, ok: false, latency_ms: 0, reply: "", error: "Missing LOVABLE_API_KEY" };
+      return {
+        layer: data.layer,
+        model,
+        ok: false,
+        latency_ms: 0,
+        reply: "",
+        error: "Missing LOVABLE_API_KEY",
+      };
     }
     const { createLovableAiGateway } = await import("./ai-gateway.server");
     const gateway = createLovableAiGateway(key);
@@ -127,13 +134,25 @@ export const readinessCheckFn = createServerFn({ method: "POST" })
       .select("id,steps")
       .limit(100);
     if (reqErr) {
-      checks.push({ key: "audit.reasoning", label: "Reasoning trace integrity", status: "fail", detail: reqErr.message });
-    } else {
-      const withSteps = (reqRows ?? []).filter((r) => Array.isArray(r.steps) && (r.steps as unknown[]).length > 0).length;
       checks.push({
         key: "audit.reasoning",
         label: "Reasoning trace integrity",
-        status: reqRows && reqRows.length > 0 && withSteps === reqRows.length ? "pass" : reqRows && reqRows.length === 0 ? "warn" : "warn",
+        status: "fail",
+        detail: reqErr.message,
+      });
+    } else {
+      const withSteps = (reqRows ?? []).filter(
+        (r) => Array.isArray(r.steps) && (r.steps as unknown[]).length > 0,
+      ).length;
+      checks.push({
+        key: "audit.reasoning",
+        label: "Reasoning trace integrity",
+        status:
+          reqRows && reqRows.length > 0 && withSteps === reqRows.length
+            ? "pass"
+            : reqRows && reqRows.length === 0
+              ? "warn"
+              : "warn",
         detail: `${withSteps}/${reqRows?.length ?? 0} directives carry a persisted reasoning trace.`,
       });
     }
@@ -142,15 +161,21 @@ export const readinessCheckFn = createServerFn({ method: "POST" })
       .from("retention_audit_entries")
       .select("*", { count: "exact", head: true });
     if (auditErr) {
-      checks.push({ key: "audit.retention", label: "Retention audit ledger", status: "fail", detail: auditErr.message });
+      checks.push({
+        key: "audit.retention",
+        label: "Retention audit ledger",
+        status: "fail",
+        detail: auditErr.message,
+      });
     } else {
       checks.push({
         key: "audit.retention",
         label: "Retention audit ledger",
         status: (auditCount ?? 0) > 0 ? "pass" : "warn",
-        detail: (auditCount ?? 0) > 0
-          ? `${auditCount} audit entries persisted server-side (encrypted at rest).`
-          : "Ledger reachable but empty — trigger any retention change to populate.",
+        detail:
+          (auditCount ?? 0) > 0
+            ? `${auditCount} audit entries persisted server-side (encrypted at rest).`
+            : "Ledger reachable but empty — trigger any retention change to populate.",
       });
     }
 
@@ -169,9 +194,10 @@ export const readinessCheckFn = createServerFn({ method: "POST" })
       key: "env.required",
       label: "Required environment variables present",
       status: missingEnv.length === 0 ? "pass" : "fail",
-      detail: missingEnv.length === 0
-        ? `${envVars.length}/${envVars.length} server variables resolved (values never logged).`
-        : `Missing: ${missingEnv.join(", ")}.`,
+      detail:
+        missingEnv.length === 0
+          ? `${envVars.length}/${envVars.length} server variables resolved (values never logged).`
+          : `Missing: ${missingEnv.join(", ")}.`,
     });
 
     // Live API connectivity through the AI Gateway.

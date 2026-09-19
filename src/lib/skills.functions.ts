@@ -44,9 +44,19 @@ const CreateArchetypeInput = z.object({
 });
 
 function toRow(r: {
-  id: string; codename: string; role: string; layer: string; department: string;
-  autonomy: number; skills: unknown; packs: unknown; guardrails: unknown;
-  status: string; trained: number; deployed: number; updated_label: string;
+  id: string;
+  codename: string;
+  role: string;
+  layer: string;
+  department: string;
+  autonomy: number;
+  skills: unknown;
+  packs: unknown;
+  guardrails: unknown;
+  status: string;
+  trained: number;
+  deployed: number;
+  updated_label: string;
 }): ArchetypeRow {
   return {
     id: r.id,
@@ -70,7 +80,9 @@ export const listArchetypesFn = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("secp_archetypes")
-      .select("id,codename,role,layer,department,autonomy,skills,packs,guardrails,status,trained,deployed,updated_label")
+      .select(
+        "id,codename,role,layer,department,autonomy,skills,packs,guardrails,status,trained,deployed,updated_label",
+      )
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map(toRow);
@@ -88,7 +100,11 @@ export const createArchetypeFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => CreateArchetypeInput.parse(i))
   .handler(async ({ data, context }) => {
-    const idBase = data.codename.replace(/[^A-Z0-9]/gi, "").slice(0, 6).toUpperCase() || "NEW";
+    const idBase =
+      data.codename
+        .replace(/[^A-Z0-9]/gi, "")
+        .slice(0, 6)
+        .toUpperCase() || "NEW";
     const id = `AT-${idBase}-${Math.floor(Math.random() * 900 + 100)}`;
     const updated = stamp();
     const { error } = await context.supabase.from("secp_archetypes").insert({
@@ -127,11 +143,15 @@ export const advanceArchetypeFn = createServerFn({ method: "POST" })
     if (row.status === "draft") patch = { ...patch, status: "training", trained: 0.25 };
     else if (row.status === "training") {
       const next = Math.min(1, row.trained + 0.25);
-      patch = next >= 1
-        ? { ...patch, trained: 1, status: "deployed", deployed: Math.max(1, row.deployed) }
-        : { ...patch, trained: next };
+      patch =
+        next >= 1
+          ? { ...patch, trained: 1, status: "deployed", deployed: Math.max(1, row.deployed) }
+          : { ...patch, trained: next };
     } else if (row.status === "deployed") patch = { ...patch, deployed: row.deployed + 1 };
-    const { error: upd } = await context.supabase.from("secp_archetypes").update(patch).eq("id", data.id);
+    const { error: upd } = await context.supabase
+      .from("secp_archetypes")
+      .update(patch)
+      .eq("id", data.id);
     if (upd) throw new Error(upd.message);
     return { ok: true };
   });
@@ -150,9 +170,16 @@ export const retireArchetypeFn = createServerFn({ method: "POST" })
 
 export const togglePackFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => z.object({ id: z.string(), status: z.enum(["installed","available","pending"]) }).parse(i))
+  .inputValidator((i: unknown) =>
+    z.object({ id: z.string(), status: z.enum(["installed", "available", "pending"]) }).parse(i),
+  )
   .handler(async ({ data, context }) => {
-    const next: PackStatus = data.status === "installed" ? "available" : data.status === "available" ? "pending" : "installed";
+    const next: PackStatus =
+      data.status === "installed"
+        ? "available"
+        : data.status === "available"
+          ? "pending"
+          : "installed";
     const { error } = await context.supabase
       .from("secp_pack_state")
       .upsert({ pack_id: data.id, status: next }, { onConflict: "pack_id" });

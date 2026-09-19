@@ -7,9 +7,16 @@ export const Route = createFileRoute("/_authenticated/requests")({
   head: () => ({
     meta: [
       { title: "Requests — Soteria SECP" },
-      { name: "description", content: "The active queue of organizational cognition requests moving through intent, deliberation, planning, execution, and validation." },
+      {
+        name: "description",
+        content:
+          "The active queue of organizational cognition requests moving through intent, deliberation, planning, execution, and validation.",
+      },
       { property: "og:title", content: "Requests — Soteria SECP" },
-      { property: "og:description", content: "Every directive, from executive intent to auditable delivery." },
+      {
+        property: "og:description",
+        content: "Every directive, from executive intent to auditable delivery.",
+      },
     ],
   }),
   component: RequestsPage,
@@ -79,7 +86,9 @@ function RequestsPage() {
                 </div>
                 <div className="col-span-2">
                   <div className="font-mono text-[10px] text-primary">L{r.autonomy}</div>
-                  <div className="text-[9px] text-muted-foreground">{AUTONOMY_LABELS[r.autonomy]}</div>
+                  <div className="text-[9px] text-muted-foreground">
+                    {AUTONOMY_LABELS[r.autonomy]}
+                  </div>
                 </div>
                 <div className="col-span-2">
                   <div className="flex justify-between text-[9px] font-mono text-muted-foreground mb-1">
@@ -88,7 +97,9 @@ function RequestsPage() {
                   </div>
                   <div className="h-1 w-full bg-border rounded-full overflow-hidden">
                     <div
-                      className={"h-full " + (r.progress === 1 ? "bg-[color:var(--signal)]" : "bg-primary")}
+                      className={
+                        "h-full " + (r.progress === 1 ? "bg-[color:var(--signal)]" : "bg-primary")
+                      }
                       style={{ width: `${Math.max(r.progress * 100, 2)}%` }}
                     />
                   </div>

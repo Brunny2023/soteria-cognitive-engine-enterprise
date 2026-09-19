@@ -61,16 +61,40 @@ export function evaluateBreaches(rows: HealthRowLike[], t: AlertThresholds): Bre
   for (const r of rows) {
     const rate = r.calls > 0 ? (r.failed / r.calls) * 100 : 0;
     if (r.calls >= t.minSample && rate > t.failureRatePct) {
-      breaches.push({ tool: r.name, metric: "failure-rate", observed: `${rate.toFixed(1)}%`, threshold: `${t.failureRatePct}%`, severity: "critical" });
+      breaches.push({
+        tool: r.name,
+        metric: "failure-rate",
+        observed: `${rate.toFixed(1)}%`,
+        threshold: `${t.failureRatePct}%`,
+        severity: "critical",
+      });
     }
     if (r.retried > t.retryCount) {
-      breaches.push({ tool: r.name, metric: "retries", observed: String(r.retried), threshold: String(t.retryCount), severity: "warning" });
+      breaches.push({
+        tool: r.name,
+        metric: "retries",
+        observed: String(r.retried),
+        threshold: String(t.retryCount),
+        severity: "warning",
+      });
     }
     if (r.fallbacks > t.fallbackCount) {
-      breaches.push({ tool: r.name, metric: "fallbacks", observed: String(r.fallbacks), threshold: String(t.fallbackCount), severity: "critical" });
+      breaches.push({
+        tool: r.name,
+        metric: "fallbacks",
+        observed: String(r.fallbacks),
+        threshold: String(t.fallbackCount),
+        severity: "critical",
+      });
     }
     if (r.p95 > t.p95Ms) {
-      breaches.push({ tool: r.name, metric: "latency", observed: `${r.p95}ms p95`, threshold: `${t.p95Ms}ms`, severity: "warning" });
+      breaches.push({
+        tool: r.name,
+        metric: "latency",
+        observed: `${r.p95}ms p95`,
+        threshold: `${t.p95Ms}ms`,
+        severity: "warning",
+      });
     }
   }
   return breaches;
@@ -79,7 +103,8 @@ export function evaluateBreaches(rows: HealthRowLike[], t: AlertThresholds): Bre
 export function renderAlertText(breaches: Breach[]): string {
   if (breaches.length === 0) return "SECP tool health nominal — no thresholds breached.";
   const lines = breaches.map(
-    (b) => `• [${b.severity.toUpperCase()}] ${b.tool} · ${b.metric}: ${b.observed} exceeds ${b.threshold}`,
+    (b) =>
+      `• [${b.severity.toUpperCase()}] ${b.tool} · ${b.metric}: ${b.observed} exceeds ${b.threshold}`,
   );
   return [`SECP tool-health alert — ${breaches.length} threshold breach(es)`, ...lines].join("\n");
 }
@@ -92,7 +117,8 @@ export interface AlertConfig {
 }
 
 export function loadAlertConfig(): AlertConfig {
-  if (typeof window === "undefined") return { thresholds: DEFAULT_THRESHOLDS, channels: DEFAULT_CHANNELS };
+  if (typeof window === "undefined")
+    return { thresholds: DEFAULT_THRESHOLDS, channels: DEFAULT_CHANNELS };
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return { thresholds: DEFAULT_THRESHOLDS, channels: DEFAULT_CHANNELS };

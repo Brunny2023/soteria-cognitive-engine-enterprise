@@ -6,9 +6,16 @@ export const Route = createFileRoute("/_authenticated/executives")({
   head: () => ({
     meta: [
       { title: "Executive Council — Soteria SECP" },
-      { name: "description", content: "The AI executive council: eleven officer agents that interpret intent, deliberate, and set execution strategy for the organization." },
+      {
+        name: "description",
+        content:
+          "The AI executive council: eleven officer agents that interpret intent, deliberate, and set execution strategy for the organization.",
+      },
       { property: "og:title", content: "Executive Council — Soteria SECP" },
-      { property: "og:description", content: "Eleven officer agents reasoning across strategy, risk, capital, and operations." },
+      {
+        property: "og:description",
+        content: "Eleven officer agents reasoning across strategy, risk, capital, and operations.",
+      },
     ],
   }),
   component: ExecutivesPage,
@@ -27,13 +34,29 @@ function ExecutivesPage() {
         </section>
 
         <section>
-          <SectionHeading code="L2.0" title="Bound execution tools · officers act, not just advise" />
+          <SectionHeading
+            code="L2.0"
+            title="Bound execution tools · officers act, not just advise"
+          />
           <div className="grid grid-cols-4 gap-3 mb-8">
             {[
-              { name: "query_org_data", detail: "Governed read across requests, knowledge, learning and retention ledgers under row-level policy." },
-              { name: "search_knowledge", detail: "Keyword retrieval over the L1 ingested source index with coverage stats." },
-              { name: "compute_metric", detail: "Deterministic arithmetic engine — no estimated numbers in officer output." },
-              { name: "produce_artifact", detail: "Persists real deliverables to the artifact ledger with SHA-256 checksums." },
+              {
+                name: "query_org_data",
+                detail:
+                  "Governed read across requests, knowledge, learning and retention ledgers under row-level policy.",
+              },
+              {
+                name: "search_knowledge",
+                detail: "Keyword retrieval over the L1 ingested source index with coverage stats.",
+              },
+              {
+                name: "compute_metric",
+                detail: "Deterministic arithmetic engine — no estimated numbers in officer output.",
+              },
+              {
+                name: "produce_artifact",
+                detail: "Persists real deliverables to the artifact ledger with SHA-256 checksums.",
+              },
             ].map((t) => (
               <div key={t.name} className="bg-surface border border-border rounded-sm p-4">
                 <div className="font-mono text-[10px] text-accent mb-1">⌁ {t.name}</div>
@@ -79,7 +102,11 @@ function ExecutivesPage() {
                     <div
                       className={
                         "h-full " +
-                        (e.status === "active" ? "bg-primary" : e.status === "deliberating" ? "bg-accent" : "bg-border")
+                        (e.status === "active"
+                          ? "bg-primary"
+                          : e.status === "deliberating"
+                            ? "bg-accent"
+                            : "bg-border")
                       }
                       style={{ width: `${Math.max(e.load * 100, 2)}%` }}
                     />
@@ -88,7 +115,9 @@ function ExecutivesPage() {
                 <p className="text-[11px] text-muted-foreground leading-relaxed">{e.focus}</p>
                 <div className="flex items-center justify-between text-[10px] pt-2 border-t border-border">
                   <span className="text-muted-foreground">Autonomy</span>
-                  <span className="font-mono text-primary">L{e.autonomy} · {AUTONOMY_LABELS[e.autonomy]}</span>
+                  <span className="font-mono text-primary">
+                    L{e.autonomy} · {AUTONOMY_LABELS[e.autonomy]}
+                  </span>
                 </div>
               </div>
             ))}

@@ -3,7 +3,10 @@
 
 export type Aggregates = Record<string, number>;
 
-const OPS: Record<string, { prec: number; assoc: "L" | "R"; fn: (a: number, b: number) => number }> = {
+const OPS: Record<
+  string,
+  { prec: number; assoc: "L" | "R"; fn: (a: number, b: number) => number }
+> = {
   "+": { prec: 1, assoc: "L", fn: (a, b) => a + b },
   "-": { prec: 1, assoc: "L", fn: (a, b) => a - b },
   "*": { prec: 2, assoc: "L", fn: (a, b) => a * b },
@@ -85,6 +88,7 @@ export function evaluateExpression(expr: string, vars: Aggregates = {}): number 
     if (op === "(") throw new Error("Unbalanced parentheses");
     apply(op);
   }
-  if (out.length !== 1 || !Number.isFinite(out[0])) throw new Error("Expression did not resolve to a finite number");
+  if (out.length !== 1 || !Number.isFinite(out[0]))
+    throw new Error("Expression did not resolve to a finite number");
   return out[0];
 }

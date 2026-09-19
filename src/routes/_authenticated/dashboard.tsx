@@ -14,9 +14,16 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Mission Control — Soteria SECP" },
-      { name: "description", content: "Live cognition pipeline, executive roster, and organizational KPIs across the Soteria Enterprise Cognition Platform." },
+      {
+        name: "description",
+        content:
+          "Live cognition pipeline, executive roster, and organizational KPIs across the Soteria Enterprise Cognition Platform.",
+      },
       { property: "og:title", content: "Mission Control — Soteria SECP" },
-      { property: "og:description", content: "Live cognition pipeline across six intelligence layers." },
+      {
+        property: "og:description",
+        content: "Live cognition pipeline across six intelligence layers.",
+      },
     ],
   }),
   component: MissionControl,
@@ -35,12 +42,20 @@ function MissionControl() {
       <div className="p-6 grid grid-cols-12 gap-6 animate-entry">
         {/* KPI ribbon */}
         <section className="col-span-12 grid grid-cols-6 gap-3">
-          <StatChip label="Cognitive Load" value={`${Math.round(KPIS.cognitiveLoad * 100)}%`} tone="accent" />
+          <StatChip
+            label="Cognitive Load"
+            value={`${Math.round(KPIS.cognitiveLoad * 100)}%`}
+            tone="accent"
+          />
           <StatChip label="Active Specialists" value={KPIS.activeSpecialists.toLocaleString()} />
           <StatChip label="Open Requests" value={String(KPIS.openRequests)} tone="warn" />
           <StatChip label="Entities Indexed" value={KPIS.entitiesIndexed.toLocaleString()} />
           <StatChip label="Graph Connectivity" value={KPIS.connectivity.toFixed(2)} tone="accent" />
-          <StatChip label="Validation Pass" value={`${(KPIS.validationPassRate * 100).toFixed(1)}%`} tone="signal" />
+          <StatChip
+            label="Validation Pass"
+            value={`${(KPIS.validationPassRate * 100).toFixed(1)}%`}
+            tone="signal"
+          />
         </section>
 
         {/* Layers strip */}
@@ -57,8 +72,12 @@ function MissionControl() {
                   <span className="font-mono text-[10px] text-accent">{l.code}</span>
                   <span className="size-1.5 rounded-full bg-[color:var(--signal)]" />
                 </div>
-                <div className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">{l.name}</div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{l.role}</div>
+                <div className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">
+                  {l.name}
+                </div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                  {l.role}
+                </div>
               </Link>
             ))}
           </div>
@@ -69,7 +88,11 @@ function MissionControl() {
           <SectionHeading
             code="L2.0"
             title="Executive Intelligence Layer"
-            action={<Link to="/executives" className="text-[10px] text-primary hover:underline font-mono">VIEW FULL COUNCIL →</Link>}
+            action={
+              <Link to="/executives" className="text-[10px] text-primary hover:underline font-mono">
+                VIEW FULL COUNCIL →
+              </Link>
+            }
           />
           <div className="grid grid-cols-4 gap-3">
             {EXECUTIVES.slice(0, 8).map((e) => (
@@ -81,9 +104,13 @@ function MissionControl() {
                 }
               >
                 <div className="absolute top-2 right-3 font-mono text-[8px] tracking-widest">
-                  {e.status === "active" && <span className="text-[color:var(--signal)]">ACTIVE</span>}
+                  {e.status === "active" && (
+                    <span className="text-[color:var(--signal)]">ACTIVE</span>
+                  )}
                   {e.status === "deliberating" && <span className="text-accent">DELIBERATING</span>}
-                  {e.status === "hibernating" && <span className="text-muted-foreground">HIBERNATING</span>}
+                  {e.status === "hibernating" && (
+                    <span className="text-muted-foreground">HIBERNATING</span>
+                  )}
                 </div>
                 <p className="text-[10px] text-muted-foreground font-mono mb-1">{e.id}</p>
                 <h3 className="text-sm font-bold mb-1 tracking-tight">{e.codename}</h3>
@@ -112,7 +139,11 @@ function MissionControl() {
           <SectionHeading
             code="M0.2"
             title="Active Cognition Pipeline"
-            action={<Link to="/requests" className="text-[10px] text-primary hover:underline font-mono">ALL REQUESTS →</Link>}
+            action={
+              <Link to="/requests" className="text-[10px] text-primary hover:underline font-mono">
+                ALL REQUESTS →
+              </Link>
+            }
           />
           <div className="bg-surface border border-border rounded-sm">
             {REQUESTS.map((r) => (
@@ -142,7 +173,9 @@ function MissionControl() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
                     <span className="font-mono text-[10px] text-muted-foreground">{r.id}</span>
-                    <span className="text-xs font-bold group-hover:text-primary transition-colors">{r.title}</span>
+                    <span className="text-xs font-bold group-hover:text-primary transition-colors">
+                      {r.title}
+                    </span>
                     <span
                       className={
                         "px-1.5 py-0.5 text-[8px] font-mono uppercase " +
@@ -167,19 +200,31 @@ function MissionControl() {
                   </div>
                   <div className="h-1 w-full bg-border rounded-full overflow-hidden">
                     <div
-                      className={"h-full " + (r.progress === 1 ? "bg-[color:var(--signal)]" : "bg-primary")}
+                      className={
+                        "h-full " + (r.progress === 1 ? "bg-[color:var(--signal)]" : "bg-primary")
+                      }
                       style={{ width: `${r.progress * 100}%` }}
                     />
                   </div>
                 </div>
-                <span className="text-[10px] font-mono text-muted-foreground w-16 text-right">{r.updated}</span>
+                <span className="text-[10px] font-mono text-muted-foreground w-16 text-right">
+                  {r.updated}
+                </span>
               </Link>
             ))}
           </div>
         </section>
 
         <section className="col-span-4 flex flex-col gap-4">
-          <SectionHeading code="L6.0" title="Recent Audit Trail" action={<Link to="/governance" className="text-[10px] text-primary hover:underline font-mono">FULL LOG →</Link>} />
+          <SectionHeading
+            code="L6.0"
+            title="Recent Audit Trail"
+            action={
+              <Link to="/governance" className="text-[10px] text-primary hover:underline font-mono">
+                FULL LOG →
+              </Link>
+            }
+          />
           <div className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-3">
             {AUDIT_LOG.slice(0, 6).map((a, i) => (
               <div key={i} className="border-l border-border pl-3 py-1">
@@ -194,7 +239,15 @@ function MissionControl() {
               </div>
             ))}
           </div>
-          <SectionHeading code="L5.0" title="Live Workforce" action={<Link to="/workforce" className="text-[10px] text-primary hover:underline font-mono">OPEN CATALOG →</Link>} />
+          <SectionHeading
+            code="L5.0"
+            title="Live Workforce"
+            action={
+              <Link to="/workforce" className="text-[10px] text-primary hover:underline font-mono">
+                OPEN CATALOG →
+              </Link>
+            }
+          />
           <div className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-2">
             {activeSpecialists.slice(0, 8).map((s) => (
               <div key={s.id} className="flex items-center gap-3">
@@ -223,22 +276,32 @@ function Inspector() {
           Inspector · {r.id}
         </h2>
         <div className="flex gap-2 mb-3">
-          <span className="text-[9px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-sm font-mono">IN_PROGRESS</span>
-          <span className="text-[9px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-sm font-mono">A{r.autonomy}</span>
-          <span className="text-[9px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-sm font-mono">{r.priority}</span>
+          <span className="text-[9px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-sm font-mono">
+            IN_PROGRESS
+          </span>
+          <span className="text-[9px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-sm font-mono">
+            A{r.autonomy}
+          </span>
+          <span className="text-[9px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-sm font-mono">
+            {r.priority}
+          </span>
         </div>
         <h3 className="text-base font-bold tracking-tight mb-2">{r.title}</h3>
         <p className="text-xs text-muted-foreground leading-relaxed">{r.brief}</p>
       </div>
       <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
         <div>
-          <h4 className="text-[9px] font-bold uppercase text-muted-foreground mb-2 tracking-widest">Reasoning Log</h4>
+          <h4 className="text-[9px] font-bold uppercase text-muted-foreground mb-2 tracking-widest">
+            Reasoning Log
+          </h4>
           <div className="bg-background font-mono text-[10px] p-3 border border-border text-muted-foreground leading-relaxed">
             {r.steps
               .filter((s) => s.status !== "pending")
               .map((s, i) => (
                 <div key={i} className="mb-1.5">
-                  <span className="text-accent">[{String(14 + i).padStart(2, "0")}:0{i}]</span>{" "}
+                  <span className="text-accent">
+                    [{String(14 + i).padStart(2, "0")}:0{i}]
+                  </span>{" "}
                   <span className={s.status === "active" ? "text-foreground" : ""}>
                     {s.title} · {s.agent}
                   </span>
@@ -247,10 +310,15 @@ function Inspector() {
           </div>
         </div>
         <div>
-          <h4 className="text-[9px] font-bold uppercase text-muted-foreground mb-2 tracking-widest">Validators</h4>
+          <h4 className="text-[9px] font-bold uppercase text-muted-foreground mb-2 tracking-widest">
+            Validators
+          </h4>
           <div className="flex flex-col gap-2">
             {r.validators.map((v) => (
-              <div key={v.name} className="flex items-center justify-between text-[11px] border-b border-border pb-1.5">
+              <div
+                key={v.name}
+                className="flex items-center justify-between text-[11px] border-b border-border pb-1.5"
+              >
                 <span>{v.name}</span>
                 <span
                   className={
@@ -269,7 +337,9 @@ function Inspector() {
           </div>
         </div>
         <div>
-          <h4 className="text-[9px] font-bold uppercase text-muted-foreground mb-2 tracking-widest">Autonomy</h4>
+          <h4 className="text-[9px] font-bold uppercase text-muted-foreground mb-2 tracking-widest">
+            Autonomy
+          </h4>
           <div className="flex justify-between items-center text-[10px] mb-2">
             <span>Approval threshold</span>
             <span className="font-mono text-primary">L{r.autonomy}</span>

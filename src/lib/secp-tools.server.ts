@@ -3,8 +3,16 @@
 // artifacts are persisted with a SHA-256 checksum.
 import { tool } from "ai";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { datasetAggregates, evaluateExpression } from "./safe-math";
-import { authorizeQuery, scopeForAgent, WAREHOUSE, type Operator, type WarehouseTable } from "./secp-scopes";
+import {
+  authorizeQuery,
+  scopeForAgent,
+  WAREHOUSE,
+  type Operator,
+  type WarehouseTable,
+} from "./secp-scopes";
 
 export type ToolCallTrace = {
   name: string;
@@ -22,7 +30,20 @@ export type ToolCallTrace = {
   scope?: string;
 };
 
-type SupabaseLike = { from: (t: string) => any };
+type SupabaseLike = SupabaseClient<Database>;
+type QueryResult = { data: unknown[] | null; error: { message: string } | null };
+type QueryBuilder = {
+  limit: (value: number) => QueryBuilder;
+  eq: (column: string, value: string) => QueryBuilder;
+  neq: (column: string, value: string) => QueryBuilder;
+  gt: (column: string, value: string) => QueryBuilder;
+  gte: (column: string, value: string) => QueryBuilder;
+  lt: (column: string, value: string) => QueryBuilder;
+  lte: (column: string, value: string) => QueryBuilder;
+  ilike: (column: string, value: string) => QueryBuilder;
+  order: (column: string, options: { ascending: boolean }) => QueryBuilder;
+  then: PromiseLike<QueryResult>["then"];
+};
 
 const READABLE_TABLES = {
   secp_requests: "id,title,origin,priority,autonomy,progress,updated_label",
@@ -49,6 +70,9 @@ export function buildExecutionTools(opts: {
   stage: string;
   agent: string;
 }) {
+  const from = opts.supabase.from.bind(opts.supabase) as unknown as (table: string) => {
+    select: (columns: string) => QueryBuilder;
+  };
   const trace: ToolCallTrace[] = [];
   const scope = scopeForAgent(opts.agent);
 
@@ -72,7 +96,15 @@ export function buildExecutionTools(opts: {
       try {
         const result = await run();
         const output = typeof result === "string" ? result : JSON.stringify(result);
-        trace.push({ name, input, output: output.slice(0, 4000), ms: Date.now() - started, ok: true, attempts, ...extra });
+        trace.push({
+          name,
+          input,
+          output: output.slice(0, 4000),
+          ms: Date.now() - started,
+          ok: true,
+          attempts,
+          ...extra,
+        });
         return result;
       } catch (err) {
         lastError = err instanceof Error ? err.message : String(err);
@@ -94,7 +126,15 @@ export function buildExecutionTools(opts: {
       });
       return degraded;
     }
-    trace.push({ name, input, output: lastError.slice(0, 500), ms: Date.now() - started, ok: false, attempts, ...extra });
+    trace.push({
+      name,
+      input,
+      output: lastError.slice(0, 500),
+      ms: Date.now() - started,
+      ok: false,
+      attempts,
+      ...extra,
+    });
     return `TOOL_ERROR: ${lastError}`;
   };
 
@@ -112,7 +152,9 @@ export function buildExecutionTools(opts: {
           "secp_archetypes",
           "secp_pack_state",
         ]),
-        columns: z.array(z.string()).describe("Columns to project; empty array means all columns your scope permits."),
+        columns: z
+          .array(z.string())
+          .describe("Columns to project; empty array means all columns your scope permits."),
         filters: z
           .array(
             z.object({
@@ -152,16 +194,36 @@ export function buildExecutionTools(opts: {
           "run_sql_query",
           { ...input, authorizedSql: check.sql, boundParams: check.params ?? [] },
           async () => {
-            let builder = opts.supabase.from(q.table).select(q.columns.join(",")).limit(q.limit);
+            let builder = from(q.table)
+              .select(q.columns.join(","))
+              .limit(q.limit) as unknown as QueryBuilder;
             for (const f of q.filters) {
-              builder = f.op === "ilike" ? builder.ilike(f.column, `%${f.value}%`) : builder[f.op](f.column, f.value);
+              if (f.op === "ilike") builder = builder.ilike(f.column, `%${f.value}%`);
+              else if (f.op === "eq") builder = builder.eq(f.column, f.value);
+              else if (f.op === "neq") builder = builder.neq(f.column, f.value);
+              else if (f.op === "gt") builder = builder.gt(f.column, f.value);
+              else if (f.op === "gte") builder = builder.gte(f.column, f.value);
+              else if (f.op === "lt") builder = builder.lt(f.column, f.value);
+              else builder = builder.lte(f.column, f.value);
             }
             if (q.orderBy) builder = builder.order(q.orderBy, { ascending: !q.descending });
             const { data, error } = await builder;
             if (error) throw new Error(error.message);
-            return { table: q.table, sql: check.sql, rowCount: (data ?? []).length, rows: data ?? [] };
+            return {
+              table: q.table,
+              sql: check.sql,
+              rowCount: (data ?? []).length,
+              rows: data ?? [],
+            };
           },
-          () => ({ table: q.table, sql: check.sql, rowCount: 0, rows: [], degraded: true, note: "warehouse unavailable — safe empty result served" }),
+          () => ({
+            table: q.table,
+            sql: check.sql,
+            rowCount: 0,
+            rows: [],
+            degraded: true,
+            note: "warehouse unavailable — safe empty result served",
+          }),
           {
             sql: check.sql,
             scope: `${scope.agent} · ${scope.title} · cap ${scope.rowCap} · SELECT-only · ${(check.params ?? []).length} bound param(s)`,
@@ -171,7 +233,8 @@ export function buildExecutionTools(opts: {
     }),
 
     describe_warehouse: tool({
-      description: "List the warehouse tables and columns your executive scope is permitted to read before writing a query.",
+      description:
+        "List the warehouse tables and columns your executive scope is permitted to read before writing a query.",
       inputSchema: z.object({ reason: z.string() }),
       execute: async (input) =>
         record("describe_warehouse", input, async () => ({
@@ -191,8 +254,17 @@ export function buildExecutionTools(opts: {
       description:
         "Convenience read against a small set of governed tables. Prefer run_sql_query when you need specific columns or filters.",
       inputSchema: z.object({
-        table: z.enum(["secp_requests", "knowledge_sources", "learning_entries", "retention_audit_entries", "secp_archetypes"]),
-        contains: z.string().nullable().describe("Optional free-text filter applied to the row's primary label column."),
+        table: z.enum([
+          "secp_requests",
+          "knowledge_sources",
+          "learning_entries",
+          "retention_audit_entries",
+          "secp_archetypes",
+        ]),
+        contains: z
+          .string()
+          .nullable()
+          .describe("Optional free-text filter applied to the row's primary label column."),
         limit: z.number().describe("Row cap; keep it small, 1-25."),
       }),
       execute: async (input) => {
@@ -214,16 +286,23 @@ export function buildExecutionTools(opts: {
           async () => {
             const columns = READABLE_TABLES[input.table];
             const labelColumn = WAREHOUSE[input.table as WarehouseTable].labelColumn;
-            let q = opts.supabase
-              .from(input.table)
+            let q = from(input.table)
               .select(columns)
-              .limit(Math.max(1, Math.min(25, Math.round(input.limit || 10))));
+              .limit(
+                Math.max(1, Math.min(25, Math.round(input.limit || 10))),
+              ) as unknown as QueryBuilder;
             if (input.contains) q = q.ilike(labelColumn, `%${input.contains}%`);
             const { data, error } = await q;
             if (error) throw new Error(error.message);
             return { table: input.table, rowCount: (data ?? []).length, rows: data ?? [] };
           },
-          () => ({ table: input.table, rowCount: 0, rows: [], degraded: true, note: "read unavailable — safe empty result served" }),
+          () => ({
+            table: input.table,
+            rowCount: 0,
+            rows: [],
+            degraded: true,
+            note: "read unavailable — safe empty result served",
+          }),
           { scope: `${scope.agent} · ${scope.title}` },
         );
       },
@@ -234,7 +313,11 @@ export function buildExecutionTools(opts: {
         "Deterministically evaluate an arithmetic expression, optionally over a dataset exposing count/sum/avg/min/max. Use this instead of estimating arithmetic in prose.",
       inputSchema: z.object({
         label: z.string(),
-        expression: z.string().describe("Arithmetic only: numbers, + - * / % ^, parentheses, and count/sum/avg/min/max."),
+        expression: z
+          .string()
+          .describe(
+            "Arithmetic only: numbers, + - * / % ^, parentheses, and count/sum/avg/min/max.",
+          ),
         dataset: z.array(z.number()).nullable(),
       }),
       execute: async (input) =>
@@ -246,22 +329,27 @@ export function buildExecutionTools(opts: {
     }),
 
     search_knowledge: tool({
-      description: "Search the ingested L1 knowledge index for sources relevant to a keyword, returning indexing status and graph coverage.",
+      description:
+        "Search the ingested L1 knowledge index for sources relevant to a keyword, returning indexing status and graph coverage.",
       inputSchema: z.object({ keyword: z.string() }),
       execute: async (input) =>
         record(
           "search_knowledge",
           input,
           async () => {
-            const { data, error } = await opts.supabase
-              .from("knowledge_sources")
+            const { data, error } = await from("knowledge_sources")
               .select("id,name,kind,status,entities,edges,target_layer,tags")
               .ilike("name", `%${input.keyword}%`)
               .limit(10);
             if (error) throw new Error(error.message);
             return { keyword: input.keyword, matches: data ?? [] };
           },
-          () => ({ keyword: input.keyword, matches: [], degraded: true, note: "index unavailable — safe empty result served" }),
+          () => ({
+            keyword: input.keyword,
+            matches: [],
+            degraded: true,
+            note: "index unavailable — safe empty result served",
+          }),
         ),
     }),
 
@@ -286,7 +374,12 @@ export function buildExecutionTools(opts: {
               name: input.name,
               content: input.content,
               checksum,
-              inputs: { stage: opts.stage, agent: opts.agent, scope: scope.agent, tables: scope.tables },
+              inputs: {
+                stage: opts.stage,
+                agent: opts.agent,
+                scope: scope.agent,
+                tables: scope.tables,
+              },
             })
             .select("id,name,kind,checksum")
             .maybeSingle();

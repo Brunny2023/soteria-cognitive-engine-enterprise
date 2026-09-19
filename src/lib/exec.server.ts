@@ -9,7 +9,10 @@ export async function sha256(text: string): Promise<string> {
 }
 
 /** Generate a work product through the AI gateway, with a deterministic fallback. */
-export async function synthesize(prompt: string, fallback: string): Promise<{ content: string; source: string }> {
+export async function synthesize(
+  prompt: string,
+  fallback: string,
+): Promise<{ content: string; source: string }> {
   const key = process.env["LOVABLE_API_KEY"];
   if (!key) return { content: fallback, source: "deterministic fallback" };
   try {
@@ -58,7 +61,12 @@ export function taskDeliverableFallback(input: {
   ].join("\n");
 }
 
-export function engagementFallback(input: { consultant: string; domain: string; directive: string; brief: string }) {
+export function engagementFallback(input: {
+  consultant: string;
+  domain: string;
+  directive: string;
+  brief: string;
+}) {
   return [
     `# ${input.consultant} engagement`,
     ``,

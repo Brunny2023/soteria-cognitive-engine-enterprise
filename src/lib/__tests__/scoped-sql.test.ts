@@ -26,7 +26,10 @@ describe("scoped SQL execution", () => {
   });
 
   it("denies tables outside the executive scope", () => {
-    const check = authorizeQuery("MARKET RESONANCE", { table: "retention_audit_entries", limit: 5 });
+    const check = authorizeQuery("MARKET RESONANCE", {
+      table: "retention_audit_entries",
+      limit: 5,
+    });
     expect(check.allowed).toBe(false);
     expect(check.reason).toMatch(/SCOPE_DENIED/);
   });
@@ -69,7 +72,9 @@ describe("scoped SQL execution", () => {
 
   it("rejects any non-SELECT statement at the allowlist", () => {
     expect(checkStatementAllowlist("DELETE FROM secp_requests;", 0).ok).toBe(false);
-    expect(checkStatementAllowlist("SELECT id FROM secp_requests; DROP TABLE x;", 0).ok).toBe(false);
+    expect(checkStatementAllowlist("SELECT id FROM secp_requests; DROP TABLE x;", 0).ok).toBe(
+      false,
+    );
     expect(checkStatementAllowlist("SELECT id FROM secp_requests -- comment", 0).ok).toBe(false);
     expect(checkStatementAllowlist("SELECT id FROM secp_requests LIMIT 5;", 0).ok).toBe(true);
   });
@@ -83,7 +88,9 @@ describe("scoped SQL execution", () => {
       descending: false,
       limit: 3,
     });
-    expect(sql).toBe("SELECT id, name FROM knowledge_sources WHERE name ILIKE $1 ORDER BY created_at ASC LIMIT 3;");
+    expect(sql).toBe(
+      "SELECT id, name FROM knowledge_sources WHERE name ILIKE $1 ORDER BY created_at ASC LIMIT 3;",
+    );
     expect(params).toEqual(["%policy%"]);
   });
 });
@@ -95,17 +102,31 @@ function trace(partial: Partial<TraceLike>): TraceLike {
 describe("deterministic validator outcomes per stage", () => {
   const goodRead = trace({
     input: JSON.stringify({ table: "secp_requests" }),
-    output: JSON.stringify({ table: "secp_requests", rowCount: 2, rows: [{ id: "R-1", progress: 0.5, autonomy: 3 }] }),
+    output: JSON.stringify({
+      table: "secp_requests",
+      rowCount: 2,
+      rows: [{ id: "R-1", progress: 0.5, autonomy: 3 }],
+    }),
   });
 
   it("validates a grounded, in-scope stage with no artifact requirement", () => {
-    const report = validateStage({ agent: "STRATEGIC VISIONARY", stage: "analyze", trace: [goodRead], requireArtifact: false });
+    const report = validateStage({
+      agent: "STRATEGIC VISIONARY",
+      stage: "analyze",
+      trace: [goodRead],
+      requireArtifact: false,
+    });
     expect(report.verdict).toBe("validated");
     expect(report.failed).toBe(0);
   });
 
   it("returns insufficient-evidence when no read grounded the stage", () => {
-    const report = validateStage({ agent: "STRATEGIC VISIONARY", stage: "intent", trace: [], requireArtifact: false });
+    const report = validateStage({
+      agent: "STRATEGIC VISIONARY",
+      stage: "intent",
+      trace: [],
+      requireArtifact: false,
+    });
     expect(report.verdict).toBe("insufficient-evidence");
   });
 
@@ -114,7 +135,12 @@ describe("deterministic validator outcomes per stage", () => {
       input: JSON.stringify({ table: "retention_audit_entries" }),
       output: JSON.stringify({ table: "retention_audit_entries", rowCount: 1, rows: [] }),
     });
-    const report = validateStage({ agent: "MARKET RESONANCE", stage: "execute", trace: [offScope], requireArtifact: false });
+    const report = validateStage({
+      agent: "MARKET RESONANCE",
+      stage: "execute",
+      trace: [offScope],
+      requireArtifact: false,
+    });
     expect(report.verdict).toBe("rejected");
     expect(report.findings.find((f) => f.rule.startsWith("R2"))?.status).toBe("fail");
   });
@@ -122,9 +148,18 @@ describe("deterministic validator outcomes per stage", () => {
   it("rejects rows that break graph invariants", () => {
     const bad = trace({
       input: JSON.stringify({ table: "secp_requests" }),
-      output: JSON.stringify({ table: "secp_requests", rowCount: 1, rows: [{ id: "R-2", progress: 4.2, autonomy: 9 }] }),
+      output: JSON.stringify({
+        table: "secp_requests",
+        rowCount: 1,
+        rows: [{ id: "R-2", progress: 4.2, autonomy: 9 }],
+      }),
     });
-    const report = validateStage({ agent: "STRATEGIC VISIONARY", stage: "execute", trace: [bad], requireArtifact: false });
+    const report = validateStage({
+      agent: "STRATEGIC VISIONARY",
+      stage: "execute",
+      trace: [bad],
+      requireArtifact: false,
+    });
     expect(report.findings.find((f) => f.rule.startsWith("R5"))?.status).toBe("fail");
     expect(report.verdict).toBe("rejected");
   });
@@ -135,25 +170,48 @@ describe("deterministic validator outcomes per stage", () => {
       input: JSON.stringify({ label: "burn", expression: "2+2", dataset: null }),
       output: JSON.stringify({ label: "burn", value: 5 }),
     });
-    const report = validateStage({ agent: "CAPITAL ALLOCATOR", stage: "execute", trace: [goodRead, metric], requireArtifact: false });
+    const report = validateStage({
+      agent: "CAPITAL ALLOCATOR",
+      stage: "execute",
+      trace: [goodRead, metric],
+      requireArtifact: false,
+    });
     expect(report.findings.find((f) => f.rule.startsWith("R6"))?.status).toBe("fail");
   });
 
   it("requires a checksummed artifact at delivery stages", () => {
-    const withoutArtifact = validateStage({ agent: "STRATEGIC VISIONARY", stage: "deliver", trace: [goodRead], requireArtifact: true });
+    const withoutArtifact = validateStage({
+      agent: "STRATEGIC VISIONARY",
+      stage: "deliver",
+      trace: [goodRead],
+      requireArtifact: true,
+    });
     expect(withoutArtifact.verdict).toBe("rejected");
 
     const artifact = trace({
       name: "produce_artifact",
       output: JSON.stringify({ artifact: { id: "a1" }, checksum: "a".repeat(64) }),
     });
-    const withArtifact = validateStage({ agent: "STRATEGIC VISIONARY", stage: "deliver", trace: [goodRead, artifact], requireArtifact: true });
+    const withArtifact = validateStage({
+      agent: "STRATEGIC VISIONARY",
+      stage: "deliver",
+      trace: [goodRead, artifact],
+      requireArtifact: true,
+    });
     expect(withArtifact.verdict).toBe("validated");
   });
 
   it("rejects stages backed by degraded fallback evidence", () => {
-    const degraded = trace({ fallback: true, output: JSON.stringify({ table: "secp_requests", rowCount: 0, rows: [], degraded: true }) });
-    const report = validateStage({ agent: "STRATEGIC VISIONARY", stage: "execute", trace: [degraded], requireArtifact: false });
+    const degraded = trace({
+      fallback: true,
+      output: JSON.stringify({ table: "secp_requests", rowCount: 0, rows: [], degraded: true }),
+    });
+    const report = validateStage({
+      agent: "STRATEGIC VISIONARY",
+      stage: "execute",
+      trace: [degraded],
+      requireArtifact: false,
+    });
     expect(report.findings.find((f) => f.rule.startsWith("R9"))?.status).toBe("fail");
     expect(report.verdict).toBe("rejected");
   });

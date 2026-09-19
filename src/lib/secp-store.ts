@@ -21,7 +21,11 @@ const APPROVAL_KEY = "secp.approvals.v1";
 
 function loadApprovals(): ApprovalRecord[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(APPROVAL_KEY) ?? "[]"); } catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(APPROVAL_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
 }
 function saveApproval(rec: ApprovalRecord) {
   if (typeof window === "undefined") return;
@@ -60,8 +64,13 @@ export function useCreateRequest() {
   const qc = useQueryClient();
   const call = useServerFn(createRequestFn);
   const mut = useMutation({
-    mutationFn: (input: { title: string; brief: string; origin: string; autonomy: Autonomy; priority: "P0" | "P1" | "P2" }) =>
-      call({ data: input }),
+    mutationFn: (input: {
+      title: string;
+      brief: string;
+      origin: string;
+      autonomy: Autonomy;
+      priority: "P0" | "P1" | "P2";
+    }) => call({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
   const create = useCallback(
@@ -86,13 +95,13 @@ export function useAutoRunRequest() {
   const call = useServerFn(advanceRequestFn);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [awaitingApproval, setAwaitingApproval] = useState<{ requestId: string; stage: Stage } | null>(null);
+  const [awaitingApproval, setAwaitingApproval] = useState<{
+    requestId: string;
+    stage: Stage;
+  } | null>(null);
 
   const start = useCallback(
-    async (
-      id: string,
-      opts?: { requester: string; approvedStages?: Set<string> },
-    ) => {
+    async (id: string, opts?: { requester: string; approvedStages?: Set<string> }) => {
       setRunning(true);
       setError(null);
       try {
@@ -100,7 +109,9 @@ export function useAutoRunRequest() {
           // Peek at the current pending stage BEFORE dispatching.
           const cache = qc.getQueryData<RequestRecord[]>(KEY) ?? [];
           const current = cache.find((r) => r.id === id);
-          const nextStep = current?.steps.find((s) => s.status === "pending" || s.status === "active");
+          const nextStep = current?.steps.find(
+            (s) => s.status === "pending" || s.status === "active",
+          );
           if (nextStep && APPROVAL_STAGES.includes(nextStep.stage)) {
             const gateKey = `${id}:${nextStep.stage}`;
             if (!opts?.approvedStages?.has(gateKey)) {

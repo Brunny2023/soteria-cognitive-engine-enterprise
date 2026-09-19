@@ -15,7 +15,9 @@ export function ScopePreview({ agents }: { agents: string[] }) {
           <div key={agent} className="border border-border rounded-sm p-3 bg-surface-2">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-[10px] text-accent uppercase truncate">{agent}</span>
-              <span className="font-mono text-[9px] text-muted-foreground">cap {scope.rowCap} rows</span>
+              <span className="font-mono text-[9px] text-muted-foreground">
+                cap {scope.rowCap} rows
+              </span>
             </div>
             <div className="text-[10px] text-muted-foreground mt-0.5">{scope.title}</div>
             <div className="mt-2 flex flex-col gap-1.5">

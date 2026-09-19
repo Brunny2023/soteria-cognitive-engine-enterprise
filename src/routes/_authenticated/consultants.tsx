@@ -11,9 +11,16 @@ export const Route = createFileRoute("/_authenticated/consultants")({
   head: () => ({
     meta: [
       { title: "Consultant Tier — Soteria SECP" },
-      { name: "description", content: "Commission domain consultants to turn directives into solution architectures with specialist requisitions and measurable acceptance criteria." },
+      {
+        name: "description",
+        content:
+          "Commission domain consultants to turn directives into solution architectures with specialist requisitions and measurable acceptance criteria.",
+      },
       { property: "og:title", content: "Consultant Tier — Soteria SECP" },
-      { property: "og:description", content: "L3 engagement workflow — domain expertise applied to live directives." },
+      {
+        property: "og:description",
+        content: "L3 engagement workflow — domain expertise applied to live directives.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -31,7 +38,10 @@ function ConsultantsPage() {
   const [open, setOpen] = useState<string | null>(null);
 
   const directives = useQuery({ queryKey: ["secp", "programs"], queryFn: () => listPrograms() });
-  const engagements = useQuery({ queryKey: ["secp", "engagements"], queryFn: () => listEngagements() });
+  const engagements = useQuery({
+    queryKey: ["secp", "engagements"],
+    queryFn: () => listEngagements(),
+  });
 
   const active = directive || directives.data?.[0]?.request_id || "";
 
@@ -71,7 +81,8 @@ function ConsultantsPage() {
             <div className="text-xs font-mono text-muted-foreground">Loading directives…</div>
           ) : (directives.data ?? []).length === 0 ? (
             <div className="bg-surface border border-border rounded-sm p-6 text-sm text-muted-foreground">
-              No directives submitted yet. Submit one from Requests, then commission a consultant here.
+              No directives submitted yet. Submit one from Requests, then commission a consultant
+              here.
             </div>
           ) : (
             <select
@@ -99,18 +110,28 @@ function ConsultantsPage() {
             {CONSULTANTS.map((c) => {
               const count = forActive.filter((e) => e.consultant.startsWith(c.id)).length;
               return (
-                <div key={c.id} className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-3 hover:border-primary/40 transition-colors">
+                <div
+                  key={c.id}
+                  className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-3 hover:border-primary/40 transition-colors"
+                >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="font-mono text-[10px] text-accent">{c.id}</div>
                       <div className="text-sm font-bold tracking-tight">{c.name}</div>
-                      <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{c.domain}</div>
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                        {c.domain}
+                      </div>
                     </div>
-                    <span className="font-mono text-[10px] text-muted-foreground">×{c.engagements + count}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      ×{c.engagements + count}
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {c.expertise.map((x) => (
-                      <span key={x} className="text-[9px] font-mono uppercase tracking-widest border border-border px-1.5 py-0.5 text-muted-foreground">
+                      <span
+                        key={x}
+                        className="text-[9px] font-mono uppercase tracking-widest border border-border px-1.5 py-0.5 text-muted-foreground"
+                      >
                         {x}
                       </span>
                     ))}
@@ -120,7 +141,9 @@ function ConsultantsPage() {
                     disabled={!active || engage.isPending}
                     className="mt-auto text-[10px] font-mono uppercase tracking-widest border border-primary/40 text-primary bg-primary/10 px-2 py-1.5 disabled:opacity-40"
                   >
-                    {engage.isPending && engage.variables?.id === c.id ? "Engaging…" : "Commission engagement"}
+                    {engage.isPending && engage.variables?.id === c.id
+                      ? "Engaging…"
+                      : "Commission engagement"}
                   </button>
                 </div>
               );
@@ -132,7 +155,11 @@ function ConsultantsPage() {
           <SectionHeading
             code="L3.3"
             title="Engagement Ledger"
-            action={<span className="font-mono text-[10px] text-muted-foreground">{rows.length} deliverables</span>}
+            action={
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {rows.length} deliverables
+              </span>
+            }
           />
           {rows.length === 0 ? (
             <div className="bg-surface border border-border rounded-sm p-6 text-sm text-muted-foreground">
@@ -141,13 +168,17 @@ function ConsultantsPage() {
           ) : (
             <div className="flex flex-col gap-2">
               {rows.map((e) => (
-                <div key={e.id} className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-2">
+                <div
+                  key={e.id}
+                  className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-2"
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="font-mono text-[10px] text-accent">{e.consultant}</div>
                       <div className="text-sm font-bold tracking-tight">{e.request_title}</div>
                       <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        {e.domain} · sha256 {e.checksum.slice(0, 12)}… · {new Date(e.created_at).toLocaleString()}
+                        {e.domain} · sha256 {e.checksum.slice(0, 12)}… ·{" "}
+                        {new Date(e.created_at).toLocaleString()}
                       </div>
                     </div>
                     <button

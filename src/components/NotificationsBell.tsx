@@ -66,13 +66,20 @@ export function NotificationsBell() {
       {open && (
         <div className="absolute right-0 top-full mt-2 w-[360px] bg-surface border border-border rounded-sm shadow-2xl z-50 text-foreground">
           <div className="px-4 py-3 border-b border-border">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Pending co-approvals</div>
-            <div className="text-xs font-bold mt-1">{count === 0 ? "All clear — no approvals waiting" : `${count} directive${count === 1 ? "" : "s"} awaiting a second operator`}</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Pending co-approvals
+            </div>
+            <div className="text-xs font-bold mt-1">
+              {count === 0
+                ? "All clear — no approvals waiting"
+                : `${count} directive${count === 1 ? "" : "s"} awaiting a second operator`}
+            </div>
           </div>
           <div className="max-h-[320px] overflow-y-auto">
             {pending.length === 0 && (
               <div className="px-4 py-4 text-[11px] font-mono text-muted-foreground">
-                Auto-run gates for executive · validate · deliver will surface here as soon as cognition reaches them.
+                Auto-run gates for executive · validate · deliver will surface here as soon as
+                cognition reaches them.
               </div>
             )}
             {pending.map((p) => (
@@ -88,12 +95,16 @@ export function NotificationsBell() {
                   <span className="text-[color:var(--warn)] uppercase">{p.stage} gate</span>
                 </div>
                 <div className="text-[12px] mt-1 line-clamp-1">{p.title}</div>
-                <div className="mt-1 font-mono text-[10px] text-muted-foreground">Priority {p.priority} · Sign & continue →</div>
+                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
+                  Priority {p.priority} · Sign & continue →
+                </div>
               </Link>
             ))}
           </div>
           <div className="px-4 py-3 border-t border-border bg-surface-2/50">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Email reminders</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+              Email reminders
+            </div>
             <label className="flex items-center gap-2 text-[11px] mb-2">
               <input
                 type="checkbox"
@@ -118,7 +129,8 @@ export function NotificationsBell() {
               className="w-full bg-background border border-border rounded-sm px-2 py-1.5 text-[11px] font-mono focus:outline-none focus:border-primary"
             />
             <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">
-              Reminders dispatch through Lovable Emails when a verified sending domain is configured. Preference is stored locally until then.
+              Reminders dispatch through Lovable Emails when a verified sending domain is
+              configured. Preference is stored locally until then.
             </p>
           </div>
         </div>

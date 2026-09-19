@@ -9,23 +9,55 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { title: "Administration — Soteria SECP" },
-      { name: "description", content: "Enterprise administration: tenants, autonomy policy, security posture, model routing, and integration surface." },
+      {
+        name: "description",
+        content:
+          "Enterprise administration: tenants, autonomy policy, security posture, model routing, and integration surface.",
+      },
       { property: "og:title", content: "Administration — Soteria SECP" },
-      { property: "og:description", content: "Configure the cognitive operating system for your enterprise." },
+      {
+        property: "og:description",
+        content: "Configure the cognitive operating system for your enterprise.",
+      },
     ],
   }),
   component: AdminPage,
 });
 
 const AUTONOMY_POLICY = [
-  { level: 1, label: "Recommend only", scope: "All new specialist archetypes on first deployment.", enabled: true },
-  { level: 2, label: "Execute on approval", scope: "Finance, Legal, HR specialists in production.", enabled: true },
-  { level: 3, label: "Autonomous within policy", scope: "Data, Software, Operations specialists with clean 30-day audit.", enabled: true },
-  { level: 4, label: "End-to-end autonomous", scope: "Reserved. No agents currently elevated.", enabled: false },
+  {
+    level: 1,
+    label: "Recommend only",
+    scope: "All new specialist archetypes on first deployment.",
+    enabled: true,
+  },
+  {
+    level: 2,
+    label: "Execute on approval",
+    scope: "Finance, Legal, HR specialists in production.",
+    enabled: true,
+  },
+  {
+    level: 3,
+    label: "Autonomous within policy",
+    scope: "Data, Software, Operations specialists with clean 30-day audit.",
+    enabled: true,
+  },
+  {
+    level: 4,
+    label: "End-to-end autonomous",
+    scope: "Reserved. No agents currently elevated.",
+    enabled: false,
+  },
 ];
 
 const INTEGRATIONS = [
-  { code: "INT-01", name: "Salesforce CRM", status: "connected", surface: "Customer graph, opportunity ledger" },
+  {
+    code: "INT-01",
+    name: "Salesforce CRM",
+    status: "connected",
+    surface: "Customer graph, opportunity ledger",
+  },
   { code: "INT-02", name: "SAP S/4HANA", status: "connected", surface: "GL, AP/AR, materials" },
   { code: "INT-03", name: "Snowflake", status: "connected", surface: "Warehouse, model features" },
   { code: "INT-04", name: "Workday", status: "connected", surface: "People graph, comp bands" },
@@ -39,7 +71,9 @@ const INTEGRATIONS = [
 
 function AdminPage() {
   const ping = useServerFn(pingLayerFn);
-  const [results, setResults] = useState<Record<string, LayerPingResult | { pending: true } | undefined>>({});
+  const [results, setResults] = useState<
+    Record<string, LayerPingResult | { pending: true } | undefined>
+  >({});
   const [running, setRunning] = useState(false);
 
   async function pingOne(layer: (typeof LAYERS)[number]["id"]) {
@@ -51,7 +85,6 @@ function AdminPage() {
   async function pingAll() {
     setRunning(true);
     for (const l of LAYERS) {
-      // eslint-disable-next-line no-await-in-loop
       await pingOne(l.id);
     }
     setRunning(false);
@@ -95,11 +128,16 @@ function AdminPage() {
               const ok = done && (r as LayerPingResult).ok;
               const res = done ? (r as LayerPingResult) : null;
               return (
-                <div key={l.id} className="grid grid-cols-[80px_1fr_1fr_120px_120px_140px] gap-4 px-5 py-3 border-b border-border last:border-b-0 items-center">
+                <div
+                  key={l.id}
+                  className="grid grid-cols-[80px_1fr_1fr_120px_120px_140px] gap-4 px-5 py-3 border-b border-border last:border-b-0 items-center"
+                >
                   <span className="font-mono text-[10px] text-accent">{l.code}</span>
                   <div>
                     <div className="text-sm font-bold">{l.name}</div>
-                    <div className="font-mono text-[10px] text-muted-foreground">{LAYER_MODEL_CATALOG[l.id]}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground">
+                      {LAYER_MODEL_CATALOG[l.id]}
+                    </div>
                   </div>
                   <div className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 min-h-[16px]">
                     {res ? (res.ok ? res.reply : res.error) : pending ? "…" : "— not yet validated"}
@@ -136,7 +174,8 @@ function AdminPage() {
             })}
           </div>
           <p className="mt-2 text-[10px] font-mono text-muted-foreground">
-            Ping issues a live request through the Lovable AI Gateway with reasoning off and records latency per layer.
+            Ping issues a live request through the Lovable AI Gateway with reasoning off and records
+            latency per layer.
           </p>
         </section>
 
@@ -145,7 +184,10 @@ function AdminPage() {
             <SectionHeading code="AD.1" title="Autonomy Policy" />
             <div className="bg-surface border border-border rounded-sm">
               {AUTONOMY_POLICY.map((p) => (
-                <div key={p.level} className="px-5 py-4 border-b border-border last:border-b-0 flex items-start justify-between gap-4">
+                <div
+                  key={p.level}
+                  className="px-5 py-4 border-b border-border last:border-b-0 flex items-start justify-between gap-4"
+                >
                   <div>
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-[10px] text-primary">A{p.level}</span>
@@ -172,19 +214,33 @@ function AdminPage() {
             <SectionHeading code="AD.2" title="Model Routing" />
             <div className="bg-surface border border-border rounded-sm p-5 space-y-4">
               <div>
-                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Reasoning tier</div>
-                <div className="text-sm font-bold mt-1">Frontier reasoning model · fallback: workhorse</div>
-                <div className="text-[11px] text-muted-foreground mt-1">Used by executive council & consultant deliberations.</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+                  Reasoning tier
+                </div>
+                <div className="text-sm font-bold mt-1">
+                  Frontier reasoning model · fallback: workhorse
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  Used by executive council & consultant deliberations.
+                </div>
               </div>
               <div className="border-t border-border pt-4">
-                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Specialist tier</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+                  Specialist tier
+                </div>
                 <div className="text-sm font-bold mt-1">Workhorse model · task-tuned adapters</div>
-                <div className="text-[11px] text-muted-foreground mt-1">Used by 42 specialist archetypes across 7 departments.</div>
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  Used by 42 specialist archetypes across 7 departments.
+                </div>
               </div>
               <div className="border-t border-border pt-4">
-                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Governance tier</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+                  Governance tier
+                </div>
                 <div className="text-sm font-bold mt-1">Independent verification model</div>
-                <div className="text-[11px] text-muted-foreground mt-1">Separated from reasoning path for defensible audit.</div>
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  Separated from reasoning path for defensible audit.
+                </div>
               </div>
             </div>
           </div>
@@ -194,7 +250,10 @@ function AdminPage() {
           <SectionHeading code="AD.3" title="Enterprise Integrations" />
           <div className="grid grid-cols-2 gap-3">
             {INTEGRATIONS.map((i) => (
-              <div key={i.code} className="bg-surface border border-border rounded-sm px-4 py-3 flex items-center justify-between">
+              <div
+                key={i.code}
+                className="bg-surface border border-border rounded-sm px-4 py-3 flex items-center justify-between"
+              >
                 <div className="min-w-0">
                   <div className="flex items-baseline gap-2">
                     <span className="font-mono text-[10px] text-accent">{i.code}</span>

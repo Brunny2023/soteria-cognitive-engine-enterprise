@@ -1,16 +1,30 @@
 {
   "name": "tanstack_start_ts",
+  "version": "0.1.0",
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=22.13.0 <23",
+    "npm": ">=10.9.2 <11"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:security": "node scripts/check-rls-coverage.mjs",
+    "test:ai-eval": "node scripts/evaluate-reference-workflow.mjs",
+    "security:scan": "npm audit --omit=dev --audit-level=high",
+    "security:sbom": "mkdir -p reports && npm sbom --sbom-format cyclonedx --sbom-type application > reports/sbom.cdx.json",
+    "release:evidence": "node scripts/check-release-evidence.mjs",
+    "validate:release": "npm run typecheck && npm run lint && npm test && npm run test:security && npm run test:ai-eval && npm run release:evidence && npm run security:scan && npm run security:sbom && npm run build",
     "test:watch": "vitest",
     "test:e2e": "python3 tests/playwright/scoped_sql_validator.py"
   },

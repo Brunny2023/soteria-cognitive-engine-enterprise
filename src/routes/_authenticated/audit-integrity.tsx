@@ -3,16 +3,27 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { listRetentionAuditFn, type RetentionAuditRow } from "@/lib/retention-audit.functions";
-import { computeManifest, diffManifests, type IntegrityManifest, type ManifestDiff } from "@/lib/audit-integrity";
+import {
+  computeManifest,
+  diffManifests,
+  type IntegrityManifest,
+  type ManifestDiff,
+} from "@/lib/audit-integrity";
 import { downloadBlob, timestampSlug } from "@/lib/export";
 
 export const Route = createFileRoute("/_authenticated/audit-integrity")({
   head: () => ({
     meta: [
       { title: "Audit Integrity — Soteria SECP" },
-      { name: "description", content: "Verify ledger consistency and hash chain of the retention audit log." },
+      {
+        name: "description",
+        content: "Verify ledger consistency and hash chain of the retention audit log.",
+      },
       { property: "og:title", content: "Audit Integrity — Soteria SECP" },
-      { property: "og:description", content: "Recompute canonical row hashes and compare against a prior signed manifest." },
+      {
+        property: "og:description",
+        content: "Recompute canonical row hashes and compare against a prior signed manifest.",
+      },
     ],
   }),
   component: AuditIntegrityPage,
@@ -98,12 +109,16 @@ function AuditIntegrityPage() {
       <div className="p-6 flex flex-col gap-8 animate-entry">
         <section className="grid grid-cols-4 gap-3">
           <StatChip label="Rows in range" value={rows ? String(inRange.length) : "—"} />
-          <StatChip label="Chain hash" value={manifest ? manifest.chain_hash.slice(0, 10) + "…" : "—"} tone="accent" />
+          <StatChip
+            label="Chain hash"
+            value={manifest ? manifest.chain_hash.slice(0, 10) + "…" : "—"}
+            tone="accent"
+          />
           <StatChip label="Matched" value={diff ? String(diff.matched) : "—"} tone="signal" />
           <StatChip
             label="Mismatched"
             value={diff ? String(diff.mismatched.length + diff.missing.length) : "—"}
-            tone={diff && (diff.mismatched.length + diff.missing.length) > 0 ? "danger" : "signal"}
+            tone={diff && diff.mismatched.length + diff.missing.length > 0 ? "danger" : "signal"}
           />
         </section>
 
@@ -111,28 +126,55 @@ function AuditIntegrityPage() {
           <SectionHeading code="AI.1" title="Recompute row hashes for a time range" />
           <div className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">From (UTC)</label>
-              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)}
-                className="bg-background border border-border rounded-sm px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary" />
+              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                From (UTC)
+              </label>
+              <input
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                className="bg-background border border-border rounded-sm px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary"
+              />
             </div>
             <div>
-              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">To (UTC)</label>
-              <input type="date" value={to} onChange={(e) => setTo(e.target.value)}
-                className="bg-background border border-border rounded-sm px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary" />
+              <label className="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                To (UTC)
+              </label>
+              <input
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="bg-background border border-border rounded-sm px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary"
+              />
             </div>
-            <button type="button" onClick={recompute} disabled={busy}
-              className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 disabled:opacity-40">
+            <button
+              type="button"
+              onClick={recompute}
+              disabled={busy}
+              className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 disabled:opacity-40"
+            >
               {busy ? "▸ Recomputing…" : "▸ Recompute & sign"}
             </button>
-            <button type="button" onClick={exportManifest} disabled={!manifest}
-              className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-foreground disabled:opacity-40">
+            <button
+              type="button"
+              onClick={exportManifest}
+              disabled={!manifest}
+              className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-foreground disabled:opacity-40"
+            >
               ⇩ Export manifest (JSON)
             </button>
             <label className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-foreground cursor-pointer">
               ⇪ Load prior manifest
-              <input type="file" accept="application/json" hidden onChange={(e) => {
-                const f = e.target.files?.[0]; if (f) onPriorUpload(f); e.currentTarget.value = "";
-              }} />
+              <input
+                type="file"
+                accept="application/json"
+                hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onPriorUpload(f);
+                  e.currentTarget.value = "";
+                }}
+              />
             </label>
           </div>
           {error && <div className="text-[11px] font-mono text-[color:var(--danger)]">{error}</div>}
@@ -142,7 +184,8 @@ function AuditIntegrityPage() {
               <span className="mx-2 text-border">·</span>
               Rows hashed: <span className="text-foreground">{manifest.count}</span>
               <span className="mx-2 text-border">·</span>
-              Signed at <span className="text-foreground">{manifest.generated_at.slice(0, 19)}Z</span>
+              Signed at{" "}
+              <span className="text-foreground">{manifest.generated_at.slice(0, 19)}Z</span>
             </div>
           )}
         </section>
@@ -150,17 +193,40 @@ function AuditIntegrityPage() {
         {diff && (
           <section>
             <SectionHeading code="AI.2" title="Comparison against prior manifest" />
-            <div className={"bg-surface border rounded-sm p-4 " + (diff.chain_match && diff.mismatched.length === 0 && diff.missing.length === 0 ? "border-[color:var(--signal)]/40" : "border-[color:var(--danger)]/40")}>
+            <div
+              className={
+                "bg-surface border rounded-sm p-4 " +
+                (diff.chain_match && diff.mismatched.length === 0 && diff.missing.length === 0
+                  ? "border-[color:var(--signal)]/40"
+                  : "border-[color:var(--danger)]/40")
+              }
+            >
               <div className="flex items-center gap-3 text-[11px] font-mono">
-                <span className={diff.chain_match ? "text-[color:var(--signal)]" : "text-[color:var(--danger)]"}>
+                <span
+                  className={
+                    diff.chain_match ? "text-[color:var(--signal)]" : "text-[color:var(--danger)]"
+                  }
+                >
                   {diff.chain_match ? "✔ Chain hash matches" : "✘ Chain hash differs"}
                 </span>
                 <span className="text-border">·</span>
                 <span>Matched {diff.matched}</span>
                 <span className="text-border">·</span>
-                <span className={diff.mismatched.length ? "text-[color:var(--danger)]" : "text-muted-foreground"}>Mismatched {diff.mismatched.length}</span>
+                <span
+                  className={
+                    diff.mismatched.length ? "text-[color:var(--danger)]" : "text-muted-foreground"
+                  }
+                >
+                  Mismatched {diff.mismatched.length}
+                </span>
                 <span className="text-border">·</span>
-                <span className={diff.missing.length ? "text-[color:var(--warn)]" : "text-muted-foreground"}>Missing {diff.missing.length}</span>
+                <span
+                  className={
+                    diff.missing.length ? "text-[color:var(--warn)]" : "text-muted-foreground"
+                  }
+                >
+                  Missing {diff.missing.length}
+                </span>
                 <span className="text-border">·</span>
                 <span className="text-muted-foreground">Added {diff.extra.length}</span>
               </div>
@@ -169,12 +235,16 @@ function AuditIntegrityPage() {
                   {diff.mismatched.slice(0, 20).map((m) => (
                     <div key={m.id} className="border-t border-border py-2">
                       <div className="text-[color:var(--danger)]">HASH DIVERGENCE · {m.id}</div>
-                      <div className="text-muted-foreground">expected {m.expected.slice(0, 24)}…</div>
-                      <div className="text-muted-foreground">actual   {m.actual.slice(0, 24)}…</div>
+                      <div className="text-muted-foreground">
+                        expected {m.expected.slice(0, 24)}…
+                      </div>
+                      <div className="text-muted-foreground">actual {m.actual.slice(0, 24)}…</div>
                     </div>
                   ))}
                   {diff.missing.slice(0, 20).map((id) => (
-                    <div key={id} className="border-t border-border py-2 text-[color:var(--warn)]">MISSING FROM CURRENT · {id}</div>
+                    <div key={id} className="border-t border-border py-2 text-[color:var(--warn)]">
+                      MISSING FROM CURRENT · {id}
+                    </div>
                   ))}
                 </div>
               )}
@@ -191,22 +261,30 @@ function AuditIntegrityPage() {
               <span>Row SHA-256</span>
             </div>
             {!manifest && (
-              <div className="p-4 text-[11px] font-mono text-muted-foreground">Recompute to populate this table.</div>
+              <div className="p-4 text-[11px] font-mono text-muted-foreground">
+                Recompute to populate this table.
+              </div>
             )}
             {manifest?.rows.slice(0, 200).map((r) => {
               const row = rows?.find((x) => x.id === r.id);
               return (
-                <div key={r.id} className="grid grid-cols-[180px_100px_1fr] gap-4 px-4 py-2 border-b border-border last:border-b-0 font-mono text-[11px]">
+                <div
+                  key={r.id}
+                  className="grid grid-cols-[180px_100px_1fr] gap-4 px-4 py-2 border-b border-border last:border-b-0 font-mono text-[11px]"
+                >
                   <span className="text-muted-foreground">{r.ts.slice(0, 19)}</span>
                   <span className="text-accent">{row?.kind ?? "—"}</span>
-                  <span className="text-foreground truncate" title={r.hash}>{r.hash}</span>
+                  <span className="text-foreground truncate" title={r.hash}>
+                    {r.hash}
+                  </span>
                 </div>
               );
             })}
           </div>
           <p className="mt-2 text-[10px] font-mono text-muted-foreground">
-            Hashes are computed client-side over a canonical serialization of every audit row. Store the signed
-            manifest offline; load it here later to detect any drift, deletion, or tampering.
+            Hashes are computed client-side over a canonical serialization of every audit row. Store
+            the signed manifest offline; load it here later to detect any drift, deletion, or
+            tampering.
           </p>
         </section>
       </div>

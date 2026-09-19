@@ -7,9 +7,16 @@ export const Route = createFileRoute("/_authenticated/policy-sim")({
   head: () => ({
     meta: [
       { title: "Policy Simulator — Soteria SECP" },
-      { name: "description", content: "Simulate per-layer access rules against a sample knowledge source and directive to visualize the blast radius before shipping policy." },
+      {
+        name: "description",
+        content:
+          "Simulate per-layer access rules against a sample knowledge source and directive to visualize the blast radius before shipping policy.",
+      },
       { property: "og:title", content: "Policy Simulator — Soteria SECP" },
-      { property: "og:description", content: "See exactly how a policy change would gate reasoning across L1–L6." },
+      {
+        property: "og:description",
+        content: "See exactly how a policy change would gate reasoning across L1–L6.",
+      },
     ],
   }),
   component: PolicySimPage,
@@ -30,11 +37,51 @@ type Source = {
 };
 
 const SOURCES: Source[] = [
-  { id: "KS-001", name: "Global brand system v14.pdf", kind: "policy", sensitivity: "internal", region: "US", containsPii: false, tags: ["brand", "marketing"] },
-  { id: "KS-047", name: "SEA supplier concentration ledger.csv", kind: "dataset", sensitivity: "confidential", region: "APAC", containsPii: false, tags: ["risk", "sea-expansion"] },
-  { id: "KS-118", name: "EU workforce compensation snapshot Q3.xlsx", kind: "dataset", sensitivity: "restricted", region: "EU", containsPii: true, tags: ["hr", "gdpr", "comp"] },
-  { id: "KS-204", name: "Product roadmap 2026-2027.md", kind: "document", sensitivity: "restricted", region: "US", containsPii: false, tags: ["strategy", "board"] },
-  { id: "KS-311", name: "Public sustainability report.pdf", kind: "document", sensitivity: "public", region: "US", containsPii: false, tags: ["disclosure"] },
+  {
+    id: "KS-001",
+    name: "Global brand system v14.pdf",
+    kind: "policy",
+    sensitivity: "internal",
+    region: "US",
+    containsPii: false,
+    tags: ["brand", "marketing"],
+  },
+  {
+    id: "KS-047",
+    name: "SEA supplier concentration ledger.csv",
+    kind: "dataset",
+    sensitivity: "confidential",
+    region: "APAC",
+    containsPii: false,
+    tags: ["risk", "sea-expansion"],
+  },
+  {
+    id: "KS-118",
+    name: "EU workforce compensation snapshot Q3.xlsx",
+    kind: "dataset",
+    sensitivity: "restricted",
+    region: "EU",
+    containsPii: true,
+    tags: ["hr", "gdpr", "comp"],
+  },
+  {
+    id: "KS-204",
+    name: "Product roadmap 2026-2027.md",
+    kind: "document",
+    sensitivity: "restricted",
+    region: "US",
+    containsPii: false,
+    tags: ["strategy", "board"],
+  },
+  {
+    id: "KS-311",
+    name: "Public sustainability report.pdf",
+    kind: "document",
+    sensitivity: "public",
+    region: "US",
+    containsPii: false,
+    tags: ["disclosure"],
+  },
 ];
 
 type LayerRule = {
@@ -48,12 +95,60 @@ type LayerRule = {
 };
 
 const DEFAULT_RULES: LayerRule[] = [
-  { code: "L1", name: "Organizational", read: ["admin", "operator", "viewer"], write: ["admin", "operator"], maxSensitivity: "restricted", allowedRegions: ["US", "EU", "APAC"], piiAllowed: true },
-  { code: "L2", name: "Executive", read: ["admin", "operator"], write: ["admin"], maxSensitivity: "restricted", allowedRegions: ["US", "EU", "APAC"], piiAllowed: false },
-  { code: "L3", name: "Consultant", read: ["admin", "operator"], write: ["admin", "operator"], maxSensitivity: "confidential", allowedRegions: ["US", "EU", "APAC"], piiAllowed: false },
-  { code: "L4", name: "Program", read: ["admin", "operator", "viewer"], write: ["admin", "operator"], maxSensitivity: "confidential", allowedRegions: ["US", "EU", "APAC"], piiAllowed: false },
-  { code: "L5", name: "Workforce", read: ["admin", "operator"], write: ["admin", "operator"], maxSensitivity: "internal", allowedRegions: ["US", "EU"], piiAllowed: false },
-  { code: "L6", name: "Governance", read: ["admin", "operator", "viewer"], write: ["admin"], maxSensitivity: "restricted", allowedRegions: ["US", "EU", "APAC"], piiAllowed: true },
+  {
+    code: "L1",
+    name: "Organizational",
+    read: ["admin", "operator", "viewer"],
+    write: ["admin", "operator"],
+    maxSensitivity: "restricted",
+    allowedRegions: ["US", "EU", "APAC"],
+    piiAllowed: true,
+  },
+  {
+    code: "L2",
+    name: "Executive",
+    read: ["admin", "operator"],
+    write: ["admin"],
+    maxSensitivity: "restricted",
+    allowedRegions: ["US", "EU", "APAC"],
+    piiAllowed: false,
+  },
+  {
+    code: "L3",
+    name: "Consultant",
+    read: ["admin", "operator"],
+    write: ["admin", "operator"],
+    maxSensitivity: "confidential",
+    allowedRegions: ["US", "EU", "APAC"],
+    piiAllowed: false,
+  },
+  {
+    code: "L4",
+    name: "Program",
+    read: ["admin", "operator", "viewer"],
+    write: ["admin", "operator"],
+    maxSensitivity: "confidential",
+    allowedRegions: ["US", "EU", "APAC"],
+    piiAllowed: false,
+  },
+  {
+    code: "L5",
+    name: "Workforce",
+    read: ["admin", "operator"],
+    write: ["admin", "operator"],
+    maxSensitivity: "internal",
+    allowedRegions: ["US", "EU"],
+    piiAllowed: false,
+  },
+  {
+    code: "L6",
+    name: "Governance",
+    read: ["admin", "operator", "viewer"],
+    write: ["admin"],
+    maxSensitivity: "restricted",
+    allowedRegions: ["US", "EU", "APAC"],
+    piiAllowed: true,
+  },
 ];
 
 const SENSITIVITY_ORDER: Sensitivity[] = ["public", "internal", "confidential", "restricted"];
@@ -64,7 +159,12 @@ function rankSensitivity(s: Sensitivity) {
   return SENSITIVITY_ORDER.indexOf(s);
 }
 
-type Verdict = { code: string; layer: string; verdict: "allow" | "redact" | "block"; reasons: string[] };
+type Verdict = {
+  code: string;
+  layer: string;
+  verdict: "allow" | "redact" | "block";
+  reasons: string[];
+};
 
 function evaluate(source: Source, actor: Role, rules: LayerRule[]): Verdict[] {
   return rules.map((rule) => {
@@ -76,7 +176,9 @@ function evaluate(source: Source, actor: Role, rules: LayerRule[]): Verdict[] {
       verdict = "block";
     }
     if (rankSensitivity(source.sensitivity) > rankSensitivity(rule.maxSensitivity)) {
-      reasons.push(`Source sensitivity ${source.sensitivity} exceeds layer cap ${rule.maxSensitivity}.`);
+      reasons.push(
+        `Source sensitivity ${source.sensitivity} exceeds layer cap ${rule.maxSensitivity}.`,
+      );
       verdict = "block";
     }
     if (!rule.allowedRegions.includes(source.region)) {
@@ -120,7 +222,10 @@ function PolicySimPage() {
     setRules((prev) =>
       prev.map((r) =>
         r.code === code
-          ? { ...r, read: r.read.includes(role) ? r.read.filter((x) => x !== role) : [...r.read, role] }
+          ? {
+              ...r,
+              read: r.read.includes(role) ? r.read.filter((x) => x !== role) : [...r.read, role],
+            }
           : r,
       ),
     );
@@ -143,7 +248,9 @@ function PolicySimPage() {
     );
   }
   function togglePii(code: string) {
-    setRules((prev) => prev.map((r) => (r.code === code ? { ...r, piiAllowed: !r.piiAllowed } : r)));
+    setRules((prev) =>
+      prev.map((r) => (r.code === code ? { ...r, piiAllowed: !r.piiAllowed } : r)),
+    );
   }
 
   return (
@@ -151,14 +258,28 @@ function PolicySimPage() {
       <div className="p-6 flex flex-col gap-8 animate-entry">
         <section className="grid grid-cols-4 gap-3">
           <StatChip label="Layers evaluated" value={String(rules.length)} />
-          <StatChip label="Layers touched by request" value={String(layersTouched.length)} tone="accent" />
-          <StatChip label="Blocks on path" value={String(blocks)} tone={blocks ? "danger" : "signal"} />
-          <StatChip label="Redactions on path" value={String(redactions)} tone={redactions ? "warn" : "signal"} />
+          <StatChip
+            label="Layers touched by request"
+            value={String(layersTouched.length)}
+            tone="accent"
+          />
+          <StatChip
+            label="Blocks on path"
+            value={String(blocks)}
+            tone={blocks ? "danger" : "signal"}
+          />
+          <StatChip
+            label="Redactions on path"
+            value={String(redactions)}
+            tone={redactions ? "warn" : "signal"}
+          />
         </section>
 
         <section className="grid grid-cols-3 gap-4">
           <div className="bg-surface border border-border rounded-sm p-5">
-            <div className="font-mono text-[10px] text-accent mb-2">PS.1 · SAMPLE KNOWLEDGE SOURCE</div>
+            <div className="font-mono text-[10px] text-accent mb-2">
+              PS.1 · SAMPLE KNOWLEDGE SOURCE
+            </div>
             <select
               value={sourceId}
               onChange={(e) => setSourceId(e.target.value)}
@@ -171,14 +292,30 @@ function PolicySimPage() {
               ))}
             </select>
             <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
-              <div>Kind · <span className="text-foreground">{source.kind}</span></div>
-              <div>Region · <span className="text-foreground">{source.region}</span></div>
-              <div>Sensitivity · <span className="text-foreground">{source.sensitivity}</span></div>
-              <div>PII · <span className={source.containsPii ? "text-[color:var(--warn)]" : "text-foreground"}>{source.containsPii ? "present" : "none"}</span></div>
+              <div>
+                Kind · <span className="text-foreground">{source.kind}</span>
+              </div>
+              <div>
+                Region · <span className="text-foreground">{source.region}</span>
+              </div>
+              <div>
+                Sensitivity · <span className="text-foreground">{source.sensitivity}</span>
+              </div>
+              <div>
+                PII ·{" "}
+                <span
+                  className={source.containsPii ? "text-[color:var(--warn)]" : "text-foreground"}
+                >
+                  {source.containsPii ? "present" : "none"}
+                </span>
+              </div>
             </div>
             <div className="flex flex-wrap gap-1 mt-3">
               {source.tags.map((t) => (
-                <span key={t} className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-border text-muted-foreground">
+                <span
+                  key={t}
+                  className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-border text-muted-foreground"
+                >
                   {t}
                 </span>
               ))}
@@ -201,7 +338,10 @@ function PolicySimPage() {
             <p className="text-[11px] text-muted-foreground line-clamp-3">{request.brief}</p>
             <div className="flex flex-wrap gap-1 mt-3">
               {layersTouched.map((code) => (
-                <span key={code} className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-primary/40 text-primary bg-primary/10">
+                <span
+                  key={code}
+                  className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-primary/40 text-primary bg-primary/10"
+                >
                   {code}
                 </span>
               ))}
@@ -238,7 +378,9 @@ function PolicySimPage() {
               {canDeliver
                 ? "PATH CLEAR · Directive can reach delivery with current policy."
                 : `HALTED · ${blocks} layer${blocks === 1 ? "" : "s"} on the reasoning path would block this source.`}
-              {redactions > 0 && canDeliver && ` ${redactions} layer(s) would apply redaction on ingest.`}
+              {redactions > 0 &&
+                canDeliver &&
+                ` ${redactions} layer(s) would apply redaction on ingest.`}
             </div>
           </div>
         </section>
@@ -260,7 +402,9 @@ function PolicySimPage() {
                     <span className="font-mono text-[10px] text-primary">{v.code}</span>
                     <div className="text-sm font-bold mt-0.5">{v.layer}</div>
                     {!onPath && (
-                      <div className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground mt-1">Off path</div>
+                      <div className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground mt-1">
+                        Off path
+                      </div>
                     )}
                   </div>
                   <div className="flex items-center">
@@ -328,7 +472,9 @@ function PolicySimPage() {
                 </div>
                 <div className="space-y-3 text-[11px]">
                   <div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Read roles</div>
+                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">
+                      Read roles
+                    </div>
                     <div className="flex gap-1">
                       {ROLES.map((role) => (
                         <button
@@ -348,7 +494,9 @@ function PolicySimPage() {
                     </div>
                   </div>
                   <div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Max sensitivity</div>
+                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">
+                      Max sensitivity
+                    </div>
                     <div className="flex gap-1">
                       {SENSITIVITY_ORDER.map((s) => (
                         <button
@@ -368,7 +516,9 @@ function PolicySimPage() {
                     </div>
                   </div>
                   <div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Allowed regions</div>
+                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">
+                      Allowed regions
+                    </div>
                     <div className="flex gap-1">
                       {REGIONS.map((region) => (
                         <button
@@ -392,7 +542,8 @@ function PolicySimPage() {
             ))}
           </div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-3">
-            Simulation only · nothing here mutates live enforcement. Ship changes through governance review.
+            Simulation only · nothing here mutates live enforcement. Ship changes through governance
+            review.
           </p>
         </section>
       </div>

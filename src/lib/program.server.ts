@@ -63,8 +63,16 @@ export function fallbackPlan(title: string): PlanWorkstream[] {
 
   return [
     mk("WS-01", "Discovery & baseline", "Data & AI", "Data Analyst", 10, "low", [
-      ["Assemble baseline dataset", "Pull governed warehouse reads covering the directive scope.", 12],
-      ["Quantify current-state metrics", "Compute deterministic baselines for the success criteria.", 8],
+      [
+        "Assemble baseline dataset",
+        "Pull governed warehouse reads covering the directive scope.",
+        12,
+      ],
+      [
+        "Quantify current-state metrics",
+        "Compute deterministic baselines for the success criteria.",
+        8,
+      ],
     ]),
     mk("WS-02", "Compliance & policy review", "Legal", "Compliance Analyst", 14, "medium", [
       ["Map applicable policies", "Identify regulatory constraints binding the directive.", 8],
@@ -75,7 +83,11 @@ export function fallbackPlan(title: string): PlanWorkstream[] {
       ["Define materiality thresholds", "Set the thresholds validators enforce at review.", 4],
     ]),
     mk("WS-04", "Build & execution", "Software", "Solution Architect", 21, "high", [
-      ["Design execution architecture", "Sequence delivery with dependencies and abort conditions.", 16],
+      [
+        "Design execution architecture",
+        "Sequence delivery with dependencies and abort conditions.",
+        16,
+      ],
       ["Implement first increment", "Ship the smallest increment that proves the plan.", 24],
     ]),
     mk("WS-05", "Rollout & acceptance", "Operations", "Operations Analyst", 15, "low", [
