@@ -157,7 +157,7 @@ function Landing() {
                 M0.2 · PRINCIPLES
               </p>
               <h2 className="text-3xl font-bold tracking-tight mb-6">
-                Modular. Explainable. Enterprise-ready.
+                Modular. Explainable. Governed.
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 Every decision is traceable through the six cognition layers. Autonomy policies

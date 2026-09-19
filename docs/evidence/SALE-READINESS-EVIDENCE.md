@@ -15,8 +15,8 @@
 | `npm test`                                                                             | Passed            | 3 files and 23 tests passed                                                                           |
 | `npm run test:security`                                                                | Passed            | Static RLS migration coverage                                                                         |
 | `npm run test:ai-eval`                                                                 | Passed            | Synthetic grounding, policy, approval, and containment metrics all 1                                  |
-| `npm run release:evidence`                                                             | Passed            | 15 required artifacts present                                                                         |
-| `npm run security:files`                                                               | Passed            | 189 tracked files inspected; no current-revision high-confidence secret finding                       |
+| `npm run release:evidence`                                                             | Passed            | 16 required artifacts present                                                                         |
+| `npm run security:files`                                                               | Passed            | 197 tracked files inspected; no current-revision high-confidence secret finding                       |
 | `npm run security:scan`                                                                | Passed            | 0 reported production vulnerabilities at high severity threshold                                      |
 | `npm run security:sbom`                                                                | Passed            | CycloneDX SBOM generated at `reports/sbom.cdx.json`                                                   |
 | `npm run build`                                                                        | Passed            | Production build completed                                                                            |

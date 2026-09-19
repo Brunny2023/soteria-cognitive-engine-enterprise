@@ -4,7 +4,7 @@
 **Assessment date:** 19 September 2026
 **Baseline assessed:** `c8c8538fd8ffd48ea809fb7c03478800f508b507`
 **Primary verified implementation commit:** `32f44624b50a8a2105dfa0dcfe66e0f97887f97a`
-**Final publication commit:** Reported with the final delivery response after this documentation update is committed.
+**Final publication commit for the previously completed package:** `676817e5a10fedd852521ab2c855e81baa73711f`
 
 ## Executive summary
 
@@ -94,23 +94,23 @@ A buyer should provide separate staging and production infrastructure, a disposa
 
 ## Evidence index
 
-| Claim                                               | Evidence location                                                                                             |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Fresh clone and baseline                            | Git commit `c8c8538fd8ffd48ea809fb7c03478800f508b507`; `PRODUCTION-READINESS-REPORT.md`                       |
-| Public and auth pages render without backend config | `scripts/smoke-local.mjs`; browser execution recorded in `PRODUCTION-READINESS-REPORT.md`                     |
-| Protected route redirects safely                    | `src/routes/_authenticated/route.tsx`; `scripts/smoke-local.mjs`                                              |
-| Configuration gate                                  | `src/integrations/supabase/client.ts`; `src/routes/index.tsx`; `src/routes/auth.tsx`; `src/routes/__root.tsx` |
-| Typecheck and lint                                  | `npm run typecheck`; `npm run lint`                                                                           |
-| Unit and security contracts                         | `src/lib/__tests__/`; `npm test`                                                                              |
-| Static RLS coverage                                 | `npm run test:security`; `scripts/check-rls-coverage.mjs`                                                     |
-| AI evaluation                                       | `npm run test:ai-eval`; `evaluations/reference-workflow.json`                                                 |
-| Current revision sensitive-file audit               | `npm run security:files`; `scripts/check-sensitive-files.mjs`                                                 |
-| Dependency audit and SBOM                           | `npm run security:scan`; `npm run security:sbom`; `reports/sbom.cdx.json`                                     |
-| Production build                                    | `npm run build`                                                                                               |
-| Hosted CI                                           | `.github/workflows/enterprise-release.yml`; future release run URL                                            |
-| Capability status                                   | `IMPLEMENTATION-STATUS.md`                                                                                    |
-| Environment blockers                                | `PRODUCTION-READINESS-REPORT.md`                                                                              |
-| Rights and provenance                               | `docs/legal/IP-PROVENANCE-DOSSIER.md`; `docs/legal/third-party-and-provenance.md`                             |
+| Claim                                               | Evidence location                                                                                                                                                      |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fresh clone and baseline                            | Git commit `c8c8538fd8ffd48ea809fb7c03478800f508b507`; `PRODUCTION-READINESS-REPORT.md`                                                                                |
+| Public and auth pages render without backend config | `scripts/smoke-local.mjs`; browser execution recorded in `PRODUCTION-READINESS-REPORT.md`                                                                              |
+| Protected route redirects safely                    | `src/routes/_authenticated/route.tsx`; `scripts/smoke-local.mjs`                                                                                                       |
+| Configuration gate                                  | `src/integrations/supabase/client.ts`; `src/routes/index.tsx`; `src/routes/auth.tsx`; `src/routes/__root.tsx`                                                          |
+| Typecheck and lint                                  | `npm run typecheck`; `npm run lint`                                                                                                                                    |
+| Unit and security contracts                         | `src/lib/__tests__/`; `npm test`                                                                                                                                       |
+| Static RLS coverage                                 | `npm run test:security`; `scripts/check-rls-coverage.mjs`                                                                                                              |
+| AI evaluation                                       | `npm run test:ai-eval`; `evaluations/reference-workflow.json`                                                                                                          |
+| Current revision sensitive-file audit               | `npm run security:files`; `scripts/check-sensitive-files.mjs`                                                                                                          |
+| Dependency audit and SBOM                           | `npm run security:scan`; `npm run security:sbom`; `reports/sbom.cdx.json`                                                                                              |
+| Production build                                    | `npm run build`                                                                                                                                                        |
+| Hosted CI                                           | `.github/workflows/enterprise-release.yml`; [release gate run 35447760636](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/35447760636) |
+| Capability status                                   | `IMPLEMENTATION-STATUS.md`                                                                                                                                             |
+| Environment blockers                                | `PRODUCTION-READINESS-REPORT.md`                                                                                                                                       |
+| Rights and provenance                               | `docs/legal/IP-PROVENANCE-DOSSIER.md`; `docs/legal/third-party-and-provenance.md`                                                                                      |
 
 ## Final sale-readiness status
 
@@ -119,4 +119,4 @@ A buyer should provide separate staging and production infrastructure, a disposa
 **Revenue-generating SaaS: Not evidenced.**
 **Rights and chain of title: Pending external confirmation.**
 
-The final publication commit SHA and hosted CI result must be recorded in the delivery response. The primary implementation commit above identifies the commit containing the functional remediation and sale-readiness package before this final report metadata update.
+The closure revision containing this final consistency pass is reported with its hosted CI result in the delivery response. The publication commit above identifies the previously published package that this closure pass completes.

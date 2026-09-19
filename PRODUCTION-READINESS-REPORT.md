@@ -31,7 +31,7 @@ The baseline release suite passed after the configuration-gate remediation:
 - Synthetic reference-workflow evaluation passed with all four defined rates at `1`.
 - Required release-evidence check passed after the new artifacts were added.
 - Current-revision sensitive-file audit passed.
-- Production dependency audit reported zero vulnerabilities at the configured high-severity threshold.
+- Production dependency audit reported no high-severity production dependency findings at the configured threshold.
 - CycloneDX SBOM generation passed.
 - Production build passed.
 
