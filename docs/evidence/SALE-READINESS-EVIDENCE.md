@@ -5,6 +5,18 @@
 **Environment:** Ubuntu sandbox, Node 22.13.x, npm 10.9.x, local Vite server at `http://127.0.0.1:4173`
 **External credentials:** none supplied.
 
+## Final Release Identity
+
+This evidence index records the validation performed during the sale-readiness process.
+
+- **Baseline assessed:** `c8c8538fd8ffd48ea809fb7c03478800f508b507`
+- **Primary verified implementation commit:** `32f44624b50a8a2105dfa0dcfe66e0f97887f97a`
+- **Previously published sale-readiness package:** `676817e5a10fedd852521ab2c855e81baa73711f`
+- **Final closure commit:** `b9d8bc9174b426befc30cf35bc26b0a19248a181`
+- **Final hosted CI run:** [Enterprise release gate 35448522553](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/35448522553)
+
+The final closure commit represents the repository state containing the completed sale-readiness documentation and consistency pass. The final CI result was evaluated against that exact revision. Passing static, synthetic, or local tests does not constitute evidence of live production behavior where the relevant external infrastructure was unavailable.
+
 ## Executed commands
 
 | Command                                                                                | Result            | Evidence                                                                                              |
@@ -17,7 +29,7 @@
 | `npm run test:ai-eval`                                                                 | Passed            | Synthetic grounding, policy, approval, and containment metrics all 1                                  |
 | `npm run release:evidence`                                                             | Passed            | 16 required artifacts present                                                                         |
 | `npm run security:files`                                                               | Passed            | 197 tracked files inspected; no current-revision high-confidence secret finding                       |
-| `npm run security:scan`                                                                | Passed            | 0 reported production vulnerabilities at high severity threshold                                      |
+| `npm run security:scan`                                                                | Passed            | No high-severity production dependency findings at the configured threshold                          |
 | `npm run security:sbom`                                                                | Passed            | CycloneDX SBOM generated at `reports/sbom.cdx.json`                                                   |
 | `npm run build`                                                                        | Passed            | Production build completed                                                                            |
 | `npm run smoke:local`                                                                  | Passed            | Three HTTP journeys verified                                                                          |
