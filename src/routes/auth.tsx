@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { auth } from "@/integrations/auth";
 
 export const Route = createFileRoute("/auth")({
@@ -22,8 +22,10 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const configured = isSupabaseConfigured();
 
   useEffect(() => {
+    if (!configured) return;
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/onboarding", replace: true });
     });
@@ -31,7 +33,7 @@ function AuthPage() {
       if (s) navigate({ to: "/onboarding", replace: true });
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [configured, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,6 +59,7 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
+    if (!configured) return;
     setError(null);
     const result = await auth.signInWithOAuth("google", window.location.origin);
     if (result.error) setError(result.error.message ?? "Google sign-in failed");
@@ -97,9 +100,17 @@ function AuthPage() {
               : "Provision a new operator account for this workspace."}
           </p>
 
+          {!configured && (
+            <div className="mb-4 border border-[color:var(--signal)]/30 bg-[color:var(--signal)]/10 rounded-sm px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
+              Authentication is not configured in this environment. Set the required Supabase
+              variables from <code>.env.example</code> before using Mission Control.
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleGoogle}
+            disabled={!configured}
             className="w-full border border-border bg-background hover:bg-secondary py-2.5 px-4 rounded-sm text-sm font-medium mb-4 transition-colors"
           >
             Continue with Google
@@ -146,7 +157,7 @@ function AuthPage() {
             )}
             <button
               type="submit"
-              disabled={busy}
+              disabled={busy || !configured}
               className="mt-2 bg-primary text-primary-foreground py-2.5 text-[11px] font-mono uppercase tracking-widest hover:bg-accent transition-colors disabled:opacity-50"
             >
               {busy ? "…" : mode === "signin" ? "Sign in →" : "Create account →"}

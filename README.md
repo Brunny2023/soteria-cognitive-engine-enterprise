@@ -1,5 +1,28 @@
 # Soteria Cognitive Engine
 
+## Current Product Status
+
+Soteria Cognitive Engine Enterprise is a TypeScript/TanStack Start application backed by Supabase. It provides organization-scoped cognition workflows, governed execution stages, specialist and executive work surfaces, validation contracts, artifact records, and audit-oriented controls.
+
+The current repository is a sale-presentable software asset, not a claim of a production-certified or revenue-generating SaaS business. Verified in the available environment: clean installation, typecheck, lint, unit and security-contract tests, static RLS coverage, synthetic AI evaluation, current-revision sensitive-file audit, dependency audit, SBOM generation, production build, public landing-page rendering, configuration-safe authentication entry, and unauthenticated protected-route redirection.
+
+Environment-dependent: live Supabase authentication, multi-user tenant isolation, database-level RLS, real model-provider execution, email delivery, backup/restore, production deployment, and independent security review. These require buyer-controlled infrastructure and disposable credentials. See [BUYER-TECHNICAL-DUE-DILIGENCE.md](BUYER-TECHNICAL-DUE-DILIGENCE.md), [IMPLEMENTATION-STATUS.md](IMPLEMENTATION-STATUS.md), [PRODUCTION-READINESS-REPORT.md](PRODUCTION-READINESS-REPORT.md), and [SALE-READINESS-REPORT.md](SALE-READINESS-REPORT.md).
+
+Ownership, third-party dependencies, and applicable licensing rights are documented in the project's commercial due-diligence materials. Historical source provenance is preserved for diligence and is not represented as a marketing claim.
+
+### Buyer entry points
+
+- [Buyer technical diligence](BUYER-TECHNICAL-DUE-DILIGENCE.md)
+- [Implementation status](IMPLEMENTATION-STATUS.md)
+- [Production-readiness report](PRODUCTION-READINESS-REPORT.md)
+- [Sale-readiness report](SALE-READINESS-REPORT.md)
+- [Sale-readiness evidence index](docs/evidence/SALE-READINESS-EVIDENCE.md)
+- [Security threat model](docs/security/threat-model.md)
+- [Authorization matrix](docs/security/authorization-matrix.md)
+- [Operations runbook](docs/operations/runbook.md)
+- [Commercial license notice](LICENSE)
+- [Third-party and licensing schedule](docs/legal/third-party-and-provenance.md)
+
 Project Brief: Build the Soteria Enterprise Cognition Platform (SECP)
 
 Vision
@@ -638,7 +661,7 @@ Train organizational intelligence.
 
 Extend the workforce with new specialist agents.
 
-The architecture must be modular, extensible, explainable, secure, enterprise-ready, and capable of supporting future specialist domains without requiring major redesign.
+The architecture is intended to be modular, extensible, explainable, and suitable for enterprise governance after the buyer completes the environment-dependent validation described above.
 
 The goal is to establish the platform as the cognitive operating system for modern organizations, enabling enterprises to augment or automate knowledge-intensive work through coordinated AI executives, consultants, and specialist workforces operating within the organization's own knowledge, governance, and strategic objectives.
 

@@ -29,7 +29,12 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-function createSupabaseClient() {
+export type SupabaseConfig = {
+  url: string;
+  publishableKey: string;
+};
+
+export function getSupabaseConfig(): SupabaseConfig | null {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -41,14 +46,28 @@ function createSupabaseClient() {
       ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Configure the application environment.`;
+    return null;
+  }
+
+  return { url: SUPABASE_URL, publishableKey: SUPABASE_PUBLISHABLE_KEY };
+}
+
+export function isSupabaseConfigured(): boolean {
+  return getSupabaseConfig() !== null;
+}
+
+function createSupabaseClient() {
+  const config = getSupabaseConfig();
+  if (!config) {
+    const message =
+      "Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY for the browser, or SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY for SSR.";
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  return createClient<Database>(config.url, config.publishableKey, {
     global: {
-      fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
+      fetch: createSupabaseFetch(config.publishableKey),
     },
     auth: {
       storage: browserAuthStorage(),

@@ -23,10 +23,12 @@
     "test:coverage": "vitest run --coverage",
     "test:security": "node scripts/check-rls-coverage.mjs",
     "test:ai-eval": "node scripts/evaluate-reference-workflow.mjs",
+    "security:files": "node scripts/check-sensitive-files.mjs",
     "security:scan": "npm audit --omit=dev --audit-level=high",
     "security:sbom": "mkdir -p reports && npm sbom --sbom-format cyclonedx --sbom-type application > reports/sbom.cdx.json",
     "release:evidence": "node scripts/check-release-evidence.mjs",
-    "validate:release": "npm run typecheck && npm run lint && npm test && npm run test:security && npm run test:ai-eval && npm run release:evidence && npm run security:scan && npm run security:sbom && npm run build",
+    "smoke:local": "node scripts/smoke-local.mjs",
+    "validate:release": "npm run typecheck && npm run lint && npm test && npm run test:security && npm run test:ai-eval && npm run release:evidence && npm run security:files && npm run security:scan && npm run security:sbom && npm run build",
     "test:watch": "vitest",
     "test:e2e": "python3 tests/playwright/scoped_sql_validator.py"
   },

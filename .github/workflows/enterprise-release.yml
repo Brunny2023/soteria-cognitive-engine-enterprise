@@ -41,6 +41,9 @@ jobs:
             exit 1
           fi
 
+      - name: Audit sensitive content in tracked files
+        run: npm run security:files
+
       - name: Typecheck
         run: npm run typecheck
 

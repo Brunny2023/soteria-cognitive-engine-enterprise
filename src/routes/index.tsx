@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { WalkthroughPlayer } from "@/components/WalkthroughPlayer";
 
 export const Route = createFileRoute("/")({
@@ -27,6 +27,7 @@ function Landing() {
   const navigate = useNavigate();
   // If already signed in, jump to dashboard.
   useEffect(() => {
+    if (!isSupabaseConfigured()) return;
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/onboarding", replace: true });
     });

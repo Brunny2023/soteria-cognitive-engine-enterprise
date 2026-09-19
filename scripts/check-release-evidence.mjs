@@ -12,6 +12,12 @@ const required = [
   ".github/workflows/enterprise-release.yml",
   ".github/CODEOWNERS",
   "CHANGELOG.md",
+  "BUYER-TECHNICAL-DUE-DILIGENCE.md",
+  "IMPLEMENTATION-STATUS.md",
+  "PRODUCTION-READINESS-REPORT.md",
+  "SALE-READINESS-REPORT.md",
+  "docs/legal/IP-PROVENANCE-DOSSIER.md",
+  "docs/evidence/SALE-READINESS-EVIDENCE.md",
 ];
 const missing = [];
 for (const file of required) {
