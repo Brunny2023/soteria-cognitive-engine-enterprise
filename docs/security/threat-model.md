@@ -2,7 +2,7 @@
 
 ## Scope
 
-The system is a multi-tenant web application that stores organization data in Supabase, executes bounded AI workflows, persists artifacts and audit records, and uses Lovable-connected authentication and gateway integrations. This model covers the browser, application server, Supabase/Postgres, storage, AI gateway, CI/CD, operators, and external providers.
+The system is a multi-tenant web application that stores organization data in Supabase, executes bounded AI workflows, persists artifacts and audit records, and uses Supabase authentication and a configurable AI gateway. This model covers the browser, application server, Supabase/Postgres, storage, AI gateway, CI/CD, operators, and external providers.
 
 ## Assets
 

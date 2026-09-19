@@ -642,23 +642,26 @@ The architecture must be modular, extensible, explainable, secure, enterprise-re
 
 The goal is to establish the platform as the cognitive operating system for modern organizations, enabling enterprises to augment or automate knowledge-intensive work through coordinated AI executives, consultants, and specialist workforces operating within the organization's own knowledge, governance, and strategic objectives.
 
-This project was built with [Lovable](https://lovable.dev).
+## Independent installation
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/738d0657-e3b9-476f-82fb-fffb19fa6e02).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requirements: Node.js 22.13.x and npm 10.9.x.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm ci
+npm run validate:release
 npm run dev
 ```
+
+The production build is generated with `npm run build` and can be started with the server target produced under `.output/server/index.mjs`.
+
+## Configuration
+
+Copy `.env.example` to the target environment’s secret store. Configure Supabase URL and publishable/service-role keys, an OpenAI-compatible `AI_GATEWAY_BASE_URL`, `AI_GATEWAY_API_KEY`, and `AI_MODEL`. Configure `EMAIL_PROVIDER_URL` and `EMAIL_PROVIDER_API_KEY` only when email alerts are enabled. Never commit environment values.
+
+## Release evidence
+
+The release gate runs typecheck, lint, unit tests, RLS migration coverage, the reference-workflow evaluation, release-evidence checks, production dependency audit, CycloneDX SBOM generation, and the production build. See `docs/operations/runbook.md`, `docs/security/threat-model.md`, `docs/security/authorization-matrix.md`, and `docs/legal/buyer-license-schedule.md`.
+
+## Commercial rights
+
+The repository is distributed under the transaction notice in `LICENSE` until a definitive commercial agreement is executed. Third-party dependencies and hosted services retain their own terms; consult `docs/legal/third-party-and-provenance.md` and the generated SBOM before redistribution.

@@ -1,26 +1,23 @@
 # Changelog
 
-## Unreleased — Enterprise-readiness foundation
-
-This clone-only upgrade preserves Lovable fingerprints, ownership, attribution, and tracking history.
+## Unreleased — Commercial distribution hardening
 
 ### Added
 
-- Explicit Node 22.13.0 and npm 10.9.2 policy.
-- Secret-free `.env.example` and stronger secret/coverage ignore rules.
-- Root `typecheck`, security validation, coverage, audit, and release-validation scripts.
-- GitHub Actions workflow for install, typecheck, lint, tests, RLS migration coverage, audit, and production build.
-- CODEOWNERS, provenance/ownership policy, authorization matrix, ADRs, deployment runbook, and buyer-facing release checklist.
-- Executable tenant-boundary, role-change, service-role-context, audit-integrity, and telemetry-redaction tests.
-- Synthetic reference-workflow evaluation with grounding, policy, approval, containment, latency, and cost metrics.
-- Threat model, incident-response playbook, Cloudflare/local staging manifests, evidence checker, and CycloneDX SBOM generation.
+- Provider-neutral Supabase OAuth adapter and browser storage.
+- Generic OpenAI-compatible AI gateway configuration.
+- Generic transactional email adapter.
+- Provider-neutral runtime error reporting.
+- Standard TanStack Start, Vite, Nitro, React, Tailwind, and TypeScript build configuration.
+- Tenant-boundary, role-change, service-role-context, audit-integrity, and telemetry-redaction tests.
+- Reference-workflow evaluation, threat model, incident-response playbook, deployment contracts, SBOM generation, and release-evidence checks.
 
 ### Changed
 
-- Regenerated `package-lock.json` using npm’s legacy peer-dependency policy because the original lockfile could not be consumed by clean `npm ci`.
-- Removed only the tracked `.env` from this local clone; no GitHub or Lovable history was changed.
+- Removed platform-specific development dependencies, preview hooks, metadata, and provider headers.
+- Replaced platform-specific environment variables with documented generic contracts.
+- Removed tracked environment values from the distributable revision.
 
-### Not changed intentionally
+### Sales-readiness note
 
-- Lovable-specific packages, configuration, metadata, integrations, and fingerprints remain in place.
-- No commits were pushed to GitHub.
+The product runtime remains AI-enabled. Product claims must be supported by the included evaluation fixtures and by staging evidence for the buyer’s selected model, gateway, data, and deployment configuration.

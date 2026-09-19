@@ -11,7 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportRuntimeError } from "../lib/error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -41,7 +41,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   useEffect(() => {
     const normalizedError = error instanceof Error ? error : new Error(String(error));
     console.error(normalizedError);
-    reportLovableError(normalizedError, { boundary: "tanstack_root_error_component" });
+    reportRuntimeError(normalizedError, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (

@@ -140,12 +140,12 @@ export const generatePlanFn = createServerFn({ method: "POST" })
 
     let plan = fallbackPlan(req.title as string);
     let source = "deterministic fallback";
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.AI_GATEWAY_API_KEY;
     if (key) {
       try {
-        const { createLovableAiGateway } = await import("./ai-gateway.server");
+        const { createAiGateway } = await import("./ai-gateway.server");
         const { generateObject } = await import("ai");
-        const gateway = createLovableAiGateway(key);
+        const gateway = createAiGateway(key);
         const result = await generateObject({
           model: gateway("openai/gpt-5.6-luna"),
           schema: PlanSchema,
@@ -156,7 +156,6 @@ Brief: ${req.brief}
 Priority: ${req.priority} · Autonomy level: ${req.autonomy}
 
 Rules: workstream codes are WS-01, WS-02, ... Each task department MUST be one of: Data & AI, Software, Finance, Marketing, HR, Legal, Operations. Effort hours are integers between 2 and 40. Acceptance criteria must be measurable.`,
-          providerOptions: { lovable: { reasoningEffort: "none" } },
         });
         plan = result.object.workstreams.map((w) => ({
           ...w,

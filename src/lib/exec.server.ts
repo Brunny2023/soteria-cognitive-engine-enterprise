@@ -13,16 +13,15 @@ export async function synthesize(
   prompt: string,
   fallback: string,
 ): Promise<{ content: string; source: string }> {
-  const key = process.env["LOVABLE_API_KEY"];
+  const key = process.env["AI_GATEWAY_API_KEY"];
   if (!key) return { content: fallback, source: "deterministic fallback" };
   try {
-    const { createLovableAiGateway } = await import("./ai-gateway.server");
+    const { createAiGateway } = await import("./ai-gateway.server");
     const { generateText } = await import("ai");
-    const gateway = createLovableAiGateway(key);
+    const gateway = createAiGateway(key);
     const res = await generateText({
       model: gateway("openai/gpt-5.6-luna"),
       prompt,
-      providerOptions: { lovable: { reasoningEffort: "none" } },
     });
     const text = (res.text ?? "").trim();
     if (!text) return { content: fallback, source: "deterministic fallback (empty response)" };

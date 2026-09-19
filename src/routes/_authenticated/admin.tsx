@@ -115,7 +115,7 @@ function AdminPage() {
           <div className="bg-surface border border-border rounded-sm">
             <div className="grid grid-cols-[80px_1fr_1fr_120px_120px_140px] gap-4 px-5 py-3 border-b border-border font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               <span>Layer</span>
-              <span>Model (Lovable AI Gateway)</span>
+              <span>Model (AI Gateway)</span>
               <span>Reply</span>
               <span>Latency</span>
               <span>Status</span>
@@ -174,8 +174,8 @@ function AdminPage() {
             })}
           </div>
           <p className="mt-2 text-[10px] font-mono text-muted-foreground">
-            Ping issues a live request through the Lovable AI Gateway with reasoning off and records
-            latency per layer.
+            Ping issues a live request through the AI Gateway with reasoning off and records latency
+            per layer.
           </p>
         </section>
 

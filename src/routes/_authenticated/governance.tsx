@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/governance")({
       {
         name: "description",
         content:
-          "Multi-stage validation, auditable decision trails, and organizational policy compliance for every AI-generated deliverable.",
+          "Multi-stage validation, auditable decision trails, and organizational policy compliance for every model-assisted deliverable.",
       },
       { property: "og:title", content: "Validation & Governance — Soteria SECP" },
       {

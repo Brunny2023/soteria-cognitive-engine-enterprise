@@ -39,7 +39,7 @@ export const pingLayerFn = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => PingInput.parse(input))
   .handler(async ({ data }): Promise<LayerPingResult> => {
     const model = LAYER_MODEL[data.layer];
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.AI_GATEWAY_API_KEY;
     if (!key) {
       return {
         layer: data.layer,
@@ -47,17 +47,16 @@ export const pingLayerFn = createServerFn({ method: "POST" })
         ok: false,
         latency_ms: 0,
         reply: "",
-        error: "Missing LOVABLE_API_KEY",
+        error: "Missing AI_GATEWAY_API_KEY",
       };
     }
-    const { createLovableAiGateway } = await import("./ai-gateway.server");
-    const gateway = createLovableAiGateway(key);
+    const { createAiGateway } = await import("./ai-gateway.server");
+    const gateway = createAiGateway(key);
     const started = Date.now();
     try {
       const result = await generateText({
         model: gateway(model),
         prompt: `You are the cognition endpoint for the SECP ${data.layer.toUpperCase()} layer. Reply with a single short sentence confirming you are reachable and name your layer.`,
-        providerOptions: { lovable: { reasoningEffort: "none" } },
       });
       return {
         layer: data.layer,
@@ -179,16 +178,16 @@ export const readinessCheckFn = createServerFn({ method: "POST" })
       });
     }
 
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.AI_GATEWAY_API_KEY;
     checks.push({
       key: "gateway.key",
       label: "AI Gateway credential present",
       status: key ? "pass" : "fail",
-      detail: key ? "LOVABLE_API_KEY resolved from server env." : "Missing LOVABLE_API_KEY.",
+      detail: key ? "AI_GATEWAY_API_KEY resolved from server env." : "Missing AI_GATEWAY_API_KEY.",
     });
 
     // Environment variables required by the client and server runtimes.
-    const envVars = ["SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "LOVABLE_API_KEY"] as const;
+    const envVars = ["SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "AI_GATEWAY_API_KEY"] as const;
     const missingEnv = envVars.filter((v) => !process.env[v]);
     checks.push({
       key: "env.required",
@@ -204,12 +203,11 @@ export const readinessCheckFn = createServerFn({ method: "POST" })
     if (key) {
       const started = Date.now();
       try {
-        const { createLovableAiGateway } = await import("./ai-gateway.server");
-        const gateway = createLovableAiGateway(key);
+        const { createAiGateway } = await import("./ai-gateway.server");
+        const gateway = createAiGateway(key);
         const result = await generateText({
           model: gateway(LAYER_MODEL.governance),
           prompt: "Reply with the single word READY.",
-          providerOptions: { lovable: { reasoningEffort: "none" } },
         });
         checks.push({
           key: "api.gateway",

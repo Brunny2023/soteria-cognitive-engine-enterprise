@@ -1,12 +1,10 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
-export function createLovableAiGateway(apiKey: string) {
+export function createAiGateway(apiKey: string, baseURL = process.env.AI_GATEWAY_BASE_URL) {
+  if (!baseURL) throw new Error("AI_GATEWAY_BASE_URL is not configured");
   return createOpenAICompatible({
-    name: "lovable",
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    headers: {
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "vercel-ai-sdk",
-    },
+    name: "organization-ai-gateway",
+    baseURL,
+    headers: { Authorization: `Bearer ${apiKey}` },
   });
 }

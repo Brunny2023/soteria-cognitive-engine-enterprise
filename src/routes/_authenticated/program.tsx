@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/program")({
       {
         name: "description",
         content:
-          "Convert directives into executable work: AI-generated work breakdown, specialist assignment, effort, risk, and acceptance criteria.",
+          "Convert directives into executable work: model-assisted work breakdown, specialist assignment, effort, risk, and acceptance criteria.",
       },
       { property: "og:title", content: "Program Management — Soteria SECP" },
       {

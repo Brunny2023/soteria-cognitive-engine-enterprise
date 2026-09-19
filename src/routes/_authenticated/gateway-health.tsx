@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/gateway-health")({
       {
         name: "description",
         content:
-          "Live latency, error rate, and connectivity telemetry for every intelligence layer of the Lovable AI Gateway.",
+          "Live latency, error rate, and connectivity telemetry for every intelligence layer of the AI Gateway.",
       },
       { property: "og:title", content: "AI Gateway Health — Soteria SECP" },
       {

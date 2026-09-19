@@ -18,7 +18,7 @@ Create a target Supabase project, configure the project URL and publishable key,
 
 ## AI gateway and external providers
 
-The current Lovable gateway configuration remains part of this clone and its ownership/provenance obligations are preserved. Provider credentials must be stored in the target environment’s managed secret store. Record model, endpoint, timeout, token budget, safety settings, and cost assumptions for each environment. Do not use production customer data in development or tests.
+Provider credentials must be stored in the target environment’s managed secret store. Record model, endpoint, timeout, token budget, safety settings, and cost assumptions for each environment. Do not use production customer data in development or tests.
 
 ## Backup and retention
 

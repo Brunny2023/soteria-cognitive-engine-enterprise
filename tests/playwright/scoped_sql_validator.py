@@ -1,6 +1,6 @@
 """End-to-end check: scoped SQL data-scope preview + deterministic validator UI.
 
-Restores the injected Supabase session (LOVABLE_BROWSER_* env vars) when present,
+Restores the injected Supabase session (BROWSER_SUPABASE_* env vars) when present,
 opens a directive, and asserts the per-executive scope preview and validator
 verdicts render on the request detail panel and artifact ledger.
 
@@ -20,9 +20,9 @@ SHOTS.mkdir(parents=True, exist_ok=True)
 
 
 async def restore_session(context, page):
-    storage_key = os.environ.get("LOVABLE_BROWSER_SUPABASE_STORAGE_KEY")
-    session_json = os.environ.get("LOVABLE_BROWSER_SUPABASE_SESSION_JSON")
-    cookies_json = os.environ.get("LOVABLE_BROWSER_SUPABASE_COOKIES_JSON")
+    storage_key = os.environ.get("BROWSER_SUPABASE_STORAGE_KEY")
+    session_json = os.environ.get("BROWSER_SUPABASE_SESSION_JSON")
+    cookies_json = os.environ.get("BROWSER_SUPABASE_COOKIES_JSON")
     if cookies_json:
         cookies = json.loads(cookies_json)
         for c in cookies:

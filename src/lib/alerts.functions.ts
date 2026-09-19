@@ -61,24 +61,21 @@ export const dispatchToolHealthAlertFn = createServerFn({ method: "POST" })
         result.email.detail = "a verified sender address is required";
       } else {
         try {
-          const { sendLovableEmail } = await import("@lovable.dev/email-js");
+          const { sendEmail } = await import("./email.server");
           const rows = data.breaches
             .map(
               (b) =>
                 `<li><strong>${b.severity.toUpperCase()}</strong> — ${b.tool} · ${b.metric}: ${b.observed} exceeds ${b.threshold}</li>`,
             )
             .join("");
-          await sendLovableEmail(
-            {
-              to,
-              from,
-              subject: `SECP tool-health alert — ${data.breaches.length} breach(es)`,
-              text: data.text,
-              html: `<h2>SECP tool-health alert</h2><ul>${rows}</ul>`,
-              purpose: "tool-health-alert",
-            },
-            { apiKey: process.env.LOVABLE_API_KEY! },
-          );
+          await sendEmail({
+            to,
+            from,
+            subject: `SECP tool-health alert — ${data.breaches.length} breach(es)`,
+            text: data.text,
+            html: `<h2>SECP tool-health alert</h2><ul>${rows}</ul>`,
+            purpose: "tool-health-alert",
+          });
           result.email.ok = true;
           result.email.detail = `sent to ${to}`;
         } catch (err) {

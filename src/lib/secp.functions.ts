@@ -262,10 +262,10 @@ export const advanceRequestFn = createServerFn({ method: "POST" })
     const nextIdx = record.steps.findIndex((s) => s.status === "pending" || s.status === "active");
     if (nextIdx === -1) return record;
 
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
-    const { createLovableAiGateway } = await import("./ai-gateway.server");
-    const gateway = createLovableAiGateway(key);
+    const key = process.env.AI_GATEWAY_API_KEY;
+    if (!key) throw new Error("Missing AI_GATEWAY_API_KEY");
+    const { createAiGateway } = await import("./ai-gateway.server");
+    const gateway = createAiGateway(key);
 
     const step = record.steps[nextIdx];
     const { buildExecutionTools } = await import("./secp-tools.server");
@@ -322,7 +322,6 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
         prompt,
         tools,
         stopWhen: stepCountIs(50),
-        providerOptions: { lovable: { reasoningEffort: "none" } },
       });
       reasoning = result.text.trim() || reasoning;
     } catch (err) {

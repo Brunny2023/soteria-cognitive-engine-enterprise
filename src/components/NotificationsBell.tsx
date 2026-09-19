@@ -129,7 +129,7 @@ export function NotificationsBell() {
               className="w-full bg-background border border-border rounded-sm px-2 py-1.5 text-[11px] font-mono focus:outline-none focus:border-primary"
             />
             <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">
-              Reminders dispatch through Lovable Emails when a verified sending domain is
+              Reminders dispatch through configured email provider when a verified sending domain is
               configured. Preference is stored locally until then.
             </p>
           </div>
