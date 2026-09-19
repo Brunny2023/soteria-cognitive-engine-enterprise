@@ -9,7 +9,11 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
       { title: "Operator onboarding — Soteria SECP" },
-      { name: "description", content: "Role-aware onboarding that routes each operator to the right dashboard and surfaces of the Soteria cognition platform." },
+      {
+        name: "description",
+        content:
+          "Role-aware onboarding that routes each operator to the right dashboard and surfaces of the Soteria cognition platform.",
+      },
       { property: "og:title", content: "Operator onboarding — Soteria SECP" },
       { property: "og:description", content: "Land on the right console for your role." },
     ],
@@ -43,7 +47,9 @@ function OnboardingPage() {
   if (!role) {
     return (
       <AppShell title="Onboarding" crumb="OB · Resolving role">
-        <div className="p-6 font-mono text-[11px] text-muted-foreground">Resolving role assignment…</div>
+        <div className="p-6 font-mono text-[11px] text-muted-foreground">
+          Resolving role assignment…
+        </div>
       </AppShell>
     );
   }
@@ -59,7 +65,9 @@ function OnboardingPage() {
     <AppShell title="Operator onboarding" crumb={`OB · ${profile.label}`}>
       <div className="p-6 flex flex-col gap-8 animate-entry max-w-4xl">
         <section className="bg-surface border border-border rounded-sm p-6">
-          <p className="font-mono text-[10px] tracking-widest text-accent mb-2">OB.0 · ROLE ASSIGNMENT</p>
+          <p className="font-mono text-[10px] tracking-widest text-accent mb-2">
+            OB.0 · ROLE ASSIGNMENT
+          </p>
           <h2 className="text-2xl font-bold tracking-tight">{profile.label}</h2>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{profile.blurb}</p>
           <div className="mt-4 font-mono text-[10px] text-muted-foreground">

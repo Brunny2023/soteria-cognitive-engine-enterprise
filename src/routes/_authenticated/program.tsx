@@ -17,9 +17,16 @@ export const Route = createFileRoute("/_authenticated/program")({
   head: () => ({
     meta: [
       { title: "Program Management — Soteria SECP" },
-      { name: "description", content: "Convert directives into executable work: AI-generated work breakdown, specialist assignment, effort, risk, and acceptance criteria." },
+      {
+        name: "description",
+        content:
+          "Convert directives into executable work: AI-generated work breakdown, specialist assignment, effort, risk, and acceptance criteria.",
+      },
       { property: "og:title", content: "Program Management — Soteria SECP" },
-      { property: "og:description", content: "The orchestration layer between strategy and specialist workforce execution." },
+      {
+        property: "og:description",
+        content: "The orchestration layer between strategy and specialist workforce execution.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -30,7 +37,11 @@ export const Route = createFileRoute("/_authenticated/program")({
 const STATUS: { id: TaskRow["status"]; label: string; tone: string }[] = [
   { id: "todo", label: "TODO", tone: "text-muted-foreground border-border" },
   { id: "in_progress", label: "IN FLIGHT", tone: "text-primary border-primary/40 bg-primary/10" },
-  { id: "blocked", label: "BLOCKED", tone: "text-[color:var(--danger)] border-[color:var(--danger)]/40" },
+  {
+    id: "blocked",
+    label: "BLOCKED",
+    tone: "text-[color:var(--danger)] border-[color:var(--danger)]/40",
+  },
   { id: "done", label: "DONE", tone: "text-[color:var(--signal)] border-[color:var(--signal)]/40" },
 ];
 
@@ -76,13 +87,18 @@ function ProgramPage() {
     mutationFn: (v: { taskId: string; specialistId: string }) => {
       const s = SPECIALISTS.find((x) => x.id === v.specialistId)!;
       return reassign({
-        data: { taskId: v.taskId, specialistId: s.id, specialistRole: s.role, department: s.department },
+        data: {
+          taskId: v.taskId,
+          specialistId: s.id,
+          specialistRole: s.role,
+          department: s.department,
+        },
       });
     },
     onSuccess: invalidate,
   });
 
-  const workstreams = plan.data ?? [];
+  const workstreams = useMemo(() => plan.data ?? [], [plan.data]);
   const allTasks = useMemo(() => workstreams.flatMap((w) => w.tasks), [workstreams]);
   const doneCount = allTasks.filter((t) => t.status === "done").length;
   const effort = allTasks.reduce((a, t) => a + t.effort_hours, 0);
@@ -94,7 +110,11 @@ function ProgramPage() {
       <div className="p-6 flex flex-col gap-8 animate-entry">
         <section className="grid grid-cols-4 gap-3">
           <StatChip label="Directives tracked" value={String(programs.data?.length ?? 0)} />
-          <StatChip label="Tasks in flight" value={String(allTasks.filter((t) => t.status === "in_progress").length)} tone="accent" />
+          <StatChip
+            label="Tasks in flight"
+            value={String(allTasks.filter((t) => t.status === "in_progress").length)}
+            tone="accent"
+          />
           <StatChip label="Critical path" value={criticalPath ? `${criticalPath}d` : "—"} />
           <StatChip label="Effort committed" value={`${effort}h`} />
         </section>
@@ -103,7 +123,11 @@ function ProgramPage() {
           <SectionHeading
             code="L4.0"
             title="Directive portfolio"
-            action={<span className="font-mono text-[10px] text-muted-foreground">{doneCount}/{allTasks.length} tasks complete</span>}
+            action={
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {doneCount}/{allTasks.length} tasks complete
+              </span>
+            }
           />
           <div className="flex flex-wrap gap-2">
             {(programs.data ?? []).map((p) => (
@@ -118,7 +142,9 @@ function ProgramPage() {
                 }
               >
                 {p.request_id} · {p.title.slice(0, 34)}
-                <span className="ml-2 text-[9px] opacity-70">{p.workstreams} WS / {p.tasks} tasks</span>
+                <span className="ml-2 text-[9px] opacity-70">
+                  {p.workstreams} WS / {p.tasks} tasks
+                </span>
               </button>
             ))}
             {!programs.isLoading && !(programs.data ?? []).length && (
@@ -141,13 +167,18 @@ function ProgramPage() {
                   disabled={gen.isPending}
                   className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 disabled:opacity-50"
                 >
-                  {gen.isPending ? "▪ Decomposing…" : workstreams.length ? "↻ Regenerate plan" : "▸ Generate plan"}
+                  {gen.isPending
+                    ? "▪ Decomposing…"
+                    : workstreams.length
+                      ? "↻ Regenerate plan"
+                      : "▸ Generate plan"}
                 </button>
               }
             />
             {gen.data && (
               <p className="font-mono text-[10px] text-muted-foreground mb-3">
-                {gen.data.workstreams} workstreams · {gen.data.tasks} tasks · source: {gen.data.source}
+                {gen.data.workstreams} workstreams · {gen.data.tasks} tasks · source:{" "}
+                {gen.data.source}
               </p>
             )}
             {gen.isError && (
@@ -165,13 +196,19 @@ function ProgramPage() {
                     <div className="px-5 py-4 border-b border-border">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
-                          <div className="font-mono text-[10px] text-accent">{w.code} · {w.owner_role}</div>
+                          <div className="font-mono text-[10px] text-accent">
+                            {w.code} · {w.owner_role}
+                          </div>
                           <div className="text-sm font-bold mt-1">{w.title}</div>
-                          <div className="text-[11px] text-muted-foreground mt-1">{w.objective}</div>
+                          <div className="text-[11px] text-muted-foreground mt-1">
+                            {w.objective}
+                          </div>
                         </div>
                         <div className="text-right shrink-0 font-mono text-[10px] text-muted-foreground">
                           <div>{w.duration_days}d</div>
-                          <div className={RISK_TONE[w.risk] ?? "text-muted-foreground"}>RISK {w.risk.toUpperCase()}</div>
+                          <div className={RISK_TONE[w.risk] ?? "text-muted-foreground"}>
+                            RISK {w.risk.toUpperCase()}
+                          </div>
                         </div>
                       </div>
                       <div className="mt-3">
@@ -180,36 +217,53 @@ function ProgramPage() {
                           <span>{Math.round(progress * 100)}%</span>
                         </div>
                         <div className="h-1 w-full bg-border rounded-full overflow-hidden">
-                          <div className="h-full bg-primary" style={{ width: `${Math.max(progress * 100, 1)}%` }} />
+                          <div
+                            className="h-full bg-primary"
+                            style={{ width: `${Math.max(progress * 100, 1)}%` }}
+                          />
                         </div>
                       </div>
                       {w.acceptance && (
                         <div className="text-[10px] text-muted-foreground mt-3">
-                          <span className="font-mono text-accent">ACCEPTANCE · </span>{w.acceptance}
+                          <span className="font-mono text-accent">ACCEPTANCE · </span>
+                          {w.acceptance}
                         </div>
                       )}
                     </div>
 
                     {w.tasks.map((t) => (
-                      <div key={t.id} className="grid grid-cols-12 gap-3 items-center px-5 py-3 border-b border-border last:border-b-0">
+                      <div
+                        key={t.id}
+                        className="grid grid-cols-12 gap-3 items-center px-5 py-3 border-b border-border last:border-b-0"
+                      >
                         <div className="col-span-4 min-w-0">
                           <div className="text-xs font-medium truncate">{t.title}</div>
-                          <div className="text-[10px] text-muted-foreground truncate">{t.detail}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">
+                            {t.detail}
+                          </div>
                         </div>
                         <div className="col-span-3">
                           <select
                             aria-label={`Assign specialist for ${t.title}`}
                             value={t.specialist_id}
-                            onChange={(e) => assign.mutate({ taskId: t.id, specialistId: e.target.value })}
+                            onChange={(e) =>
+                              assign.mutate({ taskId: t.id, specialistId: e.target.value })
+                            }
                             className="w-full bg-background border border-border rounded-sm px-2 py-1 font-mono text-[10px] text-foreground"
                           >
                             {SPECIALISTS.map((s) => (
-                              <option key={s.id} value={s.id}>{s.id} · {s.role}</option>
+                              <option key={s.id} value={s.id}>
+                                {s.id} · {s.role}
+                              </option>
                             ))}
                           </select>
-                          <div className="text-[9px] font-mono text-muted-foreground mt-1">{t.department}</div>
+                          <div className="text-[9px] font-mono text-muted-foreground mt-1">
+                            {t.department}
+                          </div>
                         </div>
-                        <div className="col-span-1 font-mono text-[10px] text-muted-foreground">{t.effort_hours}h</div>
+                        <div className="col-span-1 font-mono text-[10px] text-muted-foreground">
+                          {t.effort_hours}h
+                        </div>
                         <div className="col-span-4 flex flex-wrap gap-1 justify-end">
                           {STATUS.map((s) => (
                             <button
@@ -218,7 +272,9 @@ function ProgramPage() {
                               onClick={() => status.mutate({ taskId: t.id, status: s.id })}
                               className={
                                 "font-mono text-[9px] uppercase tracking-widest px-2 py-1 border rounded-sm transition-colors " +
-                                (t.status === s.id ? s.tone : "border-border text-muted-foreground hover:text-foreground")
+                                (t.status === s.id
+                                  ? s.tone
+                                  : "border-border text-muted-foreground hover:text-foreground")
                               }
                             >
                               {s.label}
@@ -228,7 +284,9 @@ function ProgramPage() {
                       </div>
                     ))}
                     {!w.tasks.length && (
-                      <div className="px-5 py-3 font-mono text-[10px] text-muted-foreground">No tasks in this workstream.</div>
+                      <div className="px-5 py-3 font-mono text-[10px] text-muted-foreground">
+                        No tasks in this workstream.
+                      </div>
                     )}
                   </div>
                 );
@@ -237,8 +295,8 @@ function ProgramPage() {
               {!plan.isLoading && !workstreams.length && (
                 <div className="bg-surface border border-border rounded-sm p-6 font-mono text-[11px] text-muted-foreground">
                   No work breakdown yet for {active}
-                  {activeProgram ? ` · ${activeProgram.title}` : ""}. Generate a plan to decompose it into
-                  workstreams and assign the specialist mesh.
+                  {activeProgram ? ` · ${activeProgram.title}` : ""}. Generate a plan to decompose
+                  it into workstreams and assign the specialist mesh.
                 </div>
               )}
             </div>
@@ -256,14 +314,23 @@ function ProgramPage() {
                 }, {}),
               ).map(([dept, hours]) => (
                 <div key={dept} className="flex items-center gap-3">
-                  <span className="w-28 shrink-0 font-mono text-[10px] text-muted-foreground">{dept}</span>
+                  <span className="w-28 shrink-0 font-mono text-[10px] text-muted-foreground">
+                    {dept}
+                  </span>
                   <div className="h-1 flex-1 bg-border rounded-full overflow-hidden">
-                    <div className="h-full bg-accent" style={{ width: `${Math.min(100, (hours / Math.max(effort, 1)) * 100)}%` }} />
+                    <div
+                      className="h-full bg-accent"
+                      style={{ width: `${Math.min(100, (hours / Math.max(effort, 1)) * 100)}%` }}
+                    />
                   </div>
-                  <span className="font-mono text-[10px] text-foreground w-12 text-right">{hours}h</span>
+                  <span className="font-mono text-[10px] text-foreground w-12 text-right">
+                    {hours}h
+                  </span>
                 </div>
               ))}
-              {!allTasks.length && <p className="text-[11px] text-muted-foreground">No committed effort yet.</p>}
+              {!allTasks.length && (
+                <p className="text-[11px] text-muted-foreground">No committed effort yet.</p>
+              )}
             </div>
           </div>
           <div className="bg-surface border border-border rounded-sm p-5">
@@ -271,8 +338,12 @@ function ProgramPage() {
             <ul className="text-[11px] text-muted-foreground space-y-2">
               {workstreams.map((w) => (
                 <li key={w.id} className="flex gap-2">
-                  <span className={"font-mono " + (RISK_TONE[w.risk] ?? "")}>{w.risk.toUpperCase()}</span>
-                  <span>{w.title} — {w.duration_days}d, {w.tasks.length} tasks, owner {w.owner_role}.</span>
+                  <span className={"font-mono " + (RISK_TONE[w.risk] ?? "")}>
+                    {w.risk.toUpperCase()}
+                  </span>
+                  <span>
+                    {w.title} — {w.duration_days}d, {w.tasks.length} tasks, owner {w.owner_role}.
+                  </span>
                 </li>
               ))}
               {!workstreams.length && <li>No workstreams planned yet.</li>}

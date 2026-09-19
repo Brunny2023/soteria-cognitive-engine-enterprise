@@ -6,9 +6,17 @@ export const Route = createFileRoute("/_authenticated/governance")({
   head: () => ({
     meta: [
       { title: "Validation & Governance — Soteria SECP" },
-      { name: "description", content: "Multi-stage validation, auditable decision trails, and organizational policy compliance for every AI-generated deliverable." },
+      {
+        name: "description",
+        content:
+          "Multi-stage validation, auditable decision trails, and organizational policy compliance for every AI-generated deliverable.",
+      },
       { property: "og:title", content: "Validation & Governance — Soteria SECP" },
-      { property: "og:description", content: "Every deliverable, validated across accuracy, compliance, brand, security, and reproducibility." },
+      {
+        property: "og:description",
+        content:
+          "Every deliverable, validated across accuracy, compliance, brand, security, and reproducibility.",
+      },
     ],
   }),
   component: GovernancePage,
@@ -54,7 +62,11 @@ function GovernancePage() {
                   <span
                     className={
                       "font-mono text-xs " +
-                      (c.pass >= 99 ? "text-[color:var(--signal)]" : c.pass >= 96 ? "text-accent" : "text-[color:var(--warn)]")
+                      (c.pass >= 99
+                        ? "text-[color:var(--signal)]"
+                        : c.pass >= 96
+                          ? "text-accent"
+                          : "text-[color:var(--warn)]")
                     }
                   >
                     {c.pass.toFixed(1)}%
@@ -64,7 +76,11 @@ function GovernancePage() {
                   <div
                     className={
                       "h-full " +
-                      (c.pass >= 99 ? "bg-[color:var(--signal)]" : c.pass >= 96 ? "bg-accent" : "bg-[color:var(--warn)]")
+                      (c.pass >= 99
+                        ? "bg-[color:var(--signal)]"
+                        : c.pass >= 96
+                          ? "bg-accent"
+                          : "bg-[color:var(--warn)]")
                     }
                     style={{ width: `${c.pass}%` }}
                   />

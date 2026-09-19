@@ -69,21 +69,34 @@ function AuthPage() {
       <header className="border-b border-border">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-6 h-16">
           <Link to="/" className="flex items-center gap-3">
-            <div className="size-7 bg-primary rounded-sm flex items-center justify-center text-primary-foreground text-xs font-bold">S</div>
-            <span className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">SOTERIA · SECP</span>
+            <div className="size-7 bg-primary rounded-sm flex items-center justify-center text-primary-foreground text-xs font-bold">
+              S
+            </div>
+            <span className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+              SOTERIA · SECP
+            </span>
           </Link>
-          <Link to="/" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground">← Back</Link>
+          <Link
+            to="/"
+            className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            ← Back
+          </Link>
         </div>
       </header>
 
       <main className="flex-1 grid place-items-center px-6 py-16">
         <div className="w-full max-w-md bg-surface border border-border rounded-sm p-8">
-          <p className="font-mono text-[10px] tracking-widest text-accent mb-2">M0.0 · CREDENTIAL CHECKPOINT</p>
+          <p className="font-mono text-[10px] tracking-widest text-accent mb-2">
+            M0.0 · CREDENTIAL CHECKPOINT
+          </p>
           <h1 className="text-2xl font-bold tracking-tight mb-1">
             {mode === "signin" ? "Access Mission Control" : "Register operator"}
           </h1>
           <p className="text-xs text-muted-foreground mb-6">
-            {mode === "signin" ? "Sign in with your Soteria operator credentials." : "Provision a new operator account for this workspace."}
+            {mode === "signin"
+              ? "Sign in with your Soteria operator credentials."
+              : "Provision a new operator account for this workspace."}
           </p>
 
           <button
@@ -96,13 +109,17 @@ function AuthPage() {
 
           <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px bg-border" />
-            <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">or email</span>
+            <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
+              or email
+            </span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Email</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Email
+              </span>
               <input
                 type="email"
                 required
@@ -112,7 +129,9 @@ function AuthPage() {
               />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Password</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Password
+              </span>
               <input
                 type="password"
                 required
@@ -138,7 +157,10 @@ function AuthPage() {
 
           <button
             type="button"
-            onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); }}
+            onClick={() => {
+              setMode(mode === "signin" ? "signup" : "signin");
+              setError(null);
+            }}
             className="mt-6 w-full text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
           >
             {mode === "signin" ? "Need an account? Register →" : "Have an account? Sign in →"}

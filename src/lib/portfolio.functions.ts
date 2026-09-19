@@ -32,8 +32,20 @@ export type PortfolioProgram = {
 export type PortfolioView = {
   programs: PortfolioProgram[];
   capacity: { department: string; hours: number; specialists: number }[];
-  contention: { specialist_id: string; specialist_role: string; directives: string[]; open_tasks: number }[];
-  totals: { directives: number; tasks: number; done: number; blocked: number; effort_hours: number; deliverables: number };
+  contention: {
+    specialist_id: string;
+    specialist_role: string;
+    directives: string[];
+    open_tasks: number;
+  }[];
+  totals: {
+    directives: number;
+    tasks: number;
+    done: number;
+    blocked: number;
+    effort_hours: number;
+    deliverables: number;
+  };
 };
 
 /** Cross-directive portfolio: critical path, capacity, and specialist contention. */
@@ -51,17 +63,38 @@ export const portfolioFn = createServerFn({ method: "GET" })
       .order("position", { ascending: true });
     const { data: tasks } = await context.supabase
       .from("secp_tasks")
-      .select("id,request_id,workstream_id,status,effort_hours,department,specialist_id,specialist_role");
+      .select(
+        "id,request_id,workstream_id,status,effort_hours,department,specialist_id,specialist_role",
+      );
     const { data: arts } = await context.supabase
       .from("secp_artifacts")
       .select("request_id,stage")
       .eq("stage", "workforce");
 
-    const requests = (reqs ?? []) as { id: string; title: string; priority: string; autonomy: number; progress: number }[];
-    const streams = (ws ?? []) as { id: string; request_id: string; code: string; title: string; risk: string; duration_days: number }[];
+    const requests = (reqs ?? []) as {
+      id: string;
+      title: string;
+      priority: string;
+      autonomy: number;
+      progress: number;
+    }[];
+    const streams = (ws ?? []) as {
+      id: string;
+      request_id: string;
+      code: string;
+      title: string;
+      risk: string;
+      duration_days: number;
+    }[];
     const rows = (tasks ?? []) as {
-      id: string; request_id: string; workstream_id: string; status: string;
-      effort_hours: number; department: string; specialist_id: string; specialist_role: string;
+      id: string;
+      request_id: string;
+      workstream_id: string;
+      status: string;
+      effort_hours: number;
+      department: string;
+      specialist_id: string;
+      specialist_role: string;
     }[];
     const deliverables = (arts ?? []) as { request_id: string }[];
 
@@ -109,7 +142,11 @@ export const portfolioFn = createServerFn({ method: "GET" })
 
     const contMap = new Map<string, { role: string; directives: Set<string>; open: number }>();
     for (const t of rows) {
-      const e = contMap.get(t.specialist_id) ?? { role: t.specialist_role, directives: new Set<string>(), open: 0 };
+      const e = contMap.get(t.specialist_id) ?? {
+        role: t.specialist_role,
+        directives: new Set<string>(),
+        open: 0,
+      };
       e.directives.add(t.request_id);
       if (t.status !== "done") e.open += 1;
       contMap.set(t.specialist_id, e);

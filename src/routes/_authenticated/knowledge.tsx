@@ -6,17 +6,32 @@ export const Route = createFileRoute("/_authenticated/knowledge")({
   head: () => ({
     meta: [
       { title: "Knowledge Graph — Soteria SECP" },
-      { name: "description", content: "The living enterprise knowledge graph — entities, relationships, and the reasoning substrate for every AI executive and specialist." },
+      {
+        name: "description",
+        content:
+          "The living enterprise knowledge graph — entities, relationships, and the reasoning substrate for every AI executive and specialist.",
+      },
       { property: "og:title", content: "Knowledge Graph — Soteria SECP" },
-      { property: "og:description", content: "Entities and relationships that power organizational reasoning." },
+      {
+        property: "og:description",
+        content: "Entities and relationships that power organizational reasoning.",
+      },
     ],
   }),
   component: KnowledgePage,
 });
 
 const RELATIONS = [
-  "reports_to", "owns", "depends_on", "approved_by", "created",
-  "affects", "complies_with", "learned_from", "supports", "manages",
+  "reports_to",
+  "owns",
+  "depends_on",
+  "approved_by",
+  "created",
+  "affects",
+  "complies_with",
+  "learned_from",
+  "supports",
+  "manages",
 ];
 
 function KnowledgePage() {
@@ -51,7 +66,16 @@ function KnowledgePage() {
                   const x2 = 400 + Math.cos((b * Math.PI) / 180) * r2;
                   const y2 = 225 + Math.sin((b * Math.PI) / 180) * r2;
                   return (
-                    <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="oklch(0.72 0.16 230)" strokeOpacity="0.15" strokeWidth="0.5" />
+                    <line
+                      key={i}
+                      x1={x1}
+                      y1={y1}
+                      x2={x2}
+                      y2={y2}
+                      stroke="oklch(0.72 0.16 230)"
+                      strokeOpacity="0.15"
+                      strokeWidth="0.5"
+                    />
                   );
                 })}
                 {Array.from({ length: 80 }).map((_, i) => {
@@ -62,9 +86,14 @@ function KnowledgePage() {
                   const size = 1 + (i % 4);
                   const isAccent = i % 9 === 0;
                   return (
-                    <circle key={i} cx={x} cy={y} r={size}
+                    <circle
+                      key={i}
+                      cx={x}
+                      cy={y}
+                      r={size}
                       fill={isAccent ? "oklch(0.85 0.16 195)" : "oklch(0.72 0.16 230)"}
-                      opacity={0.4 + (i % 6) * 0.1} />
+                      opacity={0.4 + (i % 6) * 0.1}
+                    />
                   );
                 })}
                 <circle cx="400" cy="225" r="120" fill="url(#glow)" />
@@ -80,7 +109,10 @@ function KnowledgePage() {
               <SectionHeading code="KG.2" title="Relation Types" />
               <div className="flex flex-wrap gap-1.5">
                 {RELATIONS.map((r) => (
-                  <span key={r} className="text-[10px] font-mono px-2 py-1 border border-border text-muted-foreground">
+                  <span
+                    key={r}
+                    className="text-[10px] font-mono px-2 py-1 border border-border text-muted-foreground"
+                  >
                     {r}
                   </span>
                 ))}
@@ -90,10 +122,15 @@ function KnowledgePage() {
               <SectionHeading code="KG.3" title="Top Nodes" />
               <div className="flex flex-col gap-2">
                 {KNOWLEDGE_NODES.map((n) => (
-                  <div key={n.id} className="flex items-center justify-between text-[11px] border-b border-border pb-1.5 last:border-b-0">
+                  <div
+                    key={n.id}
+                    className="flex items-center justify-between text-[11px] border-b border-border pb-1.5 last:border-b-0"
+                  >
                     <div className="min-w-0">
                       <div className="font-medium truncate">{n.label}</div>
-                      <div className="text-[9px] font-mono text-muted-foreground uppercase">{n.kind}</div>
+                      <div className="text-[9px] font-mono text-muted-foreground uppercase">
+                        {n.kind}
+                      </div>
                     </div>
                     <span className="font-mono text-accent shrink-0">{n.edges}▸</span>
                   </div>

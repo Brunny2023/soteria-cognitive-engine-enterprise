@@ -1,0 +1,69 @@
+name: Enterprise release gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: enterprise-release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Install, validate, test, audit, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Check tracked secret files
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)(\.env|.*\.env|\.dev\.vars)$'; then
+            echo "Tracked environment files are not allowed."
+            exit 1
+          fi
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests with coverage
+        run: npm run test:coverage
+
+      - name: RLS migration coverage
+        run: npm run test:security
+
+      - name: Reference workflow safety evaluation
+        run: npm run test:ai-eval
+
+      - name: Required release evidence
+        run: npm run release:evidence
+
+      - name: Production dependency audit
+        run: npm run security:scan
+
+      - name: Generate CycloneDX SBOM
+        run: npm run security:sbom
+
+      - name: Production build
+        run: npm run build

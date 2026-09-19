@@ -15,9 +15,16 @@ export const Route = createFileRoute("/_authenticated/retention")({
   head: () => ({
     meta: [
       { title: "Retention & Purge — Soteria SECP" },
-      { name: "description", content: "Per-category retention windows, legal-hold overrides, and compliant purge simulation for the cognitive operating system." },
+      {
+        name: "description",
+        content:
+          "Per-category retention windows, legal-hold overrides, and compliant purge simulation for the cognitive operating system.",
+      },
       { property: "og:title", content: "Retention & Purge — Soteria SECP" },
-      { property: "og:description", content: "Defensible data lifecycle across every intelligence layer." },
+      {
+        property: "og:description",
+        content: "Defensible data lifecycle across every intelligence layer.",
+      },
     ],
   }),
   component: RetentionPage,
@@ -157,7 +164,11 @@ const INITIAL: Category[] = [
 
 const PURGE_MODES: { mode: PurgeMode; label: string; blurb: string }[] = [
   { mode: "hard-delete", label: "Hard delete", blurb: "Row removed. Tombstone recorded in L6." },
-  { mode: "tokenize", label: "Tokenize", blurb: "PII replaced with stable tokens; joins preserved." },
+  {
+    mode: "tokenize",
+    label: "Tokenize",
+    blurb: "PII replaced with stable tokens; joins preserved.",
+  },
   { mode: "anonymize", label: "Anonymize", blurb: "K-anonymized for analytics. Non-reversible." },
   { mode: "archive", label: "Archive (WORM)", blurb: "Immutable cold storage. Read-only." },
 ];
@@ -309,7 +320,11 @@ function RetentionPage() {
       <div className="p-6 flex flex-col gap-8 animate-entry">
         <section className="grid grid-cols-4 gap-3">
           <StatChip label="Categories" value={String(rows.length)} />
-          <StatChip label="Records eligible today" value={totals.eligible.toLocaleString()} tone="accent" />
+          <StatChip
+            label="Records eligible today"
+            value={totals.eligible.toLocaleString()}
+            tone="accent"
+          />
           <StatChip label="Under legal hold" value={totals.held.toLocaleString()} tone="warn" />
           <StatChip
             label="Below regulatory floor"
@@ -333,18 +348,26 @@ function RetentionPage() {
               const belowFloor = r.retentionDays < r.minDays;
               const years = (r.retentionDays / 365).toFixed(1);
               return (
-                <div key={r.code} className="grid grid-cols-[80px_1fr_120px_1fr_140px_120px] gap-4 px-5 py-4 border-b border-border last:border-b-0 items-center">
+                <div
+                  key={r.code}
+                  className="grid grid-cols-[80px_1fr_120px_1fr_140px_120px] gap-4 px-5 py-4 border-b border-border last:border-b-0 items-center"
+                >
                   <span className="font-mono text-[10px] text-accent">{r.code}</span>
                   <div className="min-w-0">
                     <div className="text-sm font-bold">{r.name}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">{r.description}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {r.description}
+                    </div>
                     <div className="text-[10px] font-mono text-muted-foreground mt-1">
                       Floor · <span className="text-foreground">{r.regulatoryFloor}</span>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {r.layers.map((l) => (
-                      <span key={l} className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-border text-muted-foreground">
+                      <span
+                        key={l}
+                        className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-border text-muted-foreground"
+                      >
                         {l}
                       </span>
                     ))}
@@ -362,13 +385,17 @@ function RetentionPage() {
                     />
                     <div className="flex items-center justify-between font-mono text-[10px]">
                       <span className="text-muted-foreground">{r.minDays}d</span>
-                      <span className={belowFloor ? "text-[color:var(--danger)]" : "text-foreground"}>
+                      <span
+                        className={belowFloor ? "text-[color:var(--danger)]" : "text-foreground"}
+                      >
                         {r.retentionDays}d · {years}y
                       </span>
                       <span className="text-muted-foreground">{r.maxDays}d</span>
                     </div>
                     {belowFloor && (
-                      <span className="text-[10px] font-mono text-[color:var(--danger)]">Below regulatory floor</span>
+                      <span className="text-[10px] font-mono text-[color:var(--danger)]">
+                        Below regulatory floor
+                      </span>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -466,7 +493,9 @@ function RetentionPage() {
             >
               <div className="flex items-baseline justify-between mb-4">
                 <div>
-                  <div className="font-mono text-[10px] text-accent">{preview.code} · DRY-RUN SIMULATOR</div>
+                  <div className="font-mono text-[10px] text-accent">
+                    {preview.code} · DRY-RUN SIMULATOR
+                  </div>
                   <div className="text-base font-bold mt-1">{preview.name}</div>
                   <div className="text-[10px] font-mono text-muted-foreground mt-1">
                     Nothing is disposed. Every projected write is shown before you commit.
@@ -487,49 +516,86 @@ function RetentionPage() {
                   value={preview.legalHold ? "0 (hold)" : preview.eligible.toLocaleString()}
                   tone={preview.legalHold ? "warn" : "accent"}
                 />
-                <StatChip label="Would retain" value={(preview.volume - (preview.legalHold ? 0 : preview.eligible)).toLocaleString()} tone="signal" />
+                <StatChip
+                  label="Would retain"
+                  value={(
+                    preview.volume - (preview.legalHold ? 0 : preview.eligible)
+                  ).toLocaleString()}
+                  tone="signal"
+                />
               </div>
               <div className="border border-border rounded-sm p-4 font-mono text-[11px] text-muted-foreground leading-relaxed">
                 <div>SIMULATION · {new Date().toISOString()}</div>
-                <div>MODE     · {preview.purgeMode}</div>
-                <div>SCOPE    · {preview.layers.join(", ")}</div>
-                <div>FLOOR    · {preview.regulatoryFloor}</div>
+                <div>MODE · {preview.purgeMode}</div>
+                <div>SCOPE · {preview.layers.join(", ")}</div>
+                <div>FLOOR · {preview.regulatoryFloor}</div>
                 <div className="text-foreground mt-2">
-                  RESULT · {preview.legalHold
+                  RESULT ·{" "}
+                  {preview.legalHold
                     ? "0 rows disposed — legal hold active."
                     : `${preview.eligible.toLocaleString()} rows would be ${preview.purgeMode.replace("-", " ")}d; L6 tombstone written for each.`}
                 </div>
               </div>
               <div className="mt-4">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Projected sample rows (dry-run · anonymized)</div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+                  Projected sample rows (dry-run · anonymized)
+                </div>
                 <div className="border border-border rounded-sm">
                   <div className="grid grid-cols-[100px_1fr_120px_120px] gap-3 px-3 py-2 border-b border-border font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    <span>Record id</span><span>Reason</span><span>Age (days)</span><span>Action</span>
+                    <span>Record id</span>
+                    <span>Reason</span>
+                    <span>Age (days)</span>
+                    <span>Action</span>
                   </div>
                   {Array.from({ length: Math.min(5, preview.legalHold ? 0 : 5) }).map((_, i) => {
                     const age = preview.retentionDays + 30 + i * 47;
                     const rid = `${preview.code}-${(Math.floor(Math.random() * 900000) + 100000).toString()}`;
                     return (
-                      <div key={i} className="grid grid-cols-[100px_1fr_120px_120px] gap-3 px-3 py-2 border-b border-border last:border-b-0 text-[11px]">
+                      <div
+                        key={i}
+                        className="grid grid-cols-[100px_1fr_120px_120px] gap-3 px-3 py-2 border-b border-border last:border-b-0 text-[11px]"
+                      >
                         <span className="font-mono text-accent">{rid}</span>
-                        <span className="text-muted-foreground">Past retention window · no active legal hold</span>
+                        <span className="text-muted-foreground">
+                          Past retention window · no active legal hold
+                        </span>
                         <span className="font-mono">{age}</span>
-                        <span className="font-mono uppercase text-[color:var(--warn)]">{preview.purgeMode}</span>
+                        <span className="font-mono uppercase text-[color:var(--warn)]">
+                          {preview.purgeMode}
+                        </span>
                       </div>
                     );
                   })}
                   {preview.legalHold && (
-                    <div className="px-3 py-3 text-[11px] font-mono text-muted-foreground">— none · legal hold active</div>
+                    <div className="px-3 py-3 text-[11px] font-mono text-muted-foreground">
+                      — none · legal hold active
+                    </div>
                   )}
                 </div>
               </div>
               <div className="mt-4">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Projected audit ledger entries</div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+                  Projected audit ledger entries
+                </div>
                 <div className="border border-border rounded-sm p-3 font-mono text-[10px] text-muted-foreground space-y-1">
-                  <div>▸ <span className="text-accent">purge_execution</span> · {preview.code} · records_affected={preview.legalHold ? 0 : preview.eligible} · disposition={preview.purgeMode}</div>
-                  <div>▸ <span className="text-accent">l6_tombstone</span> · {preview.legalHold ? 0 : preview.eligible} rows · WORM archive @ region-of-record</div>
-                  <div>▸ <span className="text-accent">actor</span> · {actor.name} · <span className="text-foreground">co-approver required on commit</span></div>
-                  <div>▸ <span className="text-accent">chain_of_custody</span> · SHA-256 signed export sidecar available post-execution</div>
+                  <div>
+                    ▸ <span className="text-accent">purge_execution</span> · {preview.code} ·
+                    records_affected={preview.legalHold ? 0 : preview.eligible} · disposition=
+                    {preview.purgeMode}
+                  </div>
+                  <div>
+                    ▸ <span className="text-accent">l6_tombstone</span> ·{" "}
+                    {preview.legalHold ? 0 : preview.eligible} rows · WORM archive @
+                    region-of-record
+                  </div>
+                  <div>
+                    ▸ <span className="text-accent">actor</span> · {actor.name} ·{" "}
+                    <span className="text-foreground">co-approver required on commit</span>
+                  </div>
+                  <div>
+                    ▸ <span className="text-accent">chain_of_custody</span> · SHA-256 signed export
+                    sidecar available post-execution
+                  </div>
                 </div>
               </div>
               <div className="mt-4 flex justify-end gap-2">
@@ -542,11 +608,18 @@ function RetentionPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { const target = preview; setPreview(null); setExecuting(target); }}
+                  onClick={() => {
+                    const target = preview;
+                    setPreview(null);
+                    setExecuting(target);
+                  }}
                   disabled={preview.legalHold}
-                  className={"font-mono text-[10px] uppercase tracking-widest px-3 py-2 border " +
-                    (preview.legalHold ? "border-border text-muted-foreground cursor-not-allowed"
-                      : "border-primary/40 text-primary hover:bg-primary/10")}
+                  className={
+                    "font-mono text-[10px] uppercase tracking-widest px-3 py-2 border " +
+                    (preview.legalHold
+                      ? "border-border text-muted-foreground cursor-not-allowed"
+                      : "border-primary/40 text-primary hover:bg-primary/10")
+                  }
                 >
                   Proceed to two-operator execute
                 </button>
@@ -560,7 +633,10 @@ function RetentionPage() {
             role="dialog"
             aria-modal="true"
             className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-6"
-            onClick={() => { setExecuting(null); setApprover(""); }}
+            onClick={() => {
+              setExecuting(null);
+              setApprover("");
+            }}
           >
             <div
               className="w-full max-w-lg bg-surface border border-border rounded-sm p-6"
@@ -568,20 +644,26 @@ function RetentionPage() {
             >
               <div className="flex items-baseline justify-between mb-4">
                 <div>
-                  <div className="font-mono text-[10px] text-[color:var(--warn)]">{executing.code} · PURGE EXECUTION</div>
+                  <div className="font-mono text-[10px] text-[color:var(--warn)]">
+                    {executing.code} · PURGE EXECUTION
+                  </div>
                   <div className="text-base font-bold mt-1">{executing.name}</div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setExecuting(null); setApprover(""); }}
+                  onClick={() => {
+                    setExecuting(null);
+                    setApprover("");
+                  }}
                   className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
                 >
                   Close
                 </button>
               </div>
               <p className="text-[11px] text-muted-foreground mb-4">
-                Two-operator control. Requesting operator is <span className="text-foreground">{actor.name}</span>.
-                Enter the co-approver's name — the execution is written to the retention audit trail with both identities.
+                Two-operator control. Requesting operator is{" "}
+                <span className="text-foreground">{actor.name}</span>. Enter the co-approver's name
+                — the execution is written to the retention audit trail with both identities.
               </p>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <StatChip label="In scope" value={executing.volume.toLocaleString()} />
@@ -604,7 +686,10 @@ function RetentionPage() {
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => { setExecuting(null); setApprover(""); }}
+                  onClick={() => {
+                    setExecuting(null);
+                    setApprover("");
+                  }}
                   className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border text-muted-foreground hover:text-foreground"
                 >
                   Cancel
@@ -632,8 +717,18 @@ function RetentionPage() {
             <SectionHeading code="RT.5" title="Retention audit trail" />
             <div className="flex items-center gap-2 flex-wrap">
               <div className="flex items-center gap-1">
-                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">Filter ·</span>
-                {(["all", "retention_window", "disposition_mode", "legal_hold", "purge_execution"] as const).map((k) => (
+                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">
+                  Filter ·
+                </span>
+                {(
+                  [
+                    "all",
+                    "retention_window",
+                    "disposition_mode",
+                    "legal_hold",
+                    "purge_execution",
+                  ] as const
+                ).map((k) => (
                   <button
                     key={k}
                     type="button"
@@ -653,7 +748,10 @@ function RetentionPage() {
           </div>
           <div className="flex items-center gap-4 flex-wrap mb-3">
             <ExportGroup label="Policy changes" onExport={(fmt) => exportAudit("changes", fmt)} />
-            <ExportGroup label="Purge executions" onExport={(fmt) => exportAudit("executions", fmt)} />
+            <ExportGroup
+              label="Purge executions"
+              onExport={(fmt) => exportAudit("executions", fmt)}
+            />
             <ExportGroup label="Full audit" onExport={(fmt) => exportAudit("all", fmt)} />
           </div>
           <div className="bg-surface border border-border rounded-sm">
@@ -668,12 +766,18 @@ function RetentionPage() {
             </div>
             {filteredAudit.length === 0 && (
               <div className="px-4 py-6 text-center font-mono text-[11px] text-muted-foreground">
-                No entries recorded yet — adjust a retention window or execute a purge to populate the ledger.
+                No entries recorded yet — adjust a retention window or execute a purge to populate
+                the ledger.
               </div>
             )}
             {filteredAudit.map((e) => (
-              <div key={e.id} className="grid grid-cols-[150px_120px_120px_1fr_140px_140px_110px] gap-3 px-4 py-3 border-b border-border last:border-b-0 items-start">
-                <span className="font-mono text-[10px] text-muted-foreground">{e.ts.replace("T", " ").slice(0, 19)}</span>
+              <div
+                key={e.id}
+                className="grid grid-cols-[150px_120px_120px_1fr_140px_140px_110px] gap-3 px-4 py-3 border-b border-border last:border-b-0 items-start"
+              >
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {e.ts.replace("T", " ").slice(0, 19)}
+                </span>
                 <span
                   className={
                     "font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border w-fit " +
@@ -688,13 +792,15 @@ function RetentionPage() {
                 <div className="min-w-0">
                   <div className="text-[12px] text-foreground">
                     <span className="text-muted-foreground">{e.field}:</span>{" "}
-                    <span className="line-through text-muted-foreground">{e.before}</span>{" "}
-                    → <span className="text-foreground">{e.after}</span>
+                    <span className="line-through text-muted-foreground">{e.before}</span> →{" "}
+                    <span className="text-foreground">{e.after}</span>
                   </div>
                   <div className="text-[10px] text-muted-foreground">{e.note}</div>
                 </div>
                 <span className="text-[11px]">{e.actor_name}</span>
-                <span className="text-[11px]">{e.approver_name ?? <span className="text-muted-foreground">—</span>}</span>
+                <span className="text-[11px]">
+                  {e.approver_name ?? <span className="text-muted-foreground">—</span>}
+                </span>
                 <span className="text-right font-mono text-[11px]">
                   {e.records_affected > 0 ? e.records_affected.toLocaleString() : "—"}
                 </span>
@@ -702,7 +808,8 @@ function RetentionPage() {
             ))}
           </div>
           <div className="mt-2 text-[10px] font-mono text-muted-foreground">
-            {audit.length} entries recorded · exports include an exported_at UTC stamp for chain-of-custody.
+            {audit.length} entries recorded · exports include an exported_at UTC stamp for
+            chain-of-custody.
           </div>
         </section>
       </div>
@@ -710,10 +817,18 @@ function RetentionPage() {
   );
 }
 
-function ExportGroup({ label, onExport }: { label: string; onExport: (fmt: "csv" | "json") => void }) {
+function ExportGroup({
+  label,
+  onExport,
+}: {
+  label: string;
+  onExport: (fmt: "csv" | "json") => void;
+}) {
   return (
     <div className="flex items-center gap-1">
-      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">{label} ·</span>
+      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mr-1">
+        {label} ·
+      </span>
       {(["csv", "json"] as const).map((fmt) => (
         <button
           key={fmt}

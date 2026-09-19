@@ -8,9 +8,16 @@ export const Route = createFileRoute("/_authenticated/requests/new")({
   head: () => ({
     meta: [
       { title: "New Directive — Soteria SECP" },
-      { name: "description", content: "Submit a new directive into the Soteria organizational cognition pipeline: intent, autonomy, priority, and originating executive." },
+      {
+        name: "description",
+        content:
+          "Submit a new directive into the Soteria organizational cognition pipeline: intent, autonomy, priority, and originating executive.",
+      },
       { property: "og:title", content: "New Directive — Soteria SECP" },
-      { property: "og:description", content: "Compose a directive and dispatch it through the six-layer cognition stack." },
+      {
+        property: "og:description",
+        content: "Compose a directive and dispatch it through the six-layer cognition stack.",
+      },
     ],
   }),
   component: NewRequest,
@@ -49,7 +56,13 @@ function NewRequest() {
     if (!canSubmit || isPending) return;
     setError(null);
     try {
-      const rec = await create({ title: title.trim(), brief: brief.trim(), origin, autonomy, priority });
+      const rec = await create({
+        title: title.trim(),
+        brief: brief.trim(),
+        origin,
+        autonomy,
+        priority,
+      });
       navigate({ to: "/requests/$id", params: { id: rec.id } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to dispatch directive");
@@ -69,9 +82,14 @@ function NewRequest() {
 
         <section>
           <SectionHeading code="INTENT" title="Directive composition" />
-          <form onSubmit={submit} className="bg-surface border border-border rounded-sm p-6 flex flex-col gap-5">
+          <form
+            onSubmit={submit}
+            className="bg-surface border border-border rounded-sm p-6 flex flex-col gap-5"
+          >
             <label className="flex flex-col gap-2">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Title</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                Title
+              </span>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -102,7 +120,9 @@ function NewRequest() {
 
             <div className="grid grid-cols-3 gap-4">
               <label className="flex flex-col gap-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Origin</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Origin
+                </span>
                 <select
                   value={origin}
                   onChange={(e) => setOrigin(e.target.value)}
@@ -117,7 +137,9 @@ function NewRequest() {
               </label>
 
               <label className="flex flex-col gap-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Priority</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Priority
+                </span>
                 <div className="flex gap-2">
                   {(["P0", "P1", "P2"] as const).map((p) => (
                     <button
@@ -142,7 +164,9 @@ function NewRequest() {
               </label>
 
               <label className="flex flex-col gap-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Autonomy</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Autonomy
+                </span>
                 <select
                   value={autonomy}
                   onChange={(e) => setAutonomy(Number(e.target.value) as Autonomy)}
@@ -159,7 +183,10 @@ function NewRequest() {
 
             <div className="flex items-center justify-between border-t border-border pt-5">
               <p className="text-[11px] text-muted-foreground max-w-xl leading-relaxed">
-                On dispatch, the directive enters the pipeline at <span className="text-accent font-mono">L1 · ORGANIZATIONAL</span> and is routed through executive deliberation, consultant strategy, program planning, workforce execution, and governance validation.
+                On dispatch, the directive enters the pipeline at{" "}
+                <span className="text-accent font-mono">L1 · ORGANIZATIONAL</span> and is routed
+                through executive deliberation, consultant strategy, program planning, workforce
+                execution, and governance validation.
               </p>
               <button
                 type="submit"

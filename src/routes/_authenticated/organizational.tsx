@@ -6,19 +6,42 @@ export const Route = createFileRoute("/_authenticated/organizational")({
   head: () => ({
     meta: [
       { title: "Organizational Intelligence — Soteria SECP" },
-      { name: "description", content: "The organization's cognitive foundation: mission, values, structure, policies, decisions, and institutional knowledge." },
+      {
+        name: "description",
+        content:
+          "The organization's cognitive foundation: mission, values, structure, policies, decisions, and institutional knowledge.",
+      },
       { property: "og:title", content: "Organizational Intelligence — Soteria SECP" },
-      { property: "og:description", content: "The persistent knowledge source powering every AI executive and specialist." },
+      {
+        property: "og:description",
+        content: "The persistent knowledge source powering every AI executive and specialist.",
+      },
     ],
   }),
   component: OrganizationalPage,
 });
 
 const FACETS = [
-  { code: "MISSION", label: "Mission", body: "Give every organization a digital executive team and workforce that operate on its own knowledge, culture, and standards." },
-  { code: "VISION", label: "Vision", body: "Establish the cognitive operating system for modern enterprises." },
-  { code: "VALUES", label: "Values", body: "Rigor · Explainability · Alignment · Accountability · Continuous learning." },
-  { code: "STRUCTURE", label: "Structure", body: "11 executive functions · 7 departments · 42 specialist roles · 6 governance gates." },
+  {
+    code: "MISSION",
+    label: "Mission",
+    body: "Give every organization a digital executive team and workforce that operate on its own knowledge, culture, and standards.",
+  },
+  {
+    code: "VISION",
+    label: "Vision",
+    body: "Establish the cognitive operating system for modern enterprises.",
+  },
+  {
+    code: "VALUES",
+    label: "Values",
+    body: "Rigor · Explainability · Alignment · Accountability · Continuous learning.",
+  },
+  {
+    code: "STRUCTURE",
+    label: "Structure",
+    body: "11 executive functions · 7 departments · 42 specialist roles · 6 governance gates.",
+  },
 ];
 
 const INGESTED = [
@@ -62,10 +85,18 @@ export default function OrganizationalPage() {
             <table className="w-full text-sm">
               <thead className="bg-secondary/40 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">Corpus</th>
-                  <th className="text-right px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">Count</th>
-                  <th className="text-right px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">Δ 24h</th>
-                  <th className="text-right px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">Coverage</th>
+                  <th className="text-left px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">
+                    Corpus
+                  </th>
+                  <th className="text-right px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">
+                    Count
+                  </th>
+                  <th className="text-right px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">
+                    Δ 24h
+                  </th>
+                  <th className="text-right px-4 py-2 text-[10px] font-mono uppercase text-muted-foreground">
+                    Coverage
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -73,7 +104,9 @@ export default function OrganizationalPage() {
                   <tr key={row.kind} className="border-b border-border last:border-b-0">
                     <td className="px-4 py-3">{row.kind}</td>
                     <td className="px-4 py-3 text-right font-mono">{row.count.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right font-mono text-[color:var(--signal)]">{row.delta}</td>
+                    <td className="px-4 py-3 text-right font-mono text-[color:var(--signal)]">
+                      {row.delta}
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-block w-32 h-1 bg-border rounded-full overflow-hidden">
                         <div className="h-full bg-primary" style={{ width: `${60 + i * 4}%` }} />
@@ -90,9 +123,14 @@ export default function OrganizationalPage() {
           <SectionHeading code="L1.3" title="Anchored Knowledge Nodes" />
           <div className="grid grid-cols-3 gap-3">
             {KNOWLEDGE_NODES.map((n) => (
-              <div key={n.id} className="bg-surface border border-border rounded-sm p-3 flex items-center justify-between">
+              <div
+                key={n.id}
+                className="bg-surface border border-border rounded-sm p-3 flex items-center justify-between"
+              >
                 <div className="min-w-0">
-                  <div className="font-mono text-[9px] text-muted-foreground uppercase">{n.kind}</div>
+                  <div className="font-mono text-[9px] text-muted-foreground uppercase">
+                    {n.kind}
+                  </div>
                   <div className="text-xs font-medium truncate">{n.label}</div>
                 </div>
                 <div className="font-mono text-[10px] text-accent shrink-0">{n.edges}▸</div>

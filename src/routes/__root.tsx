@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -35,11 +36,12 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    const normalizedError = error instanceof Error ? error : new Error(String(error));
+    console.error(normalizedError);
+    reportLovableError(normalizedError, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -79,9 +81,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Soteria SECP — Enterprise Cognition Platform" },
-      { name: "description", content: "The cognitive operating system for modern organizations. Deploy AI executives, consultants, and specialist workforces that reason on your organization's own knowledge." },
+      {
+        name: "description",
+        content:
+          "The cognitive operating system for modern organizations. Deploy AI executives, consultants, and specialist workforces that reason on your organization's own knowledge.",
+      },
       { property: "og:title", content: "Soteria SECP — Enterprise Cognition Platform" },
-      { property: "og:description", content: "Deploy AI executives, consultants, and specialist workforces that operate on your organization's own knowledge, policies, and goals." },
+      {
+        property: "og:description",
+        content:
+          "Deploy AI executives, consultants, and specialist workforces that operate on your organization's own knowledge, policies, and goals.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -93,7 +103,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

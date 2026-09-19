@@ -43,7 +43,11 @@ export interface ComplianceReportPayload {
   };
 }
 
-function buildPayload({ request, approvals, operator }: ComplianceReportInput): ComplianceReportPayload {
+function buildPayload({
+  request,
+  approvals,
+  operator,
+}: ComplianceReportInput): ComplianceReportPayload {
   return {
     report_kind: "secp_request_compliance",
     generated_at: new Date().toISOString(),
@@ -68,7 +72,11 @@ function buildPayload({ request, approvals, operator }: ComplianceReportInput): 
       reasoning: s.reasoning,
       artifact: s.artifact ?? null,
     })),
-    validators: request.validators.map((v) => ({ name: v.name, status: v.status, detail: v.detail })),
+    validators: request.validators.map((v) => ({
+      name: v.name,
+      status: v.status,
+      detail: v.detail,
+    })),
     approvals,
     export_verification: {
       algorithm: "sha256",
@@ -149,12 +157,18 @@ function renderPdf(payload: ComplianceReportPayload, sha256: string): jsPDF {
     }
   }
   section("Export verification");
-  writeBlock([`Algorithm: SHA-256`, `Report hash: ${sha256}`, `Sidecar file: ${payload.request.id}-compliance.json.sha256`]);
+  writeBlock([
+    `Algorithm: SHA-256`,
+    `Report hash: ${sha256}`,
+    `Sidecar file: ${payload.request.id}-compliance.json.sha256`,
+  ]);
   writeBlock(wrapText(pdf, payload.export_verification.note, width), 9);
   return pdf;
 }
 
-export async function downloadComplianceReport(input: ComplianceReportInput): Promise<{ sha256: string; jsonFile: string; pdfFile: string }> {
+export async function downloadComplianceReport(
+  input: ComplianceReportInput,
+): Promise<{ sha256: string; jsonFile: string; pdfFile: string }> {
   const payload = buildPayload(input);
   const jsonBody = JSON.stringify(payload);
   const bodyHash = await sha256Hex(jsonBody);

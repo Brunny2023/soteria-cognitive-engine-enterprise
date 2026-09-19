@@ -12,8 +12,23 @@ type StepLike = {
   status?: string;
   reasoning?: string;
   artifact?: string;
-  toolCalls?: { name: string; ok: boolean; ms: number; attempts?: number; fallback?: boolean; sql?: string; scope?: string; input?: string; output?: string }[];
-  validation?: { verdict: string; passed: number; checked: number; findings?: { rule: string; status: string; detail: string }[] };
+  toolCalls?: {
+    name: string;
+    ok: boolean;
+    ms: number;
+    attempts?: number;
+    fallback?: boolean;
+    sql?: string;
+    scope?: string;
+    input?: string;
+    output?: string;
+  }[];
+  validation?: {
+    verdict: string;
+    passed: number;
+    checked: number;
+    findings?: { rule: string; status: string; detail: string }[];
+  };
 };
 
 function line(char = "─", n = 78) {
@@ -23,13 +38,18 @@ function line(char = "─", n = 78) {
 export function renderAuditReport(pkg: AuditPackage): string {
   const req = pkg.request;
   const steps = (Array.isArray(req?.steps) ? (req?.steps as StepLike[]) : []) ?? [];
-  const validators = (Array.isArray(req?.validators) ? (req?.validators as { name: string; status: string; detail: string }[]) : []) ?? [];
+  const validators =
+    (Array.isArray(req?.validators)
+      ? (req?.validators as { name: string; status: string; detail: string }[])
+      : []) ?? [];
   const out: string[] = [];
   out.push("SOTERIA SECP — EXECUTION AUDIT PACKAGE");
   out.push(line("="));
   out.push(`Directive      : ${req?.id ?? "—"}`);
   out.push(`Title          : ${req?.title ?? "—"}`);
-  out.push(`Origin         : ${req?.origin ?? "—"}   Priority: ${req?.priority ?? "—"}   Autonomy: L${req?.autonomy ?? "—"}`);
+  out.push(
+    `Origin         : ${req?.origin ?? "—"}   Priority: ${req?.priority ?? "—"}   Autonomy: L${req?.autonomy ?? "—"}`,
+  );
   out.push(`Progress       : ${Math.round((req?.progress ?? 0) * 100)}%`);
   out.push(`Generated (UTC): ${pkg.generated_at}`);
   out.push("");
@@ -45,21 +65,29 @@ export function renderAuditReport(pkg: AuditPackage): string {
     out.push(`[${String(s.stage ?? "").toUpperCase()}] ${s.title ?? ""}`);
     out.push(`  agent   : ${s.agent ?? "—"} (${scope.title})`);
     out.push(`  layer   : ${s.layer ?? "—"}   status: ${s.status ?? "—"}`);
-    out.push(`  scope   : tables ${scope.tables.join(", ")} · cap ${scope.rowCap} · masked ${scope.masked.join(", ") || "none"}`);
+    out.push(
+      `  scope   : tables ${scope.tables.join(", ")} · cap ${scope.rowCap} · masked ${scope.masked.join(", ") || "none"}`,
+    );
     if (s.reasoning) out.push(`  reasoning: ${s.reasoning.replace(/\s+/g, " ").slice(0, 600)}`);
     if (s.artifact) out.push(`  artifact : ${s.artifact}`);
     if (s.toolCalls?.length) {
       out.push(`  tool calls (${s.toolCalls.length}):`);
       for (const t of s.toolCalls) {
-        out.push(`    · ${t.name} — ${t.ok ? "OK" : "FAILED"} ${t.ms}ms attempts=${t.attempts ?? 1}${t.fallback ? " fallback=yes" : ""}`);
+        out.push(
+          `    · ${t.name} — ${t.ok ? "OK" : "FAILED"} ${t.ms}ms attempts=${t.attempts ?? 1}${t.fallback ? " fallback=yes" : ""}`,
+        );
         if (t.sql) out.push(`      sql   : ${t.sql}`);
         if (t.scope) out.push(`      scope : ${t.scope}`);
       }
     }
     if (s.validation) {
-      out.push(`  validator: ${s.validation.verdict} (${s.validation.passed}/${s.validation.checked})`);
+      out.push(
+        `  validator: ${s.validation.verdict} (${s.validation.passed}/${s.validation.checked})`,
+      );
       for (const f of s.validation.findings ?? []) {
-        out.push(`      ${f.status === "pass" ? "PASS" : f.status === "fail" ? "FAIL" : "SKIP"} ${f.rule} — ${f.detail}`);
+        out.push(
+          `      ${f.status === "pass" ? "PASS" : f.status === "fail" ? "FAIL" : "SKIP"} ${f.rule} — ${f.detail}`,
+        );
       }
     }
     out.push("");
@@ -83,8 +111,12 @@ export function renderAuditReport(pkg: AuditPackage): string {
   }
 
   out.push(line("="));
-  out.push("Verify: recompute SHA-256 of each artifact content and compare with the checksum above.");
-  out.push("The accompanying .sha256 sidecars sign the exact bytes of this report and its JSON twin.");
+  out.push(
+    "Verify: recompute SHA-256 of each artifact content and compare with the checksum above.",
+  );
+  out.push(
+    "The accompanying .sha256 sidecars sign the exact bytes of this report and its JSON twin.",
+  );
   return out.join("\n");
 }
 
@@ -108,7 +140,9 @@ export async function downloadAuditPackage(pkg: AuditPackage) {
     artifacts: pkg.artifacts,
     integrity: {
       artifacts: artifactDigests,
-      tampered: artifactDigests.filter((d) => d.stored_checksum !== d.recomputed_checksum).map((d) => d.id),
+      tampered: artifactDigests
+        .filter((d) => d.stored_checksum !== d.recomputed_checksum)
+        .map((d) => d.id),
     },
   };
   const jsonStr = JSON.stringify(jsonBody, null, 2);
@@ -135,5 +169,9 @@ export async function downloadAuditPackage(pkg: AuditPackage) {
     "text/plain",
   );
 
-  return { json: jsonFileHash, report: reportFileHash, tampered: jsonBody.integrity.tampered.length };
+  return {
+    json: jsonFileHash,
+    report: reportFileHash,
+    tampered: jsonBody.integrity.tampered.length,
+  };
 }

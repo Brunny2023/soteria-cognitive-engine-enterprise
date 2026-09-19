@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateText, stepCountIs } from "ai";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import type { RequestRecord, StageStep, Stage, Autonomy } from "./secp-data";
 
 const AutonomySchema = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]);
@@ -23,35 +25,129 @@ function stamp(): string {
 
 function seedSteps(title: string): StageStep[] {
   return [
-    { stage: "intent", layer: "organizational", title: "Intent ingested", agent: "SIGNAL WARDEN", status: "complete",
-      reasoning: `Directive parsed. Objective bound: "${title}". Success criteria and constraints registered against organizational policy envelope.` },
-    { stage: "context", layer: "organizational", title: "Organizational context retrieved", agent: "PRIMARY LEDGER", status: "pending",
-      reasoning: "Queued — awaiting cognition dispatch." },
-    { stage: "executive", layer: "executive", title: "Executive deliberation", agent: "STRATEGIC VISIONARY", status: "pending", reasoning: "Queued." },
-    { stage: "consultant", layer: "consultant", title: "Domain consultation", agent: "Consultant mesh", status: "pending", reasoning: "Queued." },
-    { stage: "strategy", layer: "consultant", title: "Execution strategy", agent: "HORIZON PLANNER", status: "pending", reasoning: "Queued." },
-    { stage: "plan", layer: "program", title: "Project plan generated", agent: "Program Manager v3", status: "pending", reasoning: "Queued." },
-    { stage: "assign", layer: "workforce", title: "Specialist assignment", agent: "OPERATIONAL GRAPH", status: "pending", reasoning: "Queued." },
-    { stage: "execute", layer: "workforce", title: "Workforce execution", agent: "Specialist mesh", status: "pending", reasoning: "Queued." },
-    { stage: "validate", layer: "governance", title: "Multi-stage validation", agent: "COVENANT KEEPER", status: "pending", reasoning: "Queued." },
-    { stage: "review", layer: "executive", title: "Executive review", agent: "STRATEGIC VISIONARY", status: "pending", reasoning: "Queued." },
-    { stage: "deliver", layer: "executive", title: "Deliver results", agent: "COVENANT KEEPER", status: "pending", reasoning: "Queued." },
-    { stage: "learn", layer: "organizational", title: "Capture feedback", agent: "PRIMARY LEDGER", status: "pending", reasoning: "Queued." },
+    {
+      stage: "intent",
+      layer: "organizational",
+      title: "Intent ingested",
+      agent: "SIGNAL WARDEN",
+      status: "complete",
+      reasoning: `Directive parsed. Objective bound: "${title}". Success criteria and constraints registered against organizational policy envelope.`,
+    },
+    {
+      stage: "context",
+      layer: "organizational",
+      title: "Organizational context retrieved",
+      agent: "PRIMARY LEDGER",
+      status: "pending",
+      reasoning: "Queued — awaiting cognition dispatch.",
+    },
+    {
+      stage: "executive",
+      layer: "executive",
+      title: "Executive deliberation",
+      agent: "STRATEGIC VISIONARY",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "consultant",
+      layer: "consultant",
+      title: "Domain consultation",
+      agent: "Consultant mesh",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "strategy",
+      layer: "consultant",
+      title: "Execution strategy",
+      agent: "HORIZON PLANNER",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "plan",
+      layer: "program",
+      title: "Project plan generated",
+      agent: "Program Manager v3",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "assign",
+      layer: "workforce",
+      title: "Specialist assignment",
+      agent: "OPERATIONAL GRAPH",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "execute",
+      layer: "workforce",
+      title: "Workforce execution",
+      agent: "Specialist mesh",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "validate",
+      layer: "governance",
+      title: "Multi-stage validation",
+      agent: "COVENANT KEEPER",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "review",
+      layer: "executive",
+      title: "Executive review",
+      agent: "STRATEGIC VISIONARY",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "deliver",
+      layer: "executive",
+      title: "Deliver results",
+      agent: "COVENANT KEEPER",
+      status: "pending",
+      reasoning: "Queued.",
+    },
+    {
+      stage: "learn",
+      layer: "organizational",
+      title: "Capture feedback",
+      agent: "PRIMARY LEDGER",
+      status: "pending",
+      reasoning: "Queued.",
+    },
   ];
 }
 
 function seedValidators(): RequestRecord["validators"] {
   return [
     { name: "Regulatory compliance", status: "pending", detail: "Compliance sweep queued." },
-    { name: "Financial correctness", status: "pending", detail: "Materiality thresholds not yet set." },
+    {
+      name: "Financial correctness",
+      status: "pending",
+      detail: "Materiality thresholds not yet set.",
+    },
     { name: "Explainability", status: "pending", detail: "Reasoning trace being captured." },
     { name: "Reproducibility", status: "pending", detail: "Inputs versioning in progress." },
   ];
 }
 
 function rowToRecord(row: {
-  id: string; title: string; brief: string; origin: string; autonomy: number;
-  priority: string; progress: number; updated_label: string; steps: unknown; validators: unknown;
+  id: string;
+  title: string;
+  brief: string;
+  origin: string;
+  autonomy: number;
+  priority: string;
+  progress: number;
+  updated_label: string;
+  steps: unknown;
+  validators: unknown;
 }): RequestRecord {
   return {
     id: row.id,
@@ -78,9 +174,15 @@ export const listRequestsFn = createServerFn({ method: "GET" })
     return (data ?? []).map(rowToRecord);
   });
 
-async function nextRequestId(supabase: { from: (t: string) => any }) {
-  const { data } = await supabase.from("secp_requests").select("id").order("created_at", { ascending: false }).limit(50);
-  const nums = ((data as { id: string }[] | null) ?? []).map((r) => Number.parseInt(r.id.replace(/[^0-9]/g, ""), 10)).filter(Number.isFinite);
+async function nextRequestId(supabase: SupabaseClient<Database>) {
+  const { data } = await supabase
+    .from("secp_requests")
+    .select("id")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  const nums = ((data as { id: string }[] | null) ?? [])
+    .map((r) => Number.parseInt(r.id.replace(/[^0-9]/g, ""), 10))
+    .filter(Number.isFinite);
   const next = (nums.length ? Math.max(...nums) : 800) + 1;
   return `RE-${next}`;
 }
@@ -121,17 +223,25 @@ export const createRequestFn = createServerFn({ method: "POST" })
 
 const STAGE_PROMPT: Record<Stage, string> = {
   intent: "State how you registered the directive and bound its scope.",
-  context: "Describe how you traversed the organizational knowledge graph — related prior projects, applicable policies, regulations, and constraints you surfaced.",
-  executive: "As the Executive Council, weigh strategic trade-offs. Cite the officer(s) whose portfolio owns this decision, the strategic risks, and the go/no-go rationale.",
-  consultant: "As the Domain Consultant tier, translate the executive stance into a domain-specific viewpoint (finance, legal, ops, etc.). Note precedents and heuristics you applied.",
-  strategy: "Draft the execution strategy: sequencing, resourcing model, success metrics, and abort conditions.",
+  context:
+    "Describe how you traversed the organizational knowledge graph — related prior projects, applicable policies, regulations, and constraints you surfaced.",
+  executive:
+    "As the Executive Council, weigh strategic trade-offs. Cite the officer(s) whose portfolio owns this decision, the strategic risks, and the go/no-go rationale.",
+  consultant:
+    "As the Domain Consultant tier, translate the executive stance into a domain-specific viewpoint (finance, legal, ops, etc.). Note precedents and heuristics you applied.",
+  strategy:
+    "Draft the execution strategy: sequencing, resourcing model, success metrics, and abort conditions.",
   plan: "Produce the project plan: workstreams, dependencies, critical path, and required specialist skills.",
-  assign: "Assign specialists to workstreams. Name representative archetypes and justify capacity/expertise fit.",
-  execute: "Report the specialist mesh's execution: what artifacts were produced, blockers encountered, and how they were resolved.",
-  validate: "Report the Governance validation battery: regulatory compliance, financial correctness, explainability, reproducibility. Cite evidence.",
+  assign:
+    "Assign specialists to workstreams. Name representative archetypes and justify capacity/expertise fit.",
+  execute:
+    "Report the specialist mesh's execution: what artifacts were produced, blockers encountered, and how they were resolved.",
+  validate:
+    "Report the Governance validation battery: regulatory compliance, financial correctness, explainability, reproducibility. Cite evidence.",
   review: "Executive review of the delivered output. Approve, request revisions, or escalate.",
   deliver: "Package deliverables, notify stakeholders, and record acceptance.",
-  learn: "Capture lessons: what to reinforce, retrain, or feed back into policy and knowledge layers.",
+  learn:
+    "Capture lessons: what to reinforce, retrain, or feed back into policy and knowledge layers.",
 };
 
 const AdvanceInput = z.object({ id: z.string() });
@@ -160,7 +270,7 @@ export const advanceRequestFn = createServerFn({ method: "POST" })
     const step = record.steps[nextIdx];
     const { buildExecutionTools } = await import("./secp-tools.server");
     const { tools, trace, scope } = buildExecutionTools({
-      supabase: context.supabase as unknown as { from: (t: string) => any },
+      supabase: context.supabase,
       requestId: record.id,
       stage: step.stage,
       agent: step.agent,
@@ -226,12 +336,19 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
       try {
         const input = JSON.parse(producedArtifact.input) as { name?: string };
         if (input?.name) artifactName = input.name;
-      } catch { /* keep prior artifact name */ }
+      } catch {
+        /* keep prior artifact name */
+      }
     }
 
     const { validateStage } = await import("./kg-rules");
     const requireArtifact = ["execute", "validate", "deliver"].includes(step.stage);
-    const validation = validateStage({ agent: step.agent, stage: step.stage, trace, requireArtifact });
+    const validation = validateStage({
+      agent: step.agent,
+      stage: step.stage,
+      trace,
+      requireArtifact,
+    });
 
     const nextSteps = record.steps.map((s, i) => {
       if (i < nextIdx) return s;
@@ -258,18 +375,34 @@ Respond in 2-4 tight sentences summarizing what you actually did and what the to
         "Regulatory compliance": ["R2 · Scope containment", "R3 · Row-cap enforcement"],
         "Financial correctness": ["R6 · Metric reproducibility", "R5 · Graph invariants"],
         Explainability: ["R1 · Evidence grounding", "R7 · Artifact provenance"],
-        Reproducibility: ["R4 · Schema conformance", "R8 · Tool reliability", "R9 · Evidence integrity"],
+        Reproducibility: [
+          "R4 · Schema conformance",
+          "R8 · Tool reliability",
+          "R9 · Evidence integrity",
+        ],
       };
       nextValidators = record.validators.map((v) => {
         const rules = bucket[v.name] ?? [];
         const related = blocking.filter((f) => rules.includes(f.rule));
         const failed = related.filter((f) => f.status === "fail");
         if (related.length === 0) {
-          return { ...v, status: validation.verdict === "validated" ? ("passed" as const) : ("pending" as const), detail: `Deterministic validator verdict: ${validation.verdict}.` };
+          return {
+            ...v,
+            status: validation.verdict === "validated" ? ("passed" as const) : ("pending" as const),
+            detail: `Deterministic validator verdict: ${validation.verdict}.`,
+          };
         }
         return failed.length
-          ? { ...v, status: "failed" as const, detail: failed.map((f) => `${f.rule}: ${f.detail}`).join(" · ") }
-          : { ...v, status: "passed" as const, detail: related.map((f) => `${f.rule}: ${f.detail}`).join(" · ") };
+          ? {
+              ...v,
+              status: "failed" as const,
+              detail: failed.map((f) => `${f.rule}: ${f.detail}`).join(" · "),
+            }
+          : {
+              ...v,
+              status: "passed" as const,
+              detail: related.map((f) => `${f.rule}: ${f.detail}`).join(" · "),
+            };
       });
       if (failing.length) {
         reasoning = `${reasoning}\n\n[VALIDATOR: REJECTED — ${failing.map((f) => f.rule).join(", ")}]`;

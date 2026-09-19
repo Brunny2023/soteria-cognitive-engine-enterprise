@@ -9,7 +9,11 @@ export const Route = createFileRoute("/_authenticated/publish")({
   head: () => ({
     meta: [
       { title: "Publish readiness — Soteria SECP" },
-      { name: "description", content: "Verify auth, database connectivity, export integrity, and audit-log completeness before shipping the cognitive operating system." },
+      {
+        name: "description",
+        content:
+          "Verify auth, database connectivity, export integrity, and audit-log completeness before shipping the cognitive operating system.",
+      },
       { property: "og:title", content: "Publish readiness — Soteria SECP" },
       { property: "og:description", content: "Pre-flight for a defensible SECP deployment." },
     ],
@@ -82,14 +86,20 @@ function PublishPage() {
           <StatChip label="Checks passed" value={String(pass)} tone="signal" />
           <StatChip label="Warnings" value={String(warn)} tone="warn" />
           <StatChip label="Failures" value={String(fail)} tone={fail ? "danger" : "signal"} />
-          <StatChip label="Deployment gate" value={ready ? "READY" : "HOLD"} tone={ready ? "signal" : "danger"} />
+          <StatChip
+            label="Deployment gate"
+            value={ready ? "READY" : "HOLD"}
+            tone={ready ? "signal" : "danger"}
+          />
         </section>
 
         <section>
           <div className="flex items-center justify-between mb-3">
             <SectionHeading code="PB.1" title="Automated verification" />
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] text-muted-foreground">{ts ? `Last run · ${ts.replace("T", " ").slice(0, 19)} UTC` : "—"}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {ts ? `Last run · ${ts.replace("T", " ").slice(0, 19)} UTC` : "—"}
+              </span>
               <button
                 type="button"
                 onClick={verify}
@@ -110,7 +120,10 @@ function PublishPage() {
           </div>
           <div className="bg-surface border border-border rounded-sm">
             {(checks ?? []).map((c) => (
-              <div key={c.key} className="grid grid-cols-[1fr_100px] gap-4 px-5 py-3 border-b border-border last:border-b-0 items-start">
+              <div
+                key={c.key}
+                className="grid grid-cols-[1fr_100px] gap-4 px-5 py-3 border-b border-border last:border-b-0 items-start"
+              >
                 <div>
                   <div className="text-sm font-bold">{c.label}</div>
                   <div className="text-[11px] text-muted-foreground mt-1">{c.detail}</div>
@@ -131,7 +144,9 @@ function PublishPage() {
               </div>
             ))}
             {!checks && (
-              <div className="px-5 py-6 text-center font-mono text-[11px] text-muted-foreground">Running…</div>
+              <div className="px-5 py-6 text-center font-mono text-[11px] text-muted-foreground">
+                Running…
+              </div>
             )}
           </div>
         </section>
@@ -140,7 +155,8 @@ function PublishPage() {
           <div className="bg-surface border border-border rounded-sm p-5">
             <SectionHeading code="PB.2" title="Export integrity self-test" />
             <p className="text-[11px] text-muted-foreground mb-3">
-              Downloads a small CSV and JSON dataset through the same export pipeline used by Governance and Retention. Confirms browser save + UTC exported_at stamp.
+              Downloads a small CSV and JSON dataset through the same export pipeline used by
+              Governance and Retention. Confirms browser save + UTC exported_at stamp.
             </p>
             <button
               type="button"
@@ -153,7 +169,9 @@ function PublishPage() {
               <div
                 className={
                   "mt-3 font-mono text-[10px] uppercase tracking-widest " +
-                  (exportOk === "pass" ? "text-[color:var(--signal)]" : "text-[color:var(--danger)]")
+                  (exportOk === "pass"
+                    ? "text-[color:var(--signal)]"
+                    : "text-[color:var(--danger)]")
                 }
               >
                 {exportOk === "pass" ? "▪ CSV + JSON delivered." : "▪ Export failed — investigate."}

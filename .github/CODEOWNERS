@@ -1,0 +1,10 @@
+# Default ownership: keep the existing owner accountable for every change.
+* @Brunny2023
+
+# Security-sensitive paths require explicit owner review.
+/supabase/ @Brunny2023
+/src/lib/*.server.ts @Brunny2023
+/src/lib/secp-*.ts @Brunny2023
+/src/lib/kg-rules.ts @Brunny2023
+/src/lib/safe-math.ts @Brunny2023
+/.github/ @Brunny2023

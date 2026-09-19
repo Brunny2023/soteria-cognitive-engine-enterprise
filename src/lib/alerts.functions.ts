@@ -63,7 +63,10 @@ export const dispatchToolHealthAlertFn = createServerFn({ method: "POST" })
         try {
           const { sendLovableEmail } = await import("@lovable.dev/email-js");
           const rows = data.breaches
-            .map((b) => `<li><strong>${b.severity.toUpperCase()}</strong> — ${b.tool} · ${b.metric}: ${b.observed} exceeds ${b.threshold}</li>`)
+            .map(
+              (b) =>
+                `<li><strong>${b.severity.toUpperCase()}</strong> — ${b.tool} · ${b.metric}: ${b.observed} exceeds ${b.threshold}</li>`,
+            )
             .join("");
           await sendLovableEmail(
             {

@@ -53,14 +53,19 @@ export const listProgramsFn = createServerFn({ method: "GET" })
     if (reqErr) throw new Error(reqErr.message);
     const { data: ws } = await context.supabase.from("secp_workstreams").select("id,request_id");
     const { data: tasks } = await context.supabase.from("secp_tasks").select("request_id,status");
-    return ((reqs ?? []) as { id: string; title: string; priority: string; autonomy: number }[]).map((r) => {
-      const t = ((tasks ?? []) as { request_id: string; status: string }[]).filter((x) => x.request_id === r.id);
+    return (
+      (reqs ?? []) as { id: string; title: string; priority: string; autonomy: number }[]
+    ).map((r) => {
+      const t = ((tasks ?? []) as { request_id: string; status: string }[]).filter(
+        (x) => x.request_id === r.id,
+      );
       return {
         request_id: r.id,
         title: r.title,
         priority: r.priority,
         autonomy: r.autonomy,
-        workstreams: ((ws ?? []) as { request_id: string }[]).filter((x) => x.request_id === r.id).length,
+        workstreams: ((ws ?? []) as { request_id: string }[]).filter((x) => x.request_id === r.id)
+          .length,
         tasks: t.length,
         done: t.filter((x) => x.status === "done").length,
       };
@@ -73,13 +78,17 @@ export const getProgramFn = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<WorkstreamRow[]> => {
     const { data: ws, error } = await context.supabase
       .from("secp_workstreams")
-      .select("id,request_id,code,title,objective,owner_role,duration_days,acceptance,risk,position")
+      .select(
+        "id,request_id,code,title,objective,owner_role,duration_days,acceptance,risk,position",
+      )
       .eq("request_id", data.requestId)
       .order("position", { ascending: true });
     if (error) throw new Error(error.message);
     const { data: tasks, error: tErr } = await context.supabase
       .from("secp_tasks")
-      .select("id,workstream_id,request_id,title,detail,specialist_id,specialist_role,department,effort_hours,status,position,updated_at")
+      .select(
+        "id,workstream_id,request_id,title,detail,specialist_id,specialist_role,department,effort_hours,status,position,updated_at",
+      )
       .eq("request_id", data.requestId)
       .order("position", { ascending: true });
     if (tErr) throw new Error(tErr.message);

@@ -142,7 +142,10 @@ export function AppShell({
             <NotificationsBell />
             <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-3">
-              <span className="text-foreground truncate max-w-[140px]" title={user?.email ?? undefined}>
+              <span
+                className="text-foreground truncate max-w-[140px]"
+                title={user?.email ?? undefined}
+              >
                 {displayName || user?.email?.split("@")[0] || "OPERATOR"}
               </span>
               <button
@@ -168,7 +171,15 @@ export function AppShell({
   );
 }
 
-export function StatChip({ label, value, tone = "default" }: { label: string; value: string; tone?: "default" | "accent" | "signal" | "warn" | "danger" }) {
+export function StatChip({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "accent" | "signal" | "warn" | "danger";
+}) {
   const color =
     tone === "accent"
       ? "text-accent"
@@ -181,18 +192,30 @@ export function StatChip({ label, value, tone = "default" }: { label: string; va
             : "text-foreground";
   return (
     <div className="flex flex-col gap-1 border border-border bg-surface rounded-sm p-3">
-      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
       <span className={"text-xl font-semibold font-mono " + color}>{value}</span>
     </div>
   );
 }
 
-export function SectionHeading({ code, title, action }: { code: string; title: string; action?: ReactNode }) {
+export function SectionHeading({
+  code,
+  title,
+  action,
+}: {
+  code: string;
+  title: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex items-end justify-between mb-4">
       <div className="flex items-baseline gap-3">
         <span className="font-mono text-[10px] text-accent">{code}</span>
-        <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{title}</h2>
+        <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+          {title}
+        </h2>
       </div>
       {action}
     </div>

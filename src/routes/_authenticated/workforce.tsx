@@ -15,9 +15,16 @@ export const Route = createFileRoute("/_authenticated/workforce")({
   head: () => ({
     meta: [
       { title: "Specialist Workforce — Soteria SECP" },
-      { name: "description", content: "Specialist task inbox and roster: assigned work executes into checksummed deliverables in the artifact ledger." },
+      {
+        name: "description",
+        content:
+          "Specialist task inbox and roster: assigned work executes into checksummed deliverables in the artifact ledger.",
+      },
       { property: "og:title", content: "Specialist Workforce — Soteria SECP" },
-      { property: "og:description", content: "L5 execution mesh — assigned tasks, live execution, and signed work products." },
+      {
+        property: "og:description",
+        content: "L5 execution mesh — assigned tasks, live execution, and signed work products.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -111,7 +118,11 @@ function TaskInbox() {
         <SectionHeading
           code="L5.1"
           title="Specialist Task Inbox"
-          action={<span className="font-mono text-[10px] text-muted-foreground">{tasks.length} shown</span>}
+          action={
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {tasks.length} shown
+            </span>
+          }
         />
         <div className="flex flex-wrap gap-2 mb-3">
           {(["ALL", ...DEPARTMENTS] as const).map((d) => (
@@ -134,13 +145,16 @@ function TaskInbox() {
           <div className="text-xs font-mono text-muted-foreground">Loading assignments…</div>
         ) : tasks.length === 0 ? (
           <div className="bg-surface border border-border rounded-sm p-6 text-sm text-muted-foreground">
-            No tasks assigned yet. Generate a work breakdown on the Program layer (L4) and specialists will receive
-            their assignments here.
+            No tasks assigned yet. Generate a work breakdown on the Program layer (L4) and
+            specialists will receive their assignments here.
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             {tasks.map((t) => (
-              <div key={t.id} className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-3">
+              <div
+                key={t.id}
+                className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-3"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="font-mono text-[10px] text-accent">
@@ -150,7 +164,10 @@ function TaskInbox() {
                     <div className="text-xs text-muted-foreground mt-1">{t.detail}</div>
                   </div>
                   <span
-                    className={"shrink-0 font-mono text-[9px] uppercase tracking-widest border px-1.5 py-0.5 " + STATUS_TONE[t.status]}
+                    className={
+                      "shrink-0 font-mono text-[9px] uppercase tracking-widest border px-1.5 py-0.5 " +
+                      STATUS_TONE[t.status]
+                    }
                   >
                     {t.status.replace("_", " ")}
                   </span>
@@ -161,12 +178,16 @@ function TaskInbox() {
                   <span>{t.department}</span>
                   <span>{t.effort_hours}h</span>
                   {t.artifact_checksum ? (
-                    <span className="text-[color:var(--signal)]">sha256 {t.artifact_checksum.slice(0, 12)}…</span>
+                    <span className="text-[color:var(--signal)]">
+                      sha256 {t.artifact_checksum.slice(0, 12)}…
+                    </span>
                   ) : null}
                   <div className="ml-auto flex gap-2">
                     {t.artifact_id ? (
                       <button
-                        onClick={() => setOpenArtifact(openArtifact === t.artifact_id ? null : t.artifact_id)}
+                        onClick={() =>
+                          setOpenArtifact(openArtifact === t.artifact_id ? null : t.artifact_id)
+                        }
                         className="border border-border px-2 py-1 hover:border-foreground/40 hover:text-foreground"
                       >
                         {openArtifact === t.artifact_id ? "Hide deliverable" : "View deliverable"}
@@ -177,14 +198,20 @@ function TaskInbox() {
                       disabled={run.isPending}
                       className="border border-primary/40 text-primary bg-primary/10 px-2 py-1 disabled:opacity-50"
                     >
-                      {run.isPending && run.variables === t.id ? "Executing…" : t.artifact_id ? "Re-execute" : "Execute task"}
+                      {run.isPending && run.variables === t.id
+                        ? "Executing…"
+                        : t.artifact_id
+                          ? "Re-execute"
+                          : "Execute task"}
                     </button>
                   </div>
                 </div>
 
                 {openArtifact && openArtifact === t.artifact_id ? (
                   <pre className="bg-secondary/30 border border-border rounded-sm p-3 text-[11px] whitespace-pre-wrap max-h-96 overflow-auto">
-                    {artifact.isLoading ? "Loading deliverable…" : (artifact.data?.content ?? "Not found")}
+                    {artifact.isLoading
+                      ? "Loading deliverable…"
+                      : (artifact.data?.content ?? "Not found")}
                   </pre>
                 ) : null}
               </div>
@@ -242,7 +269,11 @@ function Roster() {
         <SectionHeading
           code="L5.3"
           title={dept === "ALL" ? "All Specialists" : dept}
-          action={<span className="font-mono text-[10px] text-muted-foreground">{filtered.length} matches</span>}
+          action={
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {filtered.length} matches
+            </span>
+          }
         />
         <div className="bg-surface border border-border rounded-sm overflow-hidden">
           <table className="w-full text-sm">
@@ -258,14 +289,19 @@ function Roster() {
             </thead>
             <tbody>
               {filtered.map((s) => (
-                <tr key={s.id} className="border-b border-border last:border-b-0 hover:bg-secondary/30">
+                <tr
+                  key={s.id}
+                  className="border-b border-border last:border-b-0 hover:bg-secondary/30"
+                >
                   <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground">{s.id}</td>
                   <td className="px-4 py-3 font-medium">{s.role}</td>
                   <td className="px-4 py-3 text-muted-foreground">{s.department}</td>
                   <td className="px-4 py-3 font-mono">L{s.level}</td>
                   <td className="px-4 py-3">
                     <span className="font-mono text-[10px] text-primary">A{s.autonomy}</span>
-                    <span className="text-[10px] text-muted-foreground ml-2">{AUTONOMY_LABELS[s.autonomy]}</span>
+                    <span className="text-[10px] text-muted-foreground ml-2">
+                      {AUTONOMY_LABELS[s.autonomy]}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <span

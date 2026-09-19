@@ -23,11 +23,19 @@ export const listEngagementsFn = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     const rows = (data ?? []) as {
-      id: string; request_id: string; agent: string; name: string;
-      content: string; checksum: string; inputs: Record<string, unknown>; created_at: string;
+      id: string;
+      request_id: string;
+      agent: string;
+      name: string;
+      content: string;
+      checksum: string;
+      inputs: Record<string, unknown>;
+      created_at: string;
     }[];
     const { data: reqs } = await context.supabase.from("secp_requests").select("id,title");
-    const reqMap = new Map(((reqs ?? []) as { id: string; title: string }[]).map((r) => [r.id, r.title]));
+    const reqMap = new Map(
+      ((reqs ?? []) as { id: string; title: string }[]).map((r) => [r.id, r.title]),
+    );
     return rows.map((r) => ({
       id: r.id,
       request_id: r.request_id,
@@ -60,7 +68,13 @@ export const runEngagementFn = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!req) throw new Error("Directive not found");
-    const r = req as { id: string; title: string; brief: string; priority: string; autonomy: number };
+    const r = req as {
+      id: string;
+      title: string;
+      brief: string;
+      priority: string;
+      autonomy: number;
+    };
 
     const { sha256, synthesize, engagementFallback } = await import("./exec.server");
     const fallback = engagementFallback({

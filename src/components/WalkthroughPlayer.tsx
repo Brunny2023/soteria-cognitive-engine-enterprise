@@ -136,10 +136,14 @@ export function WalkthroughPlayer() {
               role="option"
               aria-selected={isActive}
               onClick={() => seek(i)}
-              onKeyDown={(e) => onRailKeyDown(e as unknown as React.KeyboardEvent<HTMLDivElement>, i)}
+              onKeyDown={(e) =>
+                onRailKeyDown(e as unknown as React.KeyboardEvent<HTMLDivElement>, i)
+              }
               className={
                 "w-full text-left px-3 py-2 border-b border-border last:border-b-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary " +
-                (isActive ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:bg-secondary")
+                (isActive
+                  ? "bg-primary/10 text-foreground"
+                  : "text-muted-foreground hover:bg-secondary")
               }
             >
               <span className="font-mono text-[9px] text-accent">

@@ -11,10 +11,7 @@ import {
 } from "./retention-audit.functions";
 
 export type RetentionAuditKind =
-  | "retention_window"
-  | "disposition_mode"
-  | "legal_hold"
-  | "purge_execution";
+  "retention_window" | "disposition_mode" | "legal_hold" | "purge_execution";
 
 export type RetentionAuditEntry = RetentionAuditRow;
 
