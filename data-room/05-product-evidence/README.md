@@ -36,8 +36,8 @@ Full command evidence is in [SALE-READINESS-EVIDENCE.md](../../docs/evidence/SAL
 
 ## CI evidence
 
-- [Final closure CI run 35448522553](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/35448522553)
-- [Release-identity documentation CI run 35449805474](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/35449805474)
+- **Authoritative transaction release:** [Enterprise release gate 36224709540](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/36224709540), testing commit `176ff0bd9c141ca5da42d53e38ed94afd217230c`.
+- Earlier release-gate runs are historical provenance only and are not the transaction release identity.
 
 ## Demo recordings
 
