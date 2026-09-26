@@ -12,8 +12,8 @@ This evidence index records the validation performed during the sale-readiness p
 - **Baseline assessed:** `c8c8538fd8ffd48ea809fb7c03478800f508b507`
 - **Primary verified implementation commit:** `32f44624b50a8a2105dfa0dcfe66e0f97887f97a`
 - **Previously published sale-readiness package:** `676817e5a10fedd852521ab2c855e81baa73711f`
-- **Final closure commit:** `b9d8bc9174b426befc30cf35bc26b0a19248a181`
-- **Final hosted CI run:** [Enterprise release gate 35448522553](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/35448522553)
+- **Final closure commit:** `176ff0bd9c141ca5da42d53e38ed94afd217230c`
+- **Final hosted CI run:** [Enterprise release gate 36224709540](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/36224709540)
 
 The final closure commit represents the repository state containing the completed sale-readiness documentation and consistency pass. The final CI result was evaluated against that exact revision. Passing static, synthetic, or local tests does not constitute evidence of live production behavior where the relevant external infrastructure was unavailable.
 
