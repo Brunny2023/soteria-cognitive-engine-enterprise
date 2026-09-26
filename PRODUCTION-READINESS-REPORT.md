@@ -57,3 +57,7 @@ No RPO, RTO, uptime, latency, cost-per-request, customer adoption, production-sc
 ## Readiness determination
 
 The current revision is **sale-presentable as a technical software asset** because a buyer can install it, run the release gate, inspect the architecture, reproduce the public smoke test, and identify the external requirements. It is **not verified as production-ready for an enterprise customer** until the blocked environment-dependent tests are completed and their evidence is attached to a release record.
+
+On 26 September 2026, the public shell at [coxec.soteriatech.pro](https://coxec.soteriatech.pro) and its `/auth` entry point were observed loading successfully. The public page presented the six-layer product overview and walkthrough; the auth page displayed a configuration-state message. No credentials were submitted. This is public reachability evidence, not production-service certification.
+
+The buyer-facing transaction package is indexed in [DATA-ROOM-INDEX.md](DATA-ROOM-INDEX.md), including preserved live-site screenshots under `data-room/05-product-evidence/`.

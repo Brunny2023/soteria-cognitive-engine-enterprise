@@ -32,6 +32,10 @@ The running local application was tested as a real user in an isolated browser a
 
 The live authenticated organization workflow, including sign-up, session persistence, organization creation, membership, organization switching, and human-approved cognitive execution, was not executed because no disposable external credentials were available.
 
+### Live public-site observation — 26 September 2026
+
+The public production shell at [coxec.soteriatech.pro](https://coxec.soteriatech.pro) loaded successfully. The landing page presented the Soteria SECP product overview, six cognition layers, a 16-chapter walkthrough, sign-in navigation, and visible status cards. The public `/auth` entry point also loaded and explicitly reported that authentication was not configured in the inspected environment. No credentials were submitted. These observations verify public reachability and presentation only; they do not prove live authenticated workflows, production telemetry, customer data, or production-scale behavior.
+
 ## Security
 
 Executed checks include TypeScript typechecking, ESLint, unit tests, pure authorization contracts, telemetry-redaction tests, static RLS migration coverage, synthetic AI safety evaluation, current-revision sensitive-file scanning, production dependency audit, and SBOM generation.
@@ -71,6 +75,8 @@ No confidential assignment, credential, personal information, or private legal a
 - `scripts/check-sensitive-files.mjs`
 - `scripts/smoke-local.mjs`
 - Package and GitHub Actions integration for the new checks
+- `DATA-ROOM-INDEX.md` and eight-section transaction data room
+- Live-site screenshots and observation record under `data-room/05-product-evidence/`
 
 ## Remaining limitations
 

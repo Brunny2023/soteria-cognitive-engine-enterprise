@@ -5,6 +5,8 @@
 **Baseline:** `c8c8538fd8ffd48ea809fb7c03478800f508b507`
 **Purpose:** Give a technically competent buyer a factual map of the current software, its evidence, its dependencies, and its limitations.
 
+**Transaction data room:** [DATA-ROOM-INDEX.md](DATA-ROOM-INDEX.md). The live public shell was observed at [coxec.soteriatech.pro](https://coxec.soteriatech.pro) on 26 September 2026; screenshots and scoped observations are preserved in `data-room/05-product-evidence/`.
+
 ## Executive summary
 
 Soteria Cognitive Engine Enterprise is a TypeScript/TanStack Start application backed by Supabase. It models organizational intelligence, executive and specialist workflows, governed execution, validation, artifacts, and audit-oriented records. The repository contains meaningful domain logic, database migrations, release automation, deployment templates, and buyer-facing security documentation.

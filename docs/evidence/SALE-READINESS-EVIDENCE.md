@@ -29,7 +29,7 @@ The final closure commit represents the repository state containing the complete
 | `npm run test:ai-eval`                                                                 | Passed            | Synthetic grounding, policy, approval, and containment metrics all 1                                  |
 | `npm run release:evidence`                                                             | Passed            | 16 required artifacts present                                                                         |
 | `npm run security:files`                                                               | Passed            | 197 tracked files inspected; no current-revision high-confidence secret finding                       |
-| `npm run security:scan`                                                                | Passed            | No high-severity production dependency findings at the configured threshold                          |
+| `npm run security:scan`                                                                | Passed            | No high-severity production dependency findings at the configured threshold                           |
 | `npm run security:sbom`                                                                | Passed            | CycloneDX SBOM generated at `reports/sbom.cdx.json`                                                   |
 | `npm run build`                                                                        | Passed            | Production build completed                                                                            |
 | `npm run smoke:local`                                                                  | Passed            | Three HTTP journeys verified                                                                          |
@@ -39,6 +39,17 @@ The final closure commit represents the repository state containing the complete
 ## Real-user browser evidence
 
 The isolated browser opened `/`, `/auth`, and `/dashboard`. The public landing page and walkthrough rendered. The authentication page rendered a configuration message when Supabase variables were absent. The protected route redirected to `/auth`. Browser console review after remediation showed no uncaught missing-Supabase exception on the public or auth pages.
+
+## Live production-site evidence
+
+Observed on **26 September 2026** at [https://coxec.soteriatech.pro](https://coxec.soteriatech.pro):
+
+- The public landing page loaded and presented the Soteria SECP product shell, six cognition layers, a 16-chapter walkthrough, sign-in navigation, and visible status cards.
+- The public authentication page loaded at `/auth` and displayed a configuration-state message stating that authentication was not configured in the inspected environment.
+- No credentials were submitted and no authenticated workflow was claimed.
+- Screenshots are preserved in `data-room/05-product-evidence/screenshots/`.
+
+These findings establish public reachability and visible presentation only. They do not establish production telemetry accuracy, customer data, live authentication, tenant isolation, model-provider behavior, production scale, or uptime.
 
 ## Tests not executed
 
