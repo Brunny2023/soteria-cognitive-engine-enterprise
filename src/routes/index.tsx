@@ -91,12 +91,12 @@ function Landing() {
           <div className="md:col-span-4 bg-surface border border-border p-5 rounded-sm font-mono text-[10px] text-muted-foreground leading-relaxed">
             <div className="flex items-center gap-2 mb-3 text-accent">
               <span className="size-1.5 rounded-full bg-[color:var(--signal)] animate-pulse" />
-              <span>SYSTEM_STATUS · NOMINAL</span>
+              <span>DEMO_STATUS · NOMINAL</span>
             </div>
-            <div>ACTIVE_SPECIALISTS · 1,284</div>
-            <div>OPEN_REQUESTS · 47</div>
-            <div>VALIDATION_PASS · 98.3%</div>
-            <div>ENTITIES_INDEXED · 42,981</div>
+            <div>EXAMPLE_SPECIALISTS · 1,284</div>
+            <div>EXAMPLE_REQUESTS · 47</div>
+            <div>EXAMPLE_VALIDATION · 98.3%</div>
+            <div>EXAMPLE_ENTITIES · 42,981</div>
           </div>
         </section>
 

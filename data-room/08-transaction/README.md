@@ -10,7 +10,7 @@ No structure transfers Soteria AI Technologies Limited, Soteria AI Technologies 
 
 ## Buyer receives
 
-Subject to the definitive agreement, the buyer may receive:
+Subject to the definitive agreement, confirmed chain of title, and applicable legal and third-party transfer restrictions, the buyer will receive the expressly agreed Coxec assets listed below:
 
 - The agreed Coxec source repository or release archive at the agreed transaction commit.
 - Source code, migrations, tests, and configuration examples.

@@ -4,9 +4,11 @@
 
 **Observed:** 26 September 2026 at `https://coxec.soteriatech.pro`.
 
-The public landing page loaded successfully and presented the Soteria SECP product overview. Visible content included the six cognition layers, a 16-chapter walkthrough, a live walkthrough control, navigation to sign-in, and status cards showing `SYSTEM_STATUS · NOMINAL`, `ACTIVE_SPECIALISTS · 1,284`, `OPEN_REQUESTS · 47`, `VALIDATION_PASS · 98.3%`, and `ENTITIES_INDEXED · 42,981`.
+The public landing page loaded successfully and presented the Soteria SECP product overview. Visible content included the six cognition layers, a 16-chapter walkthrough, a live walkthrough control, navigation to sign-in, and status cards showing hard-coded presentation values. The inspected historical capture showed `SYSTEM_STATUS · NOMINAL`, `ACTIVE_SPECIALISTS · 1,284`, `OPEN_REQUESTS · 47`, `VALIDATION_PASS · 98.3%`, and `ENTITIES_INDEXED · 42,981`.
 
 These displayed values are **live-site presentation evidence only**. They were not independently reconciled to a production database or customer telemetry.
+
+As an acquisition-preparation correction, the source now labels these values as `DEMO_STATUS` and `EXAMPLE_*` metrics. The public deployment must be rebuilt and redeployed before the correction is visible at the live domain.
 
 The public authentication page also loaded successfully. It displayed the sign-in form and explicitly stated that authentication was not configured in the inspected environment. No credentials were submitted and no authenticated workflow was claimed.
 
