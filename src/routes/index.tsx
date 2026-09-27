@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { CoxecLogo } from "@/components/CoxecLogo";
 import { MacbookFrame } from "@/components/PublicSite";
 import { AutonomySlider, LayerStack, SampleDirectives } from "@/components/LandingInteractives";
@@ -153,6 +153,7 @@ const FRAMEWORKS = [
 function Landing() {
   const navigate = useNavigate();
   useEffect(() => {
+    if (!isSupabaseConfigured()) return;
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/onboarding", replace: true });
     });
