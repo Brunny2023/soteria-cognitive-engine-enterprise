@@ -8,7 +8,7 @@ The public landing page loaded successfully and presented the Soteria SECP produ
 
 These displayed values are **live-site presentation evidence only**. They were not independently reconciled to a production database or customer telemetry.
 
-As an acquisition-preparation correction, the source now labels these values as `DEMO_STATUS` and `EXAMPLE_*` metrics. The public deployment must be rebuilt and redeployed before the correction is visible at the live domain.
+As an acquisition-preparation correction, the source now labels these values as `DEMO_STATUS` and `EXAMPLE_*` metrics. A public smoke check on 27 September 2026 returned HTTP 200 and confirmed the corrected `DEMO_STATUS` and `EXAMPLE_*` markers at the live domain; no `SYSTEM_STATUS`, `ACTIVE_SPECIALISTS`, or `OPEN_REQUESTS` markers were found. This confirms presentation labeling only, not production telemetry.
 
 The public authentication page also loaded successfully. It displayed the sign-in form and explicitly stated that authentication was not configured in the inspected environment. No credentials were submitted and no authenticated workflow was claimed.
 

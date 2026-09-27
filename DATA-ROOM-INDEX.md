@@ -42,21 +42,22 @@ Explicit exclusions include Soteria AI Technologies Limited, Soteria AI Technolo
 - **Revenue-generating business:** Not evidenced in this repository.
 - **Chain of title:** Requires signed assignment and third-party rights confirmation.
 - **Credential remediation:** Closing prerequisite; historical and current credentials must be rotated, revoked, or confirmed inactive before transfer.
-- **Public metrics:** Historical status-card values were presentation-only; the source now labels them as demonstration/example values. A public redeployment is required for the correction to appear at the live domain.
+- **Public metrics:** Historical status-card values were presentation-only; the source and live deployment now label them as demonstration/example values. A public smoke check on 27 September 2026 returned HTTP 200 and confirmed `DEMO_STATUS` and `EXAMPLE_*` markers; no `SYSTEM_STATUS`, `ACTIVE_SPECIALISTS`, or `OPEN_REQUESTS` markers were found.
 
 ## Authoritative transaction release identity
 
-The authoritative engineering and evidence release remains unchanged. Acquisition-preparation documents and the public metric-label correction are subsequent preparation changes and do not alter the preserved evidence claims.
+The authoritative transaction release remains unchanged and is the only release identity for the transaction evidence package. Later commits and runs are preparation or validation work and must not be interpreted as replacing it.
 
-- **Exact authoritative release commit:** `176ff0bd9c141ca5da42d53e38ed94afd217230c`
+- **Exact authoritative transaction release commit:** `176ff0bd9c141ca5da42d53e38ed94afd217230c`
 - **Exact authoritative hosted release gate:** [Enterprise release gate 36224709540](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/36224709540)
 - **Exact authoritative evidence package:** `docs/evidence/SALE-READINESS-EVIDENCE.md`, `PRODUCTION-READINESS-REPORT.md`, `BUYER-TECHNICAL-DUE-DILIGENCE.md`, `SALE-READINESS-REPORT.md`, `data-room/01-08/`, and the checked-in release/security evidence referenced by those documents.
 - **Primary implementation commit:** `32f44624b50a8a2105dfa0dcfe66e0f97887f97a`
+- **Subsequent acquisition-preparation validation — not the transaction release identity:** commit `b26126695b70495f2451c090985e3d89eccf059b`, hosted release gate [36226067198](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/36226067198).
 - **Prior historical package:** `676817e5a10fedd852521ab2c855e81baa73711f`; retained for provenance only.
 
 ## Private transaction-room material
 
-The private pricing workpaper and closing checklist are maintained outside the public repository at `/home/ubuntu/repo-evaluation/sale-readiness/private-transaction-room/`. They are not part of the public technical data room and contain no commitment to a buyer.
+The private pricing workpaper and closing checklist are maintained outside the public repository at `/home/ubuntu/repo-evaluation/sale-readiness/private-transaction-room/`. They are not part of the public technical data room.
 
 ## Restricted-room additions before closing
 

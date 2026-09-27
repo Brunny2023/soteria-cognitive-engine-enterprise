@@ -25,7 +25,7 @@ Subject to definitive agreement, chain-of-title verification, and third-party tr
 
 ## Buyer value proposition
 
-The economic proposition is to **acquire an existing enterprise software foundation rather than build the foundation from zero**. Potential buyer value may include:
+The economic proposition is to **acquire an existing enterprise software foundation rather than build the foundation from zero**. The acquisition is intended for a buyer seeking to accelerate an enterprise software, AI workflow, governed execution, or organizational intelligence initiative without building the underlying platform foundation from zero. Potential buyer value may include:
 
 - Engineering time saved by starting from an existing architecture.
 - A concrete architectural starting point for a buyer’s own product or internal platform.
