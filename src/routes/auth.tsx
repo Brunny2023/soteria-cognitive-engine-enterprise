@@ -21,6 +21,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const configured = isSupabaseConfigured();
 
@@ -38,15 +39,23 @@ function AuthPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setNotice(null);
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
+        if (data.session) {
+          navigate({ to: "/onboarding", replace: true });
+        } else {
+          setNotice(
+            "Account created, but this project still requires email confirmation. Disable email confirmations in Supabase Auth to allow immediate access.",
+          );
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -99,6 +108,27 @@ function AuthPage() {
               ? "Sign in with your Soteria operator credentials."
               : "Provision a new operator account for this workspace."}
           </p>
+
+          <div className="grid grid-cols-2 gap-1 p-1 mb-4 bg-background border border-border rounded-sm">
+            {["signin", "signup"].map((nextMode) => (
+              <button
+                key={nextMode}
+                type="button"
+                onClick={() => {
+                  setMode(nextMode as "signin" | "signup");
+                  setError(null);
+                  setNotice(null);
+                }}
+                className={`py-2 text-[10px] font-mono uppercase tracking-widest transition-colors ${
+                  mode === nextMode
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {nextMode === "signin" ? "Sign in" : "Create account"}
+              </button>
+            ))}
+          </div>
 
           {!configured && (
             <div className="mb-4 border border-[color:var(--signal)]/30 bg-[color:var(--signal)]/10 rounded-sm px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
@@ -155,6 +185,11 @@ function AuthPage() {
                 {error}
               </div>
             )}
+            {notice && (
+              <div className="text-[11px] text-muted-foreground border border-primary/30 bg-primary/10 rounded-sm px-3 py-2">
+                {notice}
+              </div>
+            )}
             <button
               type="submit"
               disabled={busy || !configured}
@@ -169,6 +204,7 @@ function AuthPage() {
             onClick={() => {
               setMode(mode === "signin" ? "signup" : "signin");
               setError(null);
+              setNotice(null);
             }}
             className="mt-6 w-full text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
           >

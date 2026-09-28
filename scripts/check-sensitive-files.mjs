@@ -7,7 +7,7 @@ const files = execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" })
 
 const trackedEnvironmentFile = /(^|\/)(\.env|.*\.env|\.dev\.vars)$/i;
 const highConfidenceSecret =
-  /(?:sb_(?:publishable|secret)_[A-Za-z0-9_=-]{12,}|AKIA[0-9A-Z]{16}|-----BEGIN (?:RSA|EC|OPENSSH|PRIVATE) KEY-----)/;
+  /(?:sb_secret_[A-Za-z0-9_=-]{12,}|AKIA[0-9A-Z]{16}|-----BEGIN (?:RSA|EC|OPENSSH|PRIVATE) KEY-----)/;
 const privateKeyOrCredentialAssignment =
   /^\s*(?:export\s+)?(?:AWS_SECRET_ACCESS_KEY|SUPABASE_SERVICE_ROLE_KEY|AI_GATEWAY_API_KEY|DATABASE_URL|PRIVATE_KEY)\s*=\s*(?!process\.env|import\.meta\.env|\$\{)[^\s#]+/m;
 const findings = [];
