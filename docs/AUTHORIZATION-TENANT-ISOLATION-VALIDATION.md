@@ -72,10 +72,9 @@ The frontend is not an authoritative authorization layer. A backend/database che
 
 The baseline `/admin` route was nested under the authenticated layout but had no platform-role check. Any authenticated user who knew `/admin` could render the administrator page. More importantly, `pingLayerFn` used only `requireSupabaseAuth`, so any authenticated user could call the underlying AI-gateway validation action directly, bypassing the UI.
 
-### Corrective change staged locally
+### Corrective change published
 
-- Added `requirePlatformAdmin` server middleware that checks the RLS-protected `user_roles` table for the caller's `admin` role.
-- Applied that middleware to `pingLayerFn`.
+- Added a server-side `user_roles` check inside `pingLayerFn` that checks the RLS-protected table for the caller's `admin` role.
 - Added a frontend redirect for non-admin users who navigate directly to `/admin`.
 
 These changes are published in `ca002740d4cefcd5c6b4ee76f005308f758c8104`. The connected Supabase management channel timed out during migration application, so live database activation remains unverified.
@@ -143,7 +142,7 @@ The previously applied super-admin migrations provide database trigger and RLS p
 - the database trigger rejects non-super-admin attempts to assign `admin`;
 - new-user provisioning assigns `operator`.
 
-The local source audit also found that the original frontend admin page was not itself an authorization boundary. That is corrected locally with a UI gate and, more importantly, a server-side gate on the administrator gateway action.
+The local source audit also found that the original frontend admin page was not itself an authorization boundary. That is corrected in the published code with a UI gate and, more importantly, a server-side role check on the administrator gateway action.
 
 A live ordinary-user direct-request test remains unproven because no isolated second account was created for this audit.
 
@@ -162,7 +161,7 @@ The only reviewed dynamic service-role use is the invite-code lookup in `src/lib
 | Authenticated route group | Redirect to `/auth` | Allowed into group | Allowed into group |
 | `/admin` baseline | Redirect to `/auth` | Baseline rendered admin UI if URL known | Rendered admin UI |
 | `pingLayerFn` baseline | Middleware rejects | Baseline accepted any authenticated bearer | Accepted |
-| `pingLayerFn` after local fix | Middleware rejects | Server middleware rejects | Accepted |
+| `pingLayerFn` after published fix | Middleware rejects | Server-side role check rejects | Accepted |
 | Data queries | Auth middleware / RLS | Subject to table policy; several baseline tables were over-broad | Admin role may see intended platform scope |
 
 ## Onboarding Boundary
@@ -179,7 +178,7 @@ Source evidence supports session restoration through `getSession` and `onAuthSta
 
 | Severity | Finding | Evidence | Impact | Remediation |
 |---|---|---|---|---|
-| HIGH | Administrator route and gateway action were authentication-only | `src/routes/_authenticated/admin.tsx`; `src/lib/gateway.functions.ts` | Any authenticated user could reach admin UI and invoke gateway validation | Local `requirePlatformAdmin` middleware and UI redirect; deploy and retest |
+| HIGH | Administrator route and gateway action were authentication-only | `src/routes/_authenticated/admin.tsx`; `src/lib/gateway.functions.ts` | Any authenticated user could reach admin UI and invoke gateway validation | Published server-side role check and UI redirect; deploy and retest |
 | HIGH | Legacy RLS policies exposed request, archetype, knowledge, learning, profile, and audit rows to all authenticated users | Migration policy definitions with `USING (true)` | Cross-user and cross-tenant disclosure | Local hardening migration; apply to connected project and execute User A/B tests |
 | HIGH | Retention audit actor attribution was caller-controlled | `ra_insert_authed` checked only that a user was authenticated | Audit records could be forged as another actor | Local `actor_id = auth.uid()` policy; apply and retest |
 | MEDIUM | Organization role mutation semantics allow an owner/admin to submit `owner` for a member | `setMemberRoleFn` accepts all tenant roles; policy checks caller authority but not target role transition | Possible overbroad tenant governance depending on intended policy | Define whether only owners may grant/revoke owner; add explicit transition policy and tests |

@@ -68,3 +68,18 @@ The private pricing workpaper and closing checklist are maintained outside the p
 - Redacted incident and backup/restore records.
 - Buyer-specific offer, definitive agreement, escrow, and transition documents.
 - Credential-remediation evidence and provider-log review.
+
+## Authorization and tenant-isolation milestone — 2026-10-07
+
+**Status: Published remediation with live verification outstanding.**
+
+- Final repository `main`: `dabccea9b8e4ad18a6fc13ace5aefd902016486f`.
+- Published remediation ancestor: `ca002740d4cefcd5c6b4ee76f005308f758c8104`.
+- Required migration is present in `supabase/migrations/20261007175800_harden_authorization_tenant_isolation.sql`.
+- Server-side admin authorization and the `/admin` frontend access gate are published.
+- Hosted release gate passed: [run 37663777012](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/37663777012).
+- Connected Supabase project: `ragjpjkkagrfbcwfrefm`.
+- **Live database status:** not verified. The Supabase management channel timed out on read-only migration inventory and migration application attempts.
+- **Two-user isolation status:** not verified. No customer data was used.
+
+Buyers should treat the RLS migration as a closing/deployment prerequisite until effective policies and controlled User A/User B tests are independently recorded. See `docs/AUTHORIZATION-TENANT-ISOLATION-VALIDATION.md` for the detailed matrix and historical findings.

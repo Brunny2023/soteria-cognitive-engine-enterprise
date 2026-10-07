@@ -76,3 +76,18 @@ For a configured environment, copy `.env.example` into an ignored local environm
 ## Buyer acceptance conditions
 
 Before closing or production adoption, the buyer should obtain written IP assignments and provenance confirmations, complete the license and dependency schedule, run disposable Supabase authorization tests, exercise a real model-provider workflow, perform backup/restore and rollback rehearsals, review the SBOM, configure branch protection and security scanning, and approve the production threat model through an independent reviewer.
+
+## Final authorization validation status — 2026-10-07
+
+| Control | Status | Evidence state |
+|---|---|---|
+| Published branch and clean `main` | **PASS** | `dabccea9b8e4ad18a6fc13ace5aefd902016486f`; clean and synchronized with `origin/main` |
+| Platform-admin server authorization | **PASS — source-verified** | `pingLayerFn` checks the caller's RLS-protected `user_roles` record before gateway execution |
+| Direct `/admin` ordinary-user rejection | **SOURCE-SUPPORTED / LIVE NOT VERIFIED** | Published frontend gate exists; controlled ordinary-user browser test remains pending |
+| RLS hardening | **PUBLISHED / LIVE NOT VERIFIED** | `supabase/migrations/20261007175800_harden_authorization_tenant_isolation.sql` is in `main`; Supabase management channel timed out |
+| User A/User B isolation | **NOT VERIFIED** | Disposable two-user test has not been run; no customer data was used |
+| Role escalation and super-admin protection | **PARTIAL** | Existing super-admin migrations and source checks support the controls; fresh live recheck is blocked |
+| Service-role source boundary | **SOURCE-VERIFIED** | No committed service-role credential found; final deployed bundle inspection remains pending |
+| Release gate | **PASS** | Hosted run [37663777012](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/37663777012) |
+
+The authoritative control record is `docs/AUTHORIZATION-TENANT-ISOLATION-VALIDATION.md`. Buyer acceptance should require live migration application, effective-policy inspection, and a disposable two-user negative/positive test matrix before production authorization claims.

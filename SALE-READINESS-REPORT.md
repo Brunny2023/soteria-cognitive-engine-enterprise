@@ -126,3 +126,16 @@ A buyer should provide separate staging and production infrastructure, a disposa
 **Rights and chain of title: Pending external confirmation.**
 
 The closure revision containing this final consistency pass is reported with its hosted CI result in the delivery response. The publication commit above identifies the previously published package that this closure pass completes.
+
+## Final authorization and tenant-isolation milestone — 2026-10-07
+
+- **Repository state:** Verified on `main` at `dabccea9b8e4ad18a6fc13ace5aefd902016486f`; working tree clean; published remediation commit `ca002740d4cefcd5c6b4ee76f005308f758c8104` is an ancestor.
+- **Server-side administrator authorization:** **Source-verified** in `pingLayerFn`; ordinary authenticated callers are rejected unless their RLS-protected `user_roles` record has `admin`.
+- **Direct `/admin` navigation:** **Source-supported** by the published frontend gate; live ordinary-user navigation test is **not independently verified**.
+- **RLS remediation:** **Published in Git; live activation not verified.** The connected Supabase management channel timed out during migration inventory/application.
+- **Two-user isolation matrix:** **Not verified.** No customer or production data was used and no disposable second-user test was completed.
+- **Super-admin controls:** **Previously verified/source-supported** by the existing migrations; fresh live recheck blocked by the Supabase timeout.
+- **Service-role boundary:** **Source-verified; deployed bundle not independently verified.** No committed service-role credential was found; server-only invite lookup remains server-side.
+- **CI/release gate:** **Passed** for `dabccea9b8e4ad18a6fc13ace5aefd902016486f`; [run 37663777012](https://github.com/Brunny2023/soteria-cognitive-engine-enterprise/actions/runs/37663777012).
+
+The complete control-by-control record is in `docs/AUTHORIZATION-TENANT-ISOLATION-VALIDATION.md`. This milestone does not upgrade the product to an unqualified production-security claim until the Supabase migration is applied and the isolated User A/User B matrix is executed.
