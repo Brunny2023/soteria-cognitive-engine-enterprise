@@ -6,9 +6,9 @@
 
 ## Executive Result
 
-**PASS WITH FINDINGS — remediation is staged locally; connected Supabase application was blocked by management-channel timeouts and must be re-verified before release.**
+**PASS WITH FINDINGS — remediation is published in the repository; connected Supabase application was blocked by management-channel timeouts and must be re-verified before release.**
 
-Authentication has been implemented and previously demonstrated to work for account creation, sign-in, session persistence, onboarding redirect, profile provisioning, and role provisioning. This audit found authorization and isolation defects in the pre-remediation implementation. Narrow corrective changes were made in the audit clone, but they are not represented as applied production changes in this report until the connected Supabase migration and hosted application deployment are confirmed.
+Authentication has been implemented and previously demonstrated to work for account creation, sign-in, session persistence, onboarding redirect, profile provisioning, and role provisioning. This audit found authorization and isolation defects in the pre-remediation implementation. Narrow corrective changes are published in commit `ca002740d4cefcd5c6b4ee76f005308f758c8104`; the connected Supabase migration remains unverified until the management channel recovers.
 
 ## Scope
 
@@ -35,7 +35,7 @@ This was not a penetration test, certification audit, or complete production bla
 | Baseline HEAD audited | `761970c707a65aa991530d324bf91544c37ebedc` |
 | Baseline working tree | Clean at the start of the audit clone |
 | Audit clone | `/home/ubuntu/repo-evaluation/sale-readiness/audit-clone` |
-| Local changes | Authorization middleware/UI changes and an RLS hardening migration are staged in the audit clone; not yet published |
+| Published remediation | Authorization UI/server check, RLS hardening migration, and dependency-lock fix in `ca002740d4cefcd5c6b4ee76f005308f758c8104` |
 
 ## Authentication
 
@@ -78,7 +78,7 @@ The baseline `/admin` route was nested under the authenticated layout but had no
 - Applied that middleware to `pingLayerFn`.
 - Added a frontend redirect for non-admin users who navigate directly to `/admin`.
 
-These changes are in the audit clone and are not yet published because the audit clone was rehydrated after a sandbox reset and the connected Supabase management channel timed out during migration application.
+These changes are published in `ca002740d4cefcd5c6b4ee76f005308f758c8104`. The connected Supabase management channel timed out during migration application, so live database activation remains unverified.
 
 ### Super-admin role boundary
 
@@ -97,22 +97,22 @@ The following results are from the repository migrations at the audited baseline
 
 | Table / operation | Baseline policy behavior | Assessment | Corrective status |
 |---|---|---|---|
-| `profiles` SELECT | `USING (true)` for all authenticated users | Cross-user profile disclosure | Hardening migration staged locally |
+| `profiles` SELECT | `USING (true)` for all authenticated users | Cross-user profile disclosure | Hardening migration published; live activation pending |
 | `user_roles` SELECT | Own role only, later expanded for super admin | **Pass for ordinary-user role read** | Previously applied super-admin policy retained |
-| `secp_requests` SELECT | `USING (true)` | Cross-user / cross-tenant request disclosure | Hardening migration staged locally |
+| `secp_requests` SELECT | `USING (true)` | Cross-user / cross-tenant request disclosure | Hardening migration published; live activation pending |
 | `secp_requests` INSERT | `owner_id = auth.uid()` | **Pass for ownership on insert** | No change required |
-| `secp_requests` UPDATE | Owner or platform admin; `WITH CHECK` retains owner/admin condition | **Mostly enforced**, but tenant read baseline was broad | Read hardening staged locally |
-| `secp_archetypes` SELECT | `USING (true)` | Cross-user / cross-tenant disclosure | Hardening migration staged locally |
-| `knowledge_sources` SELECT | `USING (true)` | Cross-user / cross-tenant disclosure | Hardening migration staged locally |
+| `secp_requests` UPDATE | Owner or platform admin; `WITH CHECK` retains owner/admin condition | **Mostly enforced**, but tenant read baseline was broad | Read hardening published; live activation pending |
+| `secp_archetypes` SELECT | `USING (true)` | Cross-user / cross-tenant disclosure | Hardening migration published; live activation pending |
+| `knowledge_sources` SELECT | `USING (true)` | Cross-user / cross-tenant disclosure | Hardening migration published; live activation pending |
 | `knowledge_sources` INSERT | `uploader_id = auth.uid()` | **Pass for uploader ownership** | No change required |
-| `learning_entries` SELECT | `USING (true)` | Cross-user / cross-tenant disclosure | Hardening migration staged locally |
+| `learning_entries` SELECT | `USING (true)` | Cross-user / cross-tenant disclosure | Hardening migration published; live activation pending |
 | `learning_entries` INSERT | `author_id = auth.uid()` | **Pass for author ownership** | No change required |
-| `retention_audit_entries` SELECT | `USING (true)` | Audit ledger disclosure | Hardening migration staged locally |
-| `retention_audit_entries` INSERT | Only `auth.uid() IS NOT NULL`; caller can submit another `actor_id` | Audit attribution forgery | Hardening migration staged locally |
+| `retention_audit_entries` SELECT | `USING (true)` | Audit ledger disclosure | Hardening migration published; live activation pending |
+| `retention_audit_entries` INSERT | Only `auth.uid() IS NOT NULL`; caller can submit another `actor_id` | Audit attribution forgery | Hardening migration published; live activation pending |
 | `secp_pack_state` INSERT/UPDATE | Historical `true` policies were replaced with admin/operator role checks | Role check exists, but `updated_by` was not constrained | Hardening migration adds actor constraint |
 | `organization_members` INSERT | Allows self-viewer, owner/admin, or first member | Intended join/create paths, but owner/admin role assignment needs dedicated negative tests | Not proven with two live users |
 | `organization_members` UPDATE | Owner/admin of organization | Tenant role mutation is database-protected, but owner promotion semantics need product decision | Not changed |
-| Tenant-scoped records | Later policies use organization membership for several tables | **Mixed** because legacy broad SELECT policies remain on other tables | Hardening migration staged locally |
+| Tenant-scoped records | Later policies use organization membership for several tables | **Mixed** because legacy broad SELECT policies remain on other tables | Hardening migration published; live activation pending |
 
 ### Important insert/update result
 
@@ -217,8 +217,8 @@ The audit clone contains `supabase/migrations/20261007175800_harden_authorizatio
 ### Required fixes before claiming authorization readiness
 
 1. Apply `20261007175800_harden_authorization_tenant_isolation.sql` to the connected project.
-2. Publish the local server/UI authorization changes.
-3. Run the complete release gate and hosted CI.
+2. Verify the published server/UI authorization changes at the live deployment.
+3. Re-run the complete release gate and hosted CI after the dependency-lock update.
 4. Run isolated two-user direct PostgREST and application-function tests.
 5. Re-audit organization owner/admin role transitions.
 6. Repeat logout, refresh, expiration, and account-switching tests.
