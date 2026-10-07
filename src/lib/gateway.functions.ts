@@ -37,7 +37,17 @@ export type LayerPingResult = {
 export const pingLayerFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => PingInput.parse(input))
-  .handler(async ({ data }): Promise<LayerPingResult> => {
+  .handler(async ({ data, context }): Promise<LayerPingResult> => {
+    const { data: role, error: roleError } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (roleError || !role) {
+      throw new Error("Forbidden: platform administrator role required");
+    }
+
     const model = LAYER_MODEL[data.layer];
     const key = process.env.AI_GATEWAY_API_KEY;
     if (!key) {

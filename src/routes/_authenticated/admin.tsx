@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell, SectionHeading, StatChip } from "@/components/AppShell";
 import { pingLayerFn, LAYER_MODEL_CATALOG, type LayerPingResult } from "@/lib/gateway.functions";
 import { LAYERS } from "@/lib/secp-data";
+import { useUserRoles } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -70,11 +72,29 @@ const INTEGRATIONS = [
 ];
 
 function AdminPage() {
+  const navigate = useNavigate();
+  const roles = useUserRoles();
   const ping = useServerFn(pingLayerFn);
   const [results, setResults] = useState<
     Record<string, LayerPingResult | { pending: true } | undefined>
   >({});
   const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (roles.length > 0 && !roles.includes("admin")) {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [navigate, roles]);
+
+  if (!roles.includes("admin")) {
+    return (
+      <AppShell title="Administration" crumb="AD · Access check">
+        <div className="p-6 font-mono text-[11px] text-muted-foreground">
+          Verifying platform administrator access…
+        </div>
+      </AppShell>
+    );
+  }
 
   async function pingOne(layer: (typeof LAYERS)[number]["id"]) {
     setResults((r) => ({ ...r, [layer]: { pending: true } }));
